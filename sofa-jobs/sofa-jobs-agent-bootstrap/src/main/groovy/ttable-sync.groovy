@@ -1,3 +1,4 @@
+import com.chinaums.GM.SM4Util
 import com.gmongo.GMongo
 import groovy.sql.Sql
 import me.izhong.jobs.agent.util.ContextUtil
@@ -96,6 +97,8 @@ UPDATEDATE >= to_date(?, 'yyyy-mm-dd hh24:mi:ss') and rownum < 10000  '''
             businessAccept = it["bussiness_accept"]
             def idx_mchnt_mobile_genc = it["idx_mchnt_mobile_genc"]
             def mchnt_mobile_genc = it["mchnt_mobile_genc"]
+            //SM4Util.sm4enc(keyIdx, plaintext)
+            //SM4Util.sm4dec(keyIdx, plaintext)
             //mobile = SM4ConverterUtil.convertToEntityAttribute(idx_mchnt_mobile_genc, mchnt_mobile_genc)
         })
         bmsSql.eachRow(selectInst, [inst_id], {
