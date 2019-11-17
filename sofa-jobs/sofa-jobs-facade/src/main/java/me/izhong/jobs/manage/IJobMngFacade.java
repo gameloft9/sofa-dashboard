@@ -62,7 +62,7 @@ public interface IJobMngFacade {
     void clearLog(Long jobId, Date clearBeforeTime, Integer clearBeforeNum);
     void clearLog(Long[] jobLogIds);
 
-    LogResult catLog(long triggerTime,Long jobId, Long logId, int fromLineNum);
+    LogResult catLog(Long jobId, Long logId, long triggerTime,int fromLineNum);
 
     void update(JobLog jobLog);
 

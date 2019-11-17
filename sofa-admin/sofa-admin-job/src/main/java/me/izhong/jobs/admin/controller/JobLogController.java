@@ -31,7 +31,7 @@ import java.util.Date;
 import java.util.List;
 
 @Controller
-@RequestMapping("/monitor/djob")
+@RequestMapping("/monitor/djob/log")
 public class JobLogController {
 	private static Logger logger = LoggerFactory.getLogger(JobLogController.class);
 
@@ -40,7 +40,7 @@ public class JobLogController {
 
 	private static String prefix = "monitor/djob";
 
-	@RequestMapping("/log")
+	@RequestMapping("")
 	public String index(HttpServletRequest request, Model model, Long jobId) {
 
 		// 执行器列表
@@ -63,7 +63,7 @@ public class JobLogController {
 	}
 
 	
-	@RequestMapping("/log/list")
+	@RequestMapping("/list")
 	@AjaxWrapper
 	public PageModel<JobLog> pageList(HttpServletRequest request, String jobDesc, Long jobGroupId,
 									  String status,Integer handleCode, String filterTime) {
@@ -91,7 +91,7 @@ public class JobLogController {
 	}
 
 
-	@RequestMapping("/log/detail/{jobLogId}")
+	@RequestMapping("/detail/{jobLogId}")
 	public String logDetailPage(@PathVariable Long jobLogId, Model model){
 		JobLog jobLog = jobServiceReference.jobService.findJobLogByJobLogId(jobLogId);
 		if (jobLog == null) {
@@ -101,7 +101,7 @@ public class JobLogController {
 		return prefix +  "/jobLogResult";
 	}
 
-	@RequestMapping("/log/logDetailPage")
+	@RequestMapping("/logDetailPage")
 	public String logDetailPage(long logId, Model model){
 
 		// base check
@@ -113,11 +113,11 @@ public class JobLogController {
 		return prefix +  "/jobLogDetail";
 	}
 
-	@RequestMapping("/log/logDetailCat")
+	@RequestMapping("/logDetailCat")
 	@AjaxWrapper
 	public LogResult logDetailCat(String executorAddress, long triggerTime, long jobId, long jobLogId, int fromLineNum){
 		try {
-			LogResult logResult = jobServiceReference.jobService.catLog(triggerTime, jobId, jobLogId, fromLineNum);
+			LogResult logResult = jobServiceReference.jobService.catLog(jobId, jobLogId, triggerTime, fromLineNum);
 			// is end
 //            if (logResult.getContent()!=null && logResult.getContent().getFromLineNum() > logResult.getContent().getToLineNum()) {
 //                JobLog jobLog = jobServiceReference.jobService.findJobLogByJobLogId(jobLogId);
@@ -133,41 +133,32 @@ public class JobLogController {
 		}
 	}
 
-	@RequestMapping("/log/logKill")
-	@ResponseBody
-	public ReturnT<String> logKill(long id){
+	@RequestMapping("/kill")
+	@AjaxWrapper
+	public ReturnT<String> kill(long jobLogId){
 		// base check
-		JobLog jobLog = jobServiceReference.jobService.findJobLogByJobLogId(id);
+		JobLog jobLog = jobServiceReference.jobService.findJobLogByJobLogId(jobLogId);
 		Job jobInfo = jobServiceReference.jobService.findByJobId(jobLog.getJobId());
 		if (jobInfo==null) {
-			return new ReturnT<String>(500, "任务不存在");
+			throw BusinessException.build("任务不存在");
 		}
-		if (ReturnT.SUCCESS_CODE != jobLog.getTriggerCode()) {
-			return new ReturnT<String>(500, "日志执行异常，不kill");
+		if (0 != jobLog.getTriggerCode()) {
+			throw BusinessException.build("日志执行异常，不kill");
 		}
 
 		// request of kill
 		ReturnT<String> runResult = null;
 		try {
-			runResult = jobServiceReference.jobService.kill(jobInfo.getJobId());
+			runResult = jobServiceReference.jobService.kill(jobLog.getJobLogId());
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			runResult = new ReturnT<String>(500, e.getMessage());
 		}
-
-		if (ReturnT.SUCCESS_CODE == runResult.getCode()) {
-			jobLog.setHandleCode(ReturnT.FAIL_CODE);
-			jobLog.setHandleMsg((runResult.getMsg()!=null?runResult.getMsg():""));
-			jobLog.setHandleTime(new Date());
-			jobServiceReference.jobService.update(jobLog);
-			return new ReturnT<String>(runResult.getMsg());
-		} else {
-			return new ReturnT<String>(500, runResult.getMsg());
-		}
+		return runResult;
 	}
 
 
-	@RequestMapping("/log/clearLog")
+	@RequestMapping("/clearLog")
 	@AjaxWrapper
 	public ReturnT<String> clearLog(Long jobId, Integer type){
 		if(type == null)
@@ -200,7 +191,7 @@ public class JobLogController {
 		return ReturnT.SUCCESS;
 	}
 
-    @RequestMapping("/log/clearLogByIds")
+    @RequestMapping("/clearLogByIds")
     @AjaxWrapper
     public ReturnT<String> clearLog(String jobLogIds){
         jobServiceReference.jobService.clearLog(Convert.toLongArray(jobLogIds));

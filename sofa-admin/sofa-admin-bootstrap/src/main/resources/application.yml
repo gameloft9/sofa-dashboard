@@ -29,10 +29,10 @@ spring:
   application:
     name: 分布式任务调度总控
     # 服务模块
-#  devtools:
-#    restart:
+  devtools:
+    restart:
        # 热部署开关
-#       enabled: true
+       enabled: true
 server:
   port: 8800
   tomcat:
@@ -131,6 +131,18 @@ com:
           address: zookeeper://144.131.254.141:2181
         bolt-port: 13301
 
+---
+spring:
+  profiles: zz
+  data:
+    mongodb:
+      uri: mongodb://10.10.51.212:27017/training
+com:
+  alipay:
+    sofa:
+      rpc:
+        registry:
+          address: zookeeper://10.10.51.212:2181
 
 ---
 spring:
@@ -140,6 +152,10 @@ spring:
     mongodb:
       uri: mongodb://10.10.51.212:27017/training
 
+dashboard:
+  profile: /home/server/jobs/data/
+  ip:
+    filepath: /home/server/jobs/data/qqwry.dat
 com:
   alipay:
     sofa:

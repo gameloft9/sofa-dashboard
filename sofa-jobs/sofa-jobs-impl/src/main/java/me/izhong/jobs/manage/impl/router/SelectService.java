@@ -1,4 +1,4 @@
-package me.izhong.jobs.direct;
+package me.izhong.jobs.manage.impl.router;
 
 import com.alipay.sofa.rpc.config.ConsumerConfig;
 import me.izhong.jobs.manage.IJobAgentMngFacade;

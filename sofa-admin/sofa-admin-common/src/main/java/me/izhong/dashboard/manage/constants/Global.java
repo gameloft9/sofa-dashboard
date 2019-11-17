@@ -70,7 +70,7 @@ public class Global {
      * 获取项目版本
      */
     public static String getVersion() {
-        return StringUtils.defaultString(getConfig("ruoyi.version"), "4.0.0");
+        return StringUtils.defaultString(getConfig("dashboard.version"), "4.0.0");
     }
 
     public static String getSalt() {

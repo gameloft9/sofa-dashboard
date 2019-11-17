@@ -1,11 +1,10 @@
 package me.izhong.jobs.agent.service;
 
 import me.izhong.jobs.agent.bean.JobsConfigBean;
+import me.izhong.jobs.agent.job.ShellCommandKillJob;
+import me.izhong.jobs.agent.job.ShellCommandRunJob;
 import me.izhong.jobs.manage.IJobAgentMngFacade;
 import me.izhong.jobs.agent.bean.JobContext;
-import me.izhong.jobs.agent.job.ShellCommandJob;
-import me.izhong.jobs.agent.log.AgentLog;
-import me.izhong.jobs.agent.log.RemoteLog;
 import me.izhong.jobs.model.LogResult;
 import me.izhong.model.ReturnT;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +26,16 @@ public class JobAgentMngImpl implements IJobAgentMngFacade {
 
     @Override
     public ReturnT<String> kill(Long jobId, Long triggerId) {
-        return null;
+        log.info("kill 任务 jobId:{} ,triggerId:{}",jobId,triggerId);
+        try {
+            ShellCommandKillJob commandJob = new ShellCommandKillJob();
+            //后面考虑缓存 进程id
+            JobContext context = new JobContext(jobId, triggerId, 90 * 1000, null, null);
+            commandJob.execute(context);
+        } catch (Exception e) {
+            log.error("", e);
+        }
+        return ReturnT.SUCCESS;
     }
 
     @Override
@@ -40,14 +48,12 @@ public class JobAgentMngImpl implements IJobAgentMngFacade {
 
 
         JobContext context = new JobContext(jobId, triggerId, timeout, envs, params);
-        context.setJobId(jobId);
-        context.setTriggerId(triggerId);
         log.info("收到远程任务请求 jobId:{} triggerId:{}",jobId,triggerId);
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    ShellCommandJob commandJob = new ShellCommandJob("run.sh");
+                    ShellCommandRunJob commandJob = new ShellCommandRunJob();
                     //后面考虑缓存 进程id
                     commandJob.execute(context);
                 } catch (Exception e) {
@@ -59,7 +65,7 @@ public class JobAgentMngImpl implements IJobAgentMngFacade {
     }
 
     @Override
-    public LogResult catLog(long triggerTime, Long jobId, Long logId, int fromLineNum) {
+    public LogResult catLog(Long jobId, Long logId, long triggerTime,  int fromLineNum) {
 
         String dir = jobsConfigBean.getLogDir();
         // filePath/yyyy-MM-dd

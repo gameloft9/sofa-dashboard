@@ -51,6 +51,9 @@
 	            <a class="btn btn-danger multiple disabled" onclick="clearSelected()" shiro:hasPermission="monitor:job:remove">
 	                <i class="fa fa-trash"></i> 删除选中日志
 	            </a>
+				<a class="btn btn-danger single disabled" onclick="kill()" shiro:hasPermission="monitor:job:edit">
+					<i class="fa fa-edit"></i> 停止
+				</a>
 	        </div>
 	        
 	        <div class="col-sm-12 select-table table-striped">
@@ -137,6 +140,14 @@
             $.modal.confirm("确认要删除吗？", function() {
                 $.operate.post(prefix + "/clearLogByIds", { "jobLogIds": rowIds});
                 $.operate.refresh();
+            })
+        }
+
+        /* 调度任务-停用 */
+        function kill() {
+            var rowId = $.operate.selectRowId();
+            $.modal.confirm("确认要停止任务吗？", function() {
+                $.operate.post(prefix + "/kill", { "jobLogId": rowId});
             })
         }
 	</script>

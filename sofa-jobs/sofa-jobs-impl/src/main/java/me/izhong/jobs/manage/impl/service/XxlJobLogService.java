@@ -13,11 +13,13 @@ public interface XxlJobLogService extends CrudBaseService<Long,XxlJobLog> {
 
     XxlJobLog insertTriggerBeginMessage(Long jobId, Long jobGroupId, String jobDesc, Date trggerTime, Integer finalFailRetryCount);
 
-    void updateTriggerDoneMessage(Long jobLogId, String executorAddress, String executorHandler,String executorParam,
+    void updateTriggerDoneMessage(Long jobLogId, String executorAddress,String executorParam,
                                   Integer triggerCode,String triggerMsg);
     void updateHandleStartMessage(Long triggerId, Date startTime);
 
     long updateAlarmStatus(long failLogId, int oldStatus, int newStatus);
+
+    void updateExecutorAddress(Long jobLogId, String address);
 
     void clearLog(Long jobId, Date clearBeforeTime, Integer clearBeforeNum);
 
