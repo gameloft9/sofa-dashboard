@@ -4,6 +4,7 @@ import groovy.sql.Sql
 import me.izhong.jobs.agent.util.ContextUtil
 import me.izhong.jobs.agent.util.JobStatsUtil
 import oracle.sql.TIMESTAMP
+import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.time.DateUtils
 
 import java.sql.Timestamp
@@ -98,7 +99,10 @@ UPDATEDATE >= to_date(?, 'yyyy-mm-dd hh24:mi:ss') and rownum < 10000  '''
             def idx_mchnt_mobile_genc = it["idx_mchnt_mobile_genc"]
             def mchnt_mobile_genc = it["mchnt_mobile_genc"]
             //SM4Util.sm4enc(keyIdx, plaintext)
-            //SM4Util.sm4dec(keyIdx, plaintext)
+            if(StringUtils.isNotBlank(mchnt_mobile_genc)) {
+                mchnt_mobile_genc = SM4Util.sm4dec("A001", mchnt_mobile_genc)
+                println("解密手机号:${mchnt_mobile_genc}")
+            }
             //mobile = SM4ConverterUtil.convertToEntityAttribute(idx_mchnt_mobile_genc, mchnt_mobile_genc)
         })
         bmsSql.eachRow(selectInst, [inst_id], {
