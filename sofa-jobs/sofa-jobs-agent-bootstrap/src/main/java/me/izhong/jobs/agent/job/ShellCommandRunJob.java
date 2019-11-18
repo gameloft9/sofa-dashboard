@@ -71,7 +71,7 @@ public class ShellCommandRunJob extends IJobHandler {
             }
 
             String shellCommand = SHName + " " + scriptDir
-                    + "/"+ command + " --run_env " + run_env
+                    + "/"+ command
                     + " -DisJobAgent=true -DscriptType=groovy -DsTime=" + dateTime
                     + " -DjobId=" + jobId + " -DtriggerId=" + triggerId
                     + " -Denvs=" + envParams + " -Dparams=" + execParams;
@@ -84,7 +84,7 @@ public class ShellCommandRunJob extends IJobHandler {
 
             //正常退出状态码
             shellExecutor.setExitValue(0);
-
+            log.info("系统日志目录:{}",configBean.getLogDir());
             File logFile = new File(configBean.getLogDir());
             if(!logFile.exists()) {
                 throw new JobExecutionException("日志文件路径不存在:"+configBean.getLogDir());

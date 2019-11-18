@@ -9,9 +9,9 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 public class JobsConfigBean {
 
-    @Value("${config.script.dir}")
+    @Value("${jobs.script.dir}")
     private String scriptPath;
 
-    @Value("${config.log.dir}")
+    @Value("${jobs.log.dir}")
     private String logDir;
 }

@@ -28,7 +28,8 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
-			<optional>true</optional> <!-- 表示依赖不会传递 -->
+            <version>2.1.0.RELEASE</version>
+            <optional>true</optional> <!-- 表示依赖不会传递 -->
 		</dependency>
 		<!-- 核心模块-->
         <dependency>

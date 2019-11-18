@@ -8,10 +8,12 @@ import me.izhong.jobs.agent.bean.JobContext;
 import me.izhong.jobs.model.LogResult;
 import me.izhong.model.ReturnT;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -96,7 +98,13 @@ public class JobAgentMngImpl implements IJobAgentMngFacade {
         LineNumberReader reader = null;
         try {
             //reader = new LineNumberReader(new FileReader(logFile));
-            reader = new LineNumberReader(new InputStreamReader(new FileInputStream(logFile), "utf-8"));
+            String ahrEncode = Charset.defaultCharset().displayName();
+            String langEncode = System.getenv("LANG");
+            if(StringUtils.containsIgnoreCase(langEncode,"GBK")) {
+                ahrEncode = "GBK";
+            }
+            //reader = new LineNumberReader(new FileReader(logFile));
+            reader = new LineNumberReader(new InputStreamReader(new FileInputStream(logFile), ahrEncode));
             String line = null;
 
             while ((line = reader.readLine()) != null) {

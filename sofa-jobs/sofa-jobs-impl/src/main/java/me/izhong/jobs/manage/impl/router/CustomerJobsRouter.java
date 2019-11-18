@@ -51,11 +51,10 @@ public class CustomerJobsRouter extends Router {
             XxlJobLogService jobLogService = SpringUtil.getBean(XxlJobLogService.class);
             log.info("路由地址: interfaceName:{} method:{}  {}", interfaceName, method, providerInfos);
             if ("trigger".equals(method)) {
-                log.info("按照路由策略执行trigger");
-
                 int providerSize = providerInfos.size();
                 int randInt = RandomUtils.nextInt() % providerSize;
                 ProviderInfo pi = providerInfos.get(randInt);
+                log.info("按照路由策略执行trigger,总共{}选择{}地址是{}",providerSize,randInt,pi.getHost());
 
                 Object[] args = request.getMethodArgs();
                 Long jobId = (Long) args[0];

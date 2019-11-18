@@ -13,8 +13,7 @@ logging:
   path: ../logx
   level:
     root: INFO
-
-config:
+jobs:
   log:
     dir: /home/server/jobs/logs/agent
   script:
@@ -40,7 +39,7 @@ com:
       rpc:
         registry:
           address: zookeeper://10.10.51.212:2181
-config:
+jobs:
   log:
     dir: /Users/jimmy/space/tianru/log/agent
   script:
@@ -49,7 +48,7 @@ config:
 spring:
   profiles: dev
 
-config:
+jobs:
   log:
     dir: /home/nuis/jobs/logs/agent
   script:
@@ -66,7 +65,7 @@ com:
         registry:
           address: zookeeper://10.10.51.212:2181
         bound-host: 10.10.51.212
-config:
+jobs:
   log:
     dir: /home/server/jobs/logs/agent
   script:

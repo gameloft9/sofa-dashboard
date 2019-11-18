@@ -32,7 +32,6 @@ PIDS=`ps -efc|grep java|grep $USER|grep SERVER_NAME=${SERVER_NAME}\\\\s|grep isJ
 for PID in $PIDS
 do
   echo "Print current stack information for PID ${PID} to stack.txt"
-  jstack ${PID} > stack.txt
   echo "Kill pid ${PID}."
   kill $PID
 done
