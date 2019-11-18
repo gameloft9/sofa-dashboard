@@ -199,6 +199,31 @@ public class JobMngImpl implements IJobMngFacade {
     }
 
     @Override
+    public void uploadJobErrorStatics(Long triggerId, Date endTime, Integer resultStatus, String message) {
+        log.info("收到Job异常结束信息 triggerId:{} resultStatus:{}  message:{}",triggerId,resultStatus,message);
+        //收集agent的日志
+        XxlJobLog jobLog = jobLogService.selectByPId(triggerId);
+        if(jobLog != null) {
+            if(jobLog.getHandleCode() != null) {
+                log.info("job已经执行结束忽略kill消息");
+                return;
+            }
+            jobLog.setFinishHandleTime(endTime);
+            Date startTime = jobLog.getHandleTime();
+            if(startTime != null){
+                long second1 = DateUtils.getFragmentInMilliseconds(startTime,Calendar.YEAR);
+                long second2 = DateUtils.getFragmentInMilliseconds(endTime,Calendar.YEAR);
+                String dur = DurationFormatUtils.formatPeriod(second1,second2,"HH:mm:ss");
+                jobLog.setCostHandleTime(dur);
+            }
+            jobLog.setHandleCode(resultStatus);
+            jobLog.setHandleMsg(message + (jobLog.getHandleMsg() == null ? "" : ":" + jobLog.getHandleMsg()));
+            jobLogService.update(jobLog);
+        }
+    }
+
+
+    @Override
     public PageModel<JobLog> logPageList(PageRequest request, JobLog ino) {
         XxlJobLog se = null;
         if(ino != null) {

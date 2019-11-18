@@ -48,6 +48,7 @@ public interface IJobMngFacade {
     void uploadStatics(LogStatics logStatics);
     void uploadJobStartStatics(Long triggerId, Date startTime);
     void uploadJobEndStatics(Long triggerId, Date endTime, Integer resultStatus, String message);
+    void uploadJobErrorStatics(Long triggerId, Date endTime, Integer resultStatus, String message);
 
     /**
      * 日志相关
