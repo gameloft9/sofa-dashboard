@@ -71,7 +71,7 @@ public class JobsAgentApplicationRunner implements ApplicationRunner {
         envs.put("os","mac");
         JobContext context = new JobContext(jobId,triggerId,3000,envs,params);
 
-        ShellCommandJob commandJob = new ShellCommandJob("run.sh");
+        ShellCommandRunJob commandJob = new ShellCommandRunJob("run.sh");
         try {
             //后面考虑缓存 进程id
             commandJob.execute(context);

@@ -123,9 +123,10 @@ public class JobMngImpl implements IJobMngFacade {
     }
 
     @Override
-    public ReturnT<String> kill(Long jobId) {
-        log.info("kill action");
-        return ReturnT.SUCCESS;
+    public ReturnT<String> kill(Long triggerId) {
+        log.info("kill triggerId:{}",triggerId);
+        XxlJobLog jobLog = jobLogService.selectByPId(triggerId);
+        return jobAgentServiceReference.jobAgentService.kill(jobLog.getJobId(),triggerId);
     }
 
     @Override
@@ -229,8 +230,8 @@ public class JobMngImpl implements IJobMngFacade {
     }
 
     @Override
-    public LogResult catLog(long triggerTime, Long jobId, Long logId, int fromLineNum) {
-        return jobAgentServiceReference.jobAgentService.catLog(triggerTime,jobId,logId,fromLineNum);
+    public LogResult catLog(Long jobId, Long logId,long triggerTime,  int fromLineNum) {
+        return jobAgentServiceReference.jobAgentService.catLog(jobId,logId,triggerTime,fromLineNum);
     }
 
     @Override

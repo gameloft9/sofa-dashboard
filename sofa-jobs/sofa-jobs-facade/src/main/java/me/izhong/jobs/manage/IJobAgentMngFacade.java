@@ -11,6 +11,6 @@ public interface IJobAgentMngFacade {
 
     ReturnT<String> trigger(Long jobId, Long triggerId, Map<String, String> envs, Map<String,String> params);
 
-    LogResult catLog(long triggerTime, Long jobId,  Long logId, int fromLineNum);
+    LogResult catLog( Long jobId,  Long triggerId, long triggerTime, int fromLineNum);
 
 }

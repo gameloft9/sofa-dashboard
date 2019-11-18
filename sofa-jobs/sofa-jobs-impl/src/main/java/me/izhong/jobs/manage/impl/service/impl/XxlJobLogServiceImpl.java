@@ -1,11 +1,13 @@
 package me.izhong.jobs.manage.impl.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import me.izhong.db.common.exception.BusinessException;
 import me.izhong.db.common.service.CrudBaseServiceImpl;
 import com.mongodb.client.result.UpdateResult;
 import me.izhong.jobs.manage.impl.core.model.XxlJobLog;
 import me.izhong.jobs.manage.impl.core.model.XxlJobRegistry;
 import me.izhong.jobs.manage.impl.service.XxlJobLogService;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -57,7 +60,7 @@ public class XxlJobLogServiceImpl extends CrudBaseServiceImpl<Long,XxlJobLog> im
 
     @Transactional
     @Override
-    public void updateTriggerDoneMessage(Long jobLogId, String executorAddress, String executorHandler, 
+    public void updateTriggerDoneMessage(Long jobLogId, String executorHandler,
                                          String executorParam, Integer triggerCode, String triggerMsg) {
         Assert.notNull(jobLogId,"");
         Query query = new Query();
@@ -67,7 +70,6 @@ public class XxlJobLogServiceImpl extends CrudBaseServiceImpl<Long,XxlJobLog> im
         options.upsert(true);
         options.returnNew(true);
         Update update = new Update();
-        update.set("executorAddress",executorAddress);
         update.set("executorHandler",executorHandler);
         update.set("executorParam",executorParam);
         update.set("triggerCode",triggerCode);
@@ -97,6 +99,27 @@ public class XxlJobLogServiceImpl extends CrudBaseServiceImpl<Long,XxlJobLog> im
         update.set("alarmStatus",newStatus);
         UpdateResult ur = mongoTemplate.updateMulti(query, update, XxlJobLog.class);
         return ur.getModifiedCount();
+    }
+
+    @Transactional
+    @Override
+    public void updateExecutorAddress(Long jobLogId, String address) {
+        Assert.notNull(jobLogId,"");
+        Query query = new Query();
+        query.addCriteria(Criteria.where("jobLogId").is(jobLogId));
+
+        FindAndModifyOptions options = new FindAndModifyOptions();
+        options.upsert(true);
+
+        Update update = new Update();
+        update.set("executorAddress",address);
+        mongoTemplate.findAndModify(query, update, options,XxlJobLog.class);
+    }
+
+
+    public XxlJobLog update(XxlJobLog target) {
+        log.info("targetAddress:{}",target.getExecutorAddress());
+        return super.update(target);
     }
 
     @Override

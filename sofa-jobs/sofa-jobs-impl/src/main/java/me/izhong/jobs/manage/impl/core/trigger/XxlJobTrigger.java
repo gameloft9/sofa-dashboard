@@ -75,8 +75,6 @@ public class XxlJobTrigger {
         StringBuffer triggerMsgSb = new StringBuffer();
         triggerMsgSb.append("触发类型：").append(triggerType.getTitle());
         triggerMsgSb.append("<br>").append("管理IP：").append(IpUtil.getHostIp());
-        triggerMsgSb.append("<br>").append("AddressList类型：").append(group.getAddressList() );
-        triggerMsgSb.append("<br>").append("RegistryList地址：").append(group.getRegistryList());
         //triggerMsgSb.append("<br>").append("路由策略：").append(executorRouteStrategyEnum.getTitle());
         //triggerMsgSb.append("<br>").append("阻塞策略：").append(blockStrategy.getTitle());
         triggerMsgSb.append("<br>").append("超时时间：").append(jobInfo.getExecutorTimeout());
@@ -93,8 +91,7 @@ public class XxlJobTrigger {
         logger.info("保存jobLog jobLog.getJobLogId:{} triggerCode:{} triggerMsg:{}",jobLog.getJobLogId(),triggerCode, triggerMsg);
 
         XxlJobAdminConfig.getAdminConfig().getXxlJobLogService()
-                .updateTriggerDoneMessage(jobLog.getJobLogId(),
-                        "",jobInfo.getExecutorHandler(),
+                .updateTriggerDoneMessage(jobLog.getJobLogId(),jobInfo.getExecutorHandler(),
                         exeP, triggerCode,triggerMsg);
 
         logger.debug("job trigger end, jobId:{}", jobLog.getId());

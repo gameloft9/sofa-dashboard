@@ -146,30 +146,6 @@
                 <artifactId>fastjson</artifactId>
             </dependency>
 
-            <!-- swagger2-->
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger2</artifactId>
-                <version>${swagger.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>io.swagger</groupId>
-                        <artifactId>swagger-annotations</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>io.swagger</groupId>
-                        <artifactId>swagger-models</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <!-- swagger2-UI-->
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger-ui</artifactId>
-                <version>${swagger.version}</version>
-            </dependency>
-
             <!--io常用工具类 -->
             <dependency>
                 <groupId>commons-io</groupId>
@@ -198,21 +174,7 @@
                 <version>${velocity.version}</version>
             </dependency>
 
-            <!-- &lt;!&ndash; 定时任务&ndash;&gt;
-             <dependency>
-                 <groupId>com.ruoyi</groupId>
-                 <artifactId>ruoyi-quartz</artifactId>
-                 <version>${ruoyi.version}</version>
-             </dependency>
-
-             &lt;!&ndash; 代码生成&ndash;&gt;
-             <dependency>
-                 <groupId>com.ruoyi</groupId>
-                 <artifactId>ruoyi-generator</artifactId>
-                 <version>${ruoyi.version}</version>
-             </dependency>-->
-
-            <dependency>
+ <!--           <dependency>
                 <groupId>org.quartz-scheduler</groupId>
                 <artifactId>quartz</artifactId>
                 <version>${quartz.version}</version>
@@ -223,7 +185,7 @@
                 <artifactId>quartz-mongodb</artifactId>
                 <version>${quartz-mongodb.version}</version>
             </dependency>
-
+-->
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver</artifactId>
@@ -257,13 +219,6 @@
             <dependency>
                 <groupId>me.izhong.sofa</groupId>
                 <artifactId>sofa-admin-system</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <!-- 通用工具-->
-            <dependency>
-                <groupId>me.izhong.sofa</groupId>
-                <artifactId>sofa-admin-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
