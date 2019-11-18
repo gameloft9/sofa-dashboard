@@ -60,9 +60,6 @@ public class JobScheduleHelper {
 
                     // Scan Job
                     long start = System.currentTimeMillis();
-                    //Connection conn = null;
-                    //Boolean connAutoCommit = null;
-//                    PreparedStatement preparedStatement = null;
 
                     boolean preReadSuc = true;
                     boolean lock = false;
@@ -90,7 +87,7 @@ public class JobScheduleHelper {
                             // 2、push time-ring
                             for (XxlJobInfo jobInfo: scheduleList) {
 
-                                // time-ring jump
+                                // time-ring jump 好久没运行的定时任务，+5s 也没到达当前时间，设置运行时间等待下次调度
                                 if (nowTime > jobInfo.getTriggerNextTime() + PRE_READ_MS) {
                                     // 2.1、trigger-expire > 5s：pass && make next-trigger-time
 
@@ -110,7 +107,7 @@ public class JobScheduleHelper {
 
                                 } else if (nowTime > jobInfo.getTriggerNextTime()) {
                                     // 2.2、trigger-expire < 5s：direct-trigger && make next-trigger-time
-
+                                    //任务在刚刚过去的5s以内 马上运行
                                     CronExpression cronExpression = new CronExpression(jobInfo.getJobCron());
                                     long nextTime = cronExpression.getNextValidTimeAfter(new Date()).getTime();
 
@@ -145,12 +142,10 @@ public class JobScheduleHelper {
                                             jobInfo.setTriggerLastTime(0L);
                                             jobInfo.setTriggerNextTime(0L);
                                         }
-
                                     }
-
                                 } else {
                                     // 2.3、trigger-pre-read：time-ring trigger && make next-trigger-time
-
+                                    // 未来5s内要运行的，设置到准备运行
                                     // 1、make ring second
                                     int ringSecond = (int)((jobInfo.getTriggerNextTime()/1000)%60);
 
@@ -176,12 +171,7 @@ public class JobScheduleHelper {
                             for (XxlJobInfo jobInfo: scheduleList) {
                                 xxlJobInfoService.scheduleUpdate(jobInfo);
                             }
-
                         }
-
-                        // tx stop
-
-
                     } catch (Exception e) {
                         if (!scheduleThreadToStop) {
                             logger.error("调度异常:{}", e);

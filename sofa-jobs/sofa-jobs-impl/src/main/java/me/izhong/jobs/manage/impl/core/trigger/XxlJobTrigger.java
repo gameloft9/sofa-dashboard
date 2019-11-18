@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class XxlJobTrigger {
+
     private static Logger logger = LoggerFactory.getLogger(XxlJobTrigger.class);
 
     public static ReturnT<String> trigger(long jobId, TriggerTypeEnum triggerType, int failRetryCount,  String executorParam) {
@@ -37,20 +38,28 @@ public class XxlJobTrigger {
         if (executorParam != null) {
             jobInfo.setExecutorParam(executorParam);
         }
+        //如果是阻塞的任务，这里就不调度了
+        // executor block strategy
+        ExecutorBlockStrategyEnum blockStrategy = ExecutorBlockStrategyEnum.match(jobInfo.getExecutorBlockStrategy(), null);
+        if (ExecutorBlockStrategyEnum.SERIAL_EXECUTION == blockStrategy) {
+            if(jobInfo.getRunningCount() != null && jobInfo.getRunningCount().longValue() > 0){
+                //任务正在执行
+                if(!Boolean.TRUE.equals(jobInfo.getWakeAgain()))
+                    jobInfo.setWakeAgain(Boolean.TRUE);
+                logger.info("任务[{}]正在执行中，策略[{}]放弃本次调度",jobInfo.getJobDesc(),blockStrategy);
+                return new ReturnT<String>(ReturnT.FAIL_CODE, "放弃本次调度:"+blockStrategy.getTitle());
+            } else {
+                jobInfo.setRunningCount(1L);
+            }
+            XxlJobAdminConfig.getAdminConfig().getXxlJobInfoService().updateJob(jobInfo);
+        } else if (ExecutorBlockStrategyEnum.COVER_EARLY == blockStrategy) {
+
+        } else {
+            // just queue trigger
+        }
+
         int finalFailRetryCount = failRetryCount>=0?failRetryCount: (jobInfo.getExecutorFailRetryCount() == null ? 0: jobInfo.getExecutorFailRetryCount().intValue());
-        XxlJobGroup group = XxlJobAdminConfig.getAdminConfig().getXxlJobGroupService().selectByPId(jobInfo.getJobGroupId());
-        return processTrigger(group, jobInfo, finalFailRetryCount, triggerType, executorParam);
-    }
 
-    private static ReturnT<String> processTrigger(XxlJobGroup group, XxlJobInfo jobInfo,
-                                                  int finalFailRetryCount, TriggerTypeEnum triggerType,
-                                                  String executorParam){
-
-        // param
-        //ExecutorBlockStrategyEnum blockStrategy = ExecutorBlockStrategyEnum.match(jobInfo.getExecutorBlockStrategy(), ExecutorBlockStrategyEnum.SERIAL_EXECUTION);  // block strategy
-        //ExecutorRouteStrategyEnum executorRouteStrategyEnum = ExecutorRouteStrategyEnum.match(jobInfo.getExecutorRouteStrategy(), null);    // route strategy
-
-        // 1、save log-id
 
         XxlJobLog jobLog = XxlJobAdminConfig.getAdminConfig().getXxlJobLogService()
                 .insertTriggerBeginMessage(jobInfo.getJobId(),jobInfo.getJobGroupId(),jobInfo.getJobDesc(),new Date(),jobInfo.getExecutorFailRetryCount());
@@ -76,7 +85,7 @@ public class XxlJobTrigger {
         triggerMsgSb.append("触发类型：").append(triggerType.getTitle());
         triggerMsgSb.append("<br>").append("管理IP：").append(IpUtil.getHostIp());
         //triggerMsgSb.append("<br>").append("路由策略：").append(executorRouteStrategyEnum.getTitle());
-        //triggerMsgSb.append("<br>").append("阻塞策略：").append(blockStrategy.getTitle());
+        triggerMsgSb.append("<br>").append("阻塞策略：").append(blockStrategy.getTitle());
         triggerMsgSb.append("<br>").append("超时时间：").append(jobInfo.getExecutorTimeout());
         triggerMsgSb.append("<br>").append("重试次数：").append(finalFailRetryCount);
 

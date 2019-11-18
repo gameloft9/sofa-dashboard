@@ -257,6 +257,10 @@ public class XxlJobServiceImpl extends CrudBaseServiceImpl<Long,XxlJobInfo> impl
 		exists_jobInfo.setChildJobId(jobInfo.getChildJobId());
 		exists_jobInfo.setTriggerNextTime(nextTriggerTime);
 
+		if(jobInfo.getRunningCount() !=null)
+			exists_jobInfo.setRunningCount(jobInfo.getRunningCount());
+		if(jobInfo.getWakeAgain() != null)
+			exists_jobInfo.setWakeAgain(jobInfo.getWakeAgain());
 		exists_jobInfo.setGlueSource(jobInfo.getGlueSource());
 		exists_jobInfo.setGlueRemark(jobInfo.getGlueRemark());
 		exists_jobInfo.setGlueUpdatetime(jobInfo.getGlueUpdatetime());

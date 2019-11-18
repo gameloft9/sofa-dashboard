@@ -12,7 +12,9 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Slf4j
 @Data
@@ -53,4 +55,9 @@ public class XxlJobInfo  extends TimedBasedEntity implements Serializable {
 	private Long triggerStatus;		// 调度状态：1-停止，0-运行
 	private Long triggerLastTime;	// 上次调度时间
 	private Long triggerNextTime;	// 下次调度时间
+
+	private Long runningCount;  //正在执行的数量
+	private List<Long> runningTriggerIds = new ArrayList<>();
+
+	private Boolean wakeAgain;  //如果过true，说明后续有这个任务的执行因为前一个任务在执行中没有调度起来
 }

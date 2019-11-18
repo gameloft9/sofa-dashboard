@@ -4,7 +4,8 @@ public enum TriggerTypeEnum {
 
     MANUAL("手动"),
     CRON("定时"),
-    RETRY("重试");
+    RETRY("重试"),
+    CONTINUE("继续");
 
     private TriggerTypeEnum(String title){
         this.title = title;

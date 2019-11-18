@@ -8,6 +8,7 @@ import me.izhong.db.common.service.MongoDistributedLock;
 import me.izhong.domain.PageModel;
 import me.izhong.domain.PageRequest;
 import me.izhong.jobs.manage.IJobMngFacade;
+import me.izhong.jobs.manage.impl.core.cron.CronExpression;
 import me.izhong.jobs.manage.impl.core.model.XxlJobGroup;
 import me.izhong.jobs.manage.impl.core.model.XxlJobInfo;
 import me.izhong.jobs.manage.impl.core.model.XxlJobLog;
@@ -195,6 +196,33 @@ public class JobMngImpl implements IJobMngFacade {
             jobLog.setHandleCode(resultStatus);
             jobLog.setHandleMsg(message + (jobLog.getHandleMsg() == null ? "" : ":" + jobLog.getHandleMsg()));
             jobLogService.update(jobLog);
+
+            triggerContinue(jobLog.getJobId());
+
+        }
+    }
+
+    private void triggerContinue(Long jobId) {
+        XxlJobInfo jobInfo = jobInfoService.selectByPId(jobId);
+        if(Boolean.TRUE.equals(jobInfo.getWakeAgain())) {
+            log.info("重新唤起任务的执行");
+            jobInfo.setWakeAgain(Boolean.FALSE);
+            try {
+                Date nextValidTime = new CronExpression(jobInfo.getJobCron()).getNextValidTimeAfter(new Date(jobInfo.getTriggerNextTime()));
+                if (nextValidTime != null) {
+                    jobInfo.setTriggerLastTime(jobInfo.getTriggerNextTime());
+                    jobInfo.setTriggerNextTime(nextValidTime.getTime());
+                } else {
+                    jobInfo.setTriggerStatus(0L);
+                    jobInfo.setTriggerLastTime(0L);
+                    jobInfo.setTriggerNextTime(0L);
+                }
+            } catch (Exception ee) {
+                log.error("",ee);
+            }
+            jobInfoService.updateJob(jobInfo);
+            JobTriggerPoolHelper.trigger(jobInfo.getJobId(), TriggerTypeEnum.CONTINUE, -1,  null);
+            log.info("WakeAgain触发任务执行 jobId:{}" ,jobInfo.getId() );
         }
     }
 
@@ -219,6 +247,9 @@ public class JobMngImpl implements IJobMngFacade {
             jobLog.setHandleCode(resultStatus);
             jobLog.setHandleMsg(message + (jobLog.getHandleMsg() == null ? "" : ":" + jobLog.getHandleMsg()));
             jobLogService.update(jobLog);
+
+            triggerContinue(jobLog.getJobId());
+
         }
     }
 
