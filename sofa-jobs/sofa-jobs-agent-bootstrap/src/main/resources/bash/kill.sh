@@ -12,10 +12,10 @@ echo "kill.sh JOB_ID:$JOB_ID TRIGGER_ID:$TRIGGER_ID"
 
 SERVER_NAME=sofa-jobs-agent-bootstrap
 
-echo "command:ps -efc|grep java|grep -v batch|grep $USER|grep SERVER_NAME=${SERVER_NAME}\\\\s|grep isJobAgent=true|grep -DjobId=${JOB_ID}|grep -DtriggerId=${TRIGGER_ID} | wc -l"
+echo "command:ps -efc|grep java|grep isJobAgent|grep $USER|grep SERVER_NAME=${SERVER_NAME}\\\\s|grep isJobAgent=true|grep -DjobId=${JOB_ID}|grep -DtriggerId=${TRIGGER_ID} | wc -l"
 
 
-count=`ps -efc|grep java|grep $USER|grep SERVER_NAME=${SERVER_NAME}\\\\s|grep isJobAgent=true|grep jobId=${JOB_ID}|grep triggerId=${TRIGGER_ID}| wc -l`
+count=`ps -efc|grep java|grep isJobAgent|grep $USER|grep SERVER_NAME=${SERVER_NAME}\\\\s|grep isJobAgent=true|grep jobId=${JOB_ID}|grep triggerId=${TRIGGER_ID}| wc -l`
 if [ $count -eq 0 ]; then
   echo "No running server found."
   exit 0
@@ -28,7 +28,7 @@ fi
 
 
 #先正常停止服务
-PIDS=`ps -efc|grep java|grep $USER|grep SERVER_NAME=${SERVER_NAME}\\\\s|grep isJobAgent=true|grep jobId=${JOB_ID}|grep triggerId=${TRIGGER_ID}|awk -F' ' '{print $2}'`
+PIDS=`ps -efc|grep java|grep isJobAgent|grep $USER|grep SERVER_NAME=${SERVER_NAME}\\\\s|grep isJobAgent=true|grep jobId=${JOB_ID}|grep triggerId=${TRIGGER_ID}|awk -F' ' '{print $2}'`
 for PID in $PIDS
 do
   echo "normal kill PID ${PID}"
@@ -39,7 +39,7 @@ done
 #检查服务是否停止，最多10秒
 for((i=1;i<=10;i++))
 do
-  count=`ps -efc|grep java|grep $USER|grep SERVER_NAME=${SERVER_NAME}\\\\s|grep isJobAgent=true|grep jobId=${JOB_ID}|grep triggerId=${TRIGGER_ID}|wc -l`
+  count=`ps -efc|grep java|grep isJobAgent|grep $USER|grep SERVER_NAME=${SERVER_NAME}\\\\s|grep isJobAgent=true|grep jobId=${JOB_ID}|grep triggerId=${TRIGGER_ID}|wc -l`
   if [ $count -eq 0 ]; then
     echo "Server has been stopped."
     exit 0
@@ -49,7 +49,7 @@ do
 done
 
 #强制停止服务
-PIDS=`ps -efc|grep java|grep $USER|grep SERVER_NAME=${SERVER_NAME}\\\\s|grep isJobAgent=true|grep jobId=${JOB_ID}|grep triggerId=${TRIGGER_ID}|awk -F' ' '{print $2}'`
+PIDS=`ps -efc|grep java|grep isJobAgent|grep $USER|grep SERVER_NAME=${SERVER_NAME}\\\\s|grep isJobAgent=true|grep jobId=${JOB_ID}|grep triggerId=${TRIGGER_ID}|awk -F' ' '{print $2}'`
 for PID in $PIDS
 do
   echo "Kill pid $PID forcely."
