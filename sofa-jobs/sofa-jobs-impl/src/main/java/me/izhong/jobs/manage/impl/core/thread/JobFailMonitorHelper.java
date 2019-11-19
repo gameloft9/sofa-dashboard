@@ -2,17 +2,16 @@ package me.izhong.jobs.manage.impl.core.thread;
 
 import lombok.extern.slf4j.Slf4j;
 import me.izhong.jobs.manage.impl.core.conf.XxlJobAdminConfig;
-import me.izhong.jobs.manage.impl.core.model.XxlJobGroup;
-import me.izhong.jobs.manage.impl.core.model.XxlJobInfo;
-import me.izhong.jobs.manage.impl.core.model.XxlJobLog;
+import me.izhong.jobs.manage.impl.core.model.ZJobGroup;
+import me.izhong.jobs.manage.impl.core.model.ZJobInfo;
+import me.izhong.jobs.manage.impl.core.model.ZJobLog;
 import me.izhong.jobs.manage.impl.core.trigger.TriggerTypeEnum;
-import me.izhong.jobs.manage.impl.service.XxlJobInfoService;
-import me.izhong.jobs.manage.impl.service.XxlJobLogService;
+import me.izhong.jobs.manage.impl.service.ZJobInfoService;
+import me.izhong.jobs.manage.impl.service.ZJobLogService;
 import me.izhong.model.ReturnT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -31,10 +30,10 @@ public class JobFailMonitorHelper {
     private volatile boolean toStop = false;
 
     @Autowired
-    private XxlJobInfoService jobInfoService;
+    private ZJobInfoService jobInfoService;
 
     @Autowired
-    private XxlJobLogService jobLogService;
+    private ZJobLogService jobLogService;
 
     public void start() {
         monitorThread = new Thread(new Runnable() {
@@ -55,8 +54,8 @@ public class JobFailMonitorHelper {
                                 if (lockRet < 1) {
                                     continue;
                                 }
-                                XxlJobLog log = jobLogService.selectByPId(failLogId);
-                                XxlJobInfo info = jobInfoService.selectByPId(log.getJobId());
+                                ZJobLog log = jobLogService.selectByPId(failLogId);
+                                ZJobInfo info = jobInfoService.selectByPId(log.getJobId());
 
                                 // 1、fail retry monitor
                                 if (log.getExecutorFailRetryCount() > 0) {
@@ -141,7 +140,7 @@ public class JobFailMonitorHelper {
      *
      * @param jobLog
      */
-    private boolean failAlarm(XxlJobInfo info, XxlJobLog jobLog) {
+    private boolean failAlarm(ZJobInfo info, ZJobLog jobLog) {
         boolean alarmResult = true;
 
         // send monitor email
@@ -157,7 +156,7 @@ public class JobFailMonitorHelper {
             }
 
             // email info
-            XxlJobGroup group = XxlJobAdminConfig.getAdminConfig().getXxlJobGroupService().selectByPId(info.getJobGroupId());
+            ZJobGroup group = XxlJobAdminConfig.getAdminConfig().getXxlJobGroupService().selectByPId(info.getJobGroupId());
             String personal = "名称";
             String title = "标题";
             String content = MessageFormat.format(mailBodyTemplate,

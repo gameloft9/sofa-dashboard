@@ -35,13 +35,14 @@
 					th:field="*{executorHandler}" ></div>
 				-->
 				</div>
+				<!--
 				<div class="form-group">
-					<!--<label class="col-sm-2 control-label">路由策略</label>
+					<label class="col-sm-2 control-label">路由策略</label>
 					<div class="col-sm-4">
 						<select name="executorRouteStrategy" class="form-control m-b" th:with="type=${@dict.getType('sys_job_route_strategry')}">
 							<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{executorRouteStrategy}"></option>
 						</select>
-					</div>-->
+					</div>
 					<label class="col-sm-2 control-label">状态：</label>
 					<div class="col-sm-4">
 						<label class="toggle-switch switch-solid">
@@ -50,6 +51,7 @@
 						</label>
 					</div>
 				</div>
+				-->
 				<div class="form-group">
 					<label class="col-sm-2 control-label">阻塞处理策略</label>
 					<div class="col-sm-4">

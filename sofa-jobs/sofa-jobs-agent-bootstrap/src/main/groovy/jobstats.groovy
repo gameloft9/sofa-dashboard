@@ -16,11 +16,11 @@ try {
     JobStatsUtil.insertOrUpdate(key,"ty","耗时2");
 
     value1 = JobStatsUtil.getValue1(key)
-    println("update value1:${value1}")
+    println("update value1 应该为耗时2:${value1}")
 
     JobStatsUtil.remove(key)
     value1 = JobStatsUtil.getValue1(key)
-    println("update value1:${value1}")
+    println("update value1 应该为空:${value1}")
 
 
     return 0

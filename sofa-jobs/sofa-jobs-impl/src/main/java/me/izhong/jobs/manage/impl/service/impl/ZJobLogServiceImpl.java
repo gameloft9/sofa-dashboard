@@ -1,13 +1,10 @@
 package me.izhong.jobs.manage.impl.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import me.izhong.db.common.exception.BusinessException;
 import me.izhong.db.common.service.CrudBaseServiceImpl;
 import com.mongodb.client.result.UpdateResult;
-import me.izhong.jobs.manage.impl.core.model.XxlJobLog;
-import me.izhong.jobs.manage.impl.core.model.XxlJobRegistry;
-import me.izhong.jobs.manage.impl.service.XxlJobLogService;
-import org.apache.commons.lang3.reflect.FieldUtils;
+import me.izhong.jobs.manage.impl.core.model.ZJobLog;
+import me.izhong.jobs.manage.impl.service.ZJobLogService;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -16,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,7 +20,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class XxlJobLogServiceImpl extends CrudBaseServiceImpl<Long,XxlJobLog> implements XxlJobLogService {
+public class ZJobLogServiceImpl extends CrudBaseServiceImpl<Long,ZJobLog> implements ZJobLogService {
     @Override
     public long triggerCountByHandleCode(int successCode) {
         Query query = new Query();
@@ -39,7 +35,7 @@ public class XxlJobLogServiceImpl extends CrudBaseServiceImpl<Long,XxlJobLog> im
         Criteria c2 = Criteria.where("handleCode").is(200);
         Criteria dest = c1.orOperator(c2).not();
         query.addCriteria(dest);
-        List<XxlJobLog> ls = super.selectList(query,null,null);
+        List<ZJobLog> ls = super.selectList(query,null,null);
         if(ls ==null || ls.size() == 0)
             return new ArrayList<>();
         return ls.stream().map(e->e.getJobId()).collect(Collectors.toList());
@@ -47,14 +43,14 @@ public class XxlJobLogServiceImpl extends CrudBaseServiceImpl<Long,XxlJobLog> im
     }
 
     @Override
-    public List<XxlJobLog> findRunningJobs() {
+    public List<ZJobLog> findRunningJobs() {
         Query query = new Query();
         query.addCriteria(Criteria.where("handleCode").is(null));
         return super.selectList(query,null,null);
     }
 
     @Override
-    public List<XxlJobLog> findJobLogByJobId(Long jobId) {
+    public List<ZJobLog> findJobLogByJobId(Long jobId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("jobId").is(jobId));
         return super.selectList(query,null,null);
@@ -62,8 +58,8 @@ public class XxlJobLogServiceImpl extends CrudBaseServiceImpl<Long,XxlJobLog> im
 
     @Transactional
     @Override
-    public XxlJobLog insertTriggerBeginMessage(Long jobId, Long jobGroupId, String jobDesc, Date triggerTime, Integer finalFailRetryCount) {
-        XxlJobLog jobLog = new XxlJobLog();
+    public ZJobLog insertTriggerBeginMessage(Long jobId, Long jobGroupId, String jobDesc, Date triggerTime, Integer finalFailRetryCount) {
+        ZJobLog jobLog = new ZJobLog();
         jobLog.setJobId(jobId);
         jobLog.setJobGroupId(jobGroupId);
         jobLog.setJobDesc(jobDesc);
@@ -90,7 +86,7 @@ public class XxlJobLogServiceImpl extends CrudBaseServiceImpl<Long,XxlJobLog> im
             update.set("executorParam",executorParam);
         update.set("triggerCode",triggerCode);
         update.set("triggerMsg",triggerMsg);
-        XxlJobLog ur = mongoTemplate.findAndModify(query, update, options, XxlJobLog.class);
+        ZJobLog ur = mongoTemplate.findAndModify(query, update, options, ZJobLog.class);
         //log.info("返回新值:{},{}",ur.getTriggerCode(),ur.getTriggerMsg());
     }
 
@@ -102,7 +98,7 @@ public class XxlJobLogServiceImpl extends CrudBaseServiceImpl<Long,XxlJobLog> im
 
         Update update = new Update();
         update.set("handleTime",startTime);
-        mongoTemplate.findAndModify(query, update, XxlJobLog.class);
+        mongoTemplate.findAndModify(query, update, ZJobLog.class);
     }
 
     @Override
@@ -114,7 +110,7 @@ public class XxlJobLogServiceImpl extends CrudBaseServiceImpl<Long,XxlJobLog> im
         Update update = new Update();
         update.set("handleCode",handleCode);
         update.set("handleMsg",handleMsg);
-        mongoTemplate.findAndModify(query, update, XxlJobLog.class);
+        mongoTemplate.findAndModify(query, update, ZJobLog.class);
     }
 
     @Override
@@ -125,7 +121,7 @@ public class XxlJobLogServiceImpl extends CrudBaseServiceImpl<Long,XxlJobLog> im
 
         Update update = new Update();
         update.set("alarmStatus",newStatus);
-        UpdateResult ur = mongoTemplate.updateMulti(query, update, XxlJobLog.class);
+        UpdateResult ur = mongoTemplate.updateMulti(query, update, ZJobLog.class);
         return ur.getModifiedCount();
     }
 
@@ -141,11 +137,11 @@ public class XxlJobLogServiceImpl extends CrudBaseServiceImpl<Long,XxlJobLog> im
 
         Update update = new Update();
         update.set("executorAddress",address);
-        mongoTemplate.findAndModify(query, update, options,XxlJobLog.class);
+        mongoTemplate.findAndModify(query, update, options,ZJobLog.class);
     }
 
 
-    public XxlJobLog update(XxlJobLog target) {
+    public ZJobLog update(ZJobLog target) {
         log.info("targetAddress:{}",target.getExecutorAddress());
         return super.update(target);
     }
@@ -159,7 +155,7 @@ public class XxlJobLogServiceImpl extends CrudBaseServiceImpl<Long,XxlJobLog> im
             query.addCriteria(Criteria.where("createTime").lte(clearBeforeTime));
         if(clearBeforeNum > 0)
             query.addCriteria(Criteria.where("jobId").lte(clearBeforeNum));
-        mongoTemplate.remove(query, XxlJobLog.class);
+        mongoTemplate.remove(query, ZJobLog.class);
     }
 
 
@@ -169,6 +165,6 @@ public class XxlJobLogServiceImpl extends CrudBaseServiceImpl<Long,XxlJobLog> im
             return;
         Query query = new Query();
         query.addCriteria(Criteria.where("jobLogId").in(jobLogIds));
-        mongoTemplate.remove(query, XxlJobLog.class);
+        mongoTemplate.remove(query, ZJobLog.class);
     }
 }

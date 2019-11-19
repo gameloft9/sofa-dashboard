@@ -2,10 +2,9 @@ package me.izhong.jobs.manage.impl.core.conf;
 
 import lombok.Getter;
 import lombok.Setter;
-import me.izhong.jobs.manage.impl.service.XxlJobGroupService;
-import me.izhong.jobs.manage.impl.service.XxlJobInfoService;
-import me.izhong.jobs.manage.impl.service.XxlJobLogService;
-import me.izhong.jobs.manage.impl.service.XxlJobRegistryService;
+import me.izhong.jobs.manage.impl.service.ZJobGroupService;
+import me.izhong.jobs.manage.impl.service.ZJobInfoService;
+import me.izhong.jobs.manage.impl.service.ZJobLogService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
@@ -25,12 +24,10 @@ public class XxlJobAdminConfig implements InitializingBean {
         adminConfig = this;
     }
     @Resource
-    private XxlJobLogService xxlJobLogService;
+    private ZJobLogService zJobLogService;
     @Resource
-    private XxlJobInfoService xxlJobInfoService;
+    private ZJobInfoService zJobInfoService;
     @Resource
-    private XxlJobRegistryService xxlJobRegistryService;
-    @Resource
-    private XxlJobGroupService xxlJobGroupService;
+    private ZJobGroupService xxlJobGroupService;
 
 }

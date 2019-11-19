@@ -20,7 +20,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Document(collection = "sys_djob_info")
-public class XxlJobInfo  extends TimedBasedEntity implements Serializable {
+public class ZJobInfo extends TimedBasedEntity implements Serializable {
 
 	@AutoId
 	@PrimaryId
@@ -30,6 +30,9 @@ public class XxlJobInfo  extends TimedBasedEntity implements Serializable {
 	@Search
 	private Long jobGroupId;		// 执行器主键ID
 	private String jobCron;		// 任务执行CRON表达式
+	private Long jobScriptId;
+
+
 
 	@Search(op = Search.Op.REGEX)
 	private String jobDesc;
@@ -43,11 +46,6 @@ public class XxlJobInfo  extends TimedBasedEntity implements Serializable {
 	private String executorBlockStrategy;	// 阻塞处理策略
 	private Long executorTimeout;     		// 任务执行超时时间，单位秒
 	private Integer executorFailRetryCount;		// 失败重试次数
-	
-	private String glueType;		// GLUE类型
-	private String glueSource;		// GLUE源代码
-	private String glueRemark;		// GLUE备注
-	private Date glueUpdatetime;	// GLUE更新时间
 
 	private String childJobId;		// 子任务ID，多个逗号分隔
 

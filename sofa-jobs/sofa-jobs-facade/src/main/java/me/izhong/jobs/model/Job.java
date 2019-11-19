@@ -14,6 +14,8 @@ public class Job implements Serializable {
     private Long jobGroupId;
     private String jobGroup;
 
+    private Long jobScriptId;
+
     private String jobCron;
     private String jobDesc;
 
@@ -27,11 +29,6 @@ public class Job implements Serializable {
     private String executorBlockStrategy;	// 阻塞处理策略
     private Long executorTimeout;     		// 任务执行超时时间，单位秒
     private Long executorFailRetryCount;		// 失败重试次数
-
-    private String glueType;		// GLUE类型	#com.xxl.job.core.glue.GlueTypeEnum
-    private String glueSource;		// GLUE源代码
-    private String glueRemark;		// GLUE备注
-    private Date glueUpdateTime;	// GLUE更新时间
 
     private String childJobId;		// 子任务ID，多个逗号分隔
 

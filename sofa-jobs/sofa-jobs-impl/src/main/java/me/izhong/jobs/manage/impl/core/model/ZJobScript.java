@@ -1,31 +1,36 @@
 package me.izhong.jobs.manage.impl.core.model;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import me.izhong.db.common.annotation.AutoId;
+import me.izhong.db.common.annotation.CreateTimeAdvise;
 import me.izhong.db.common.annotation.PrimaryId;
 import me.izhong.db.common.domain.TimedBasedEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.util.Date;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Document(collection = "sys_djob_log_glue")
-public class XxlJobLogGlue  extends TimedBasedEntity implements Serializable {
+@Document(collection = "sys_djob_script")
+public class ZJobScript extends TimedBasedEntity implements Serializable {
 
 	@AutoId
 	@PrimaryId
 	@Indexed(unique = true)
-	private Long jobLongGlueId;// 任务主键ID
+	private Long jobScriptId;// 主键ID
 
-	@Indexed(unique = false)
+	@Indexed
 	private Long jobId;
 
-	private String glueType;		// GLUE类型	#com.xxl.job.core.glue.GlueTypeEnum
-	private String glueSource;
-	private String glueRemark;
-	private String addTime;
+	private String type;
+	private String script;
 
+	@Indexed
+	@CreateTimeAdvise
+	private Date addTime;
 }

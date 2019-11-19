@@ -1,10 +1,8 @@
 package me.izhong.jobs.manage.impl.service.impl;
 
 import me.izhong.db.common.service.CrudBaseServiceImpl;
-import me.izhong.domain.PageModel;
-import me.izhong.domain.PageRequest;
-import me.izhong.jobs.manage.impl.core.model.XxlJobGroup;
-import me.izhong.jobs.manage.impl.service.XxlJobGroupService;
+import me.izhong.jobs.manage.impl.core.model.ZJobGroup;
+import me.izhong.jobs.manage.impl.service.ZJobGroupService;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -12,9 +10,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class XxlJobGroupServiceImpl extends CrudBaseServiceImpl<Long,XxlJobGroup> implements XxlJobGroupService {
+public class ZJobGroupServiceImpl extends CrudBaseServiceImpl<Long,ZJobGroup> implements ZJobGroupService {
     @Override
-    public List<XxlJobGroup> findByAddressType(int addressType) {
+    public List<ZJobGroup> findByAddressType(int addressType) {
         Query query = new Query();
         query.addCriteria(Criteria.where("addressType").is(addressType));
         return super.selectList(query, null, null);

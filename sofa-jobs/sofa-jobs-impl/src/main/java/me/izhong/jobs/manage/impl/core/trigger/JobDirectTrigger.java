@@ -1,21 +1,17 @@
 package me.izhong.jobs.manage.impl.core.trigger;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import me.izhong.common.util.IpUtil;
 import me.izhong.jobs.manage.IJobAgentMngFacade;
 import me.izhong.jobs.manage.impl.JobAgentServiceReference;
 import me.izhong.jobs.manage.impl.core.conf.XxlJobAdminConfig;
-import me.izhong.jobs.manage.impl.core.model.XxlJobGroup;
-import me.izhong.jobs.manage.impl.core.model.XxlJobInfo;
-import me.izhong.jobs.manage.impl.core.model.XxlJobLog;
-import me.izhong.jobs.manage.impl.core.route.ExecutorRouteStrategyEnum;
+import me.izhong.jobs.manage.impl.core.model.ZJobInfo;
+import me.izhong.jobs.manage.impl.core.model.ZJobLog;
 import me.izhong.jobs.manage.impl.core.util.SpringUtil;
 import me.izhong.jobs.model.TriggerParam;
 import me.izhong.jobs.type.ExecutorBlockStrategyEnum;
 import me.izhong.model.ReturnT;
-import me.izhong.jobs.type.ExecutorBlockStrategyEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,14 +20,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class XxlJobTrigger {
+public class JobDirectTrigger {
 
-    private static Logger logger = LoggerFactory.getLogger(XxlJobTrigger.class);
+    private static Logger logger = LoggerFactory.getLogger(JobDirectTrigger.class);
 
     public static ReturnT<String> trigger(long jobId, TriggerTypeEnum triggerType,
                                           int failRetryCount, String executorParam) {
         // load data
-        XxlJobInfo jobInfo = XxlJobAdminConfig.getAdminConfig().getXxlJobInfoService().selectByPId(jobId);
+        ZJobInfo jobInfo = XxlJobAdminConfig.getAdminConfig().getZJobInfoService().selectByPId(jobId);
         if (jobInfo == null) {
             logger.warn("trigger fail, jobId invalid，jobId={}", jobId);
             return ReturnT.FAIL;
@@ -42,7 +38,7 @@ public class XxlJobTrigger {
         //如果是阻塞的任务，这里就不调度了
         // executor block strategy
         boolean willSchedule = false;
-        XxlJobLog jobLog = null;
+        ZJobLog jobLog = null;
         ExecutorBlockStrategyEnum blockStrategy = ExecutorBlockStrategyEnum.match(jobInfo.getExecutorBlockStrategy(), null);
         if (ExecutorBlockStrategyEnum.SERIAL_EXECUTION == blockStrategy) {
             if(jobInfo.getRunningTriggerIds() != null && jobInfo.getRunningTriggerIds().size() > 0){
@@ -50,16 +46,16 @@ public class XxlJobTrigger {
                 if(!Boolean.TRUE.equals(jobInfo.getWakeAgain())) {
                     logger.info("设置WakeAgain[{}]为TRUE RunningTriggerIds:{}",jobInfo.getJobDesc(),jobInfo.getRunningTriggerIds());
                     jobInfo.setWakeAgain(Boolean.TRUE);
-                    XxlJobAdminConfig.getAdminConfig().getXxlJobInfoService().updateWaitAgain(jobInfo.getJobId(),Boolean.TRUE);
+                    XxlJobAdminConfig.getAdminConfig().getZJobInfoService().updateWaitAgain(jobInfo.getJobId(),Boolean.TRUE);
                 }
                 logger.info("任务[{}]正在执行中，策略[{}]放弃本次调度, RunningTriggerIds:{}",jobInfo.getJobDesc(),blockStrategy,jobInfo.getRunningTriggerIds());
                 return new ReturnT<String>(ReturnT.FAIL_CODE, "放弃本次调度:"+blockStrategy.getTitle());
             } else {
-                jobLog = XxlJobAdminConfig.getAdminConfig().getXxlJobLogService()
+                jobLog = XxlJobAdminConfig.getAdminConfig().getZJobLogService()
                         .insertTriggerBeginMessage(jobInfo.getJobId(),jobInfo.getJobGroupId(),jobInfo.getJobDesc(),new Date(),jobInfo.getExecutorFailRetryCount());
 
                 jobInfo.getRunningTriggerIds().add(jobLog.getJobLogId());
-                XxlJobAdminConfig.getAdminConfig().getXxlJobInfoService().updateRunningTriggers(jobLog.getJobId(),jobInfo.getRunningTriggerIds());
+                XxlJobAdminConfig.getAdminConfig().getZJobInfoService().updateRunningTriggers(jobLog.getJobId(),jobInfo.getRunningTriggerIds());
             }
         } else if (ExecutorBlockStrategyEnum.COVER_EARLY == blockStrategy) {
 
@@ -69,7 +65,7 @@ public class XxlJobTrigger {
 
         int finalFailRetryCount = failRetryCount>=0?failRetryCount: (jobInfo.getExecutorFailRetryCount() == null ? 0: jobInfo.getExecutorFailRetryCount().intValue());
         if(jobLog == null)
-            jobLog = XxlJobAdminConfig.getAdminConfig().getXxlJobLogService()
+            jobLog = XxlJobAdminConfig.getAdminConfig().getZJobLogService()
                     .insertTriggerBeginMessage(jobInfo.getJobId(),jobInfo.getJobGroupId(),jobInfo.getJobDesc(),new Date(),jobInfo.getExecutorFailRetryCount());
 
         if(executorParam != null){
@@ -92,7 +88,7 @@ public class XxlJobTrigger {
         //=============================run
         ReturnT<String>  triggerResult = runExecutor(triggerParam);
 
-        jobLog = XxlJobAdminConfig.getAdminConfig().getXxlJobLogService().selectByPId(jobLog.getJobLogId());
+        jobLog = XxlJobAdminConfig.getAdminConfig().getZJobLogService().selectByPId(jobLog.getJobLogId());
 
         // 5、collection trigger info
         StringBuffer triggerMsgSb = new StringBuffer();
@@ -113,7 +109,7 @@ public class XxlJobTrigger {
         String triggerMsg = triggerMsgSb.toString();
         logger.info("保存jobLog jobLog.getJobLogId:{} triggerCode:{} triggerMsg:{}",jobLog.getJobLogId(),triggerCode, triggerMsg);
 
-        XxlJobAdminConfig.getAdminConfig().getXxlJobLogService()
+        XxlJobAdminConfig.getAdminConfig().getZJobLogService()
                 .updateTriggerDoneMessage(jobLog.getJobLogId(),jobInfo.getExecutorHandler(),
                         exeP, triggerCode,triggerMsg);
 

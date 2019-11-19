@@ -18,7 +18,7 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Document(collection = "sys_djob_log")
-public class XxlJobLog  extends TimedBasedEntity implements Serializable {
+public class ZJobLog extends TimedBasedEntity implements Serializable {
 
 	@AutoId
 	@PrimaryId

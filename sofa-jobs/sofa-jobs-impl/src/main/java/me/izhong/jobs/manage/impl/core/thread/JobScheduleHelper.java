@@ -4,9 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import me.izhong.common.util.DateUtil;
 import me.izhong.db.common.service.MongoDistributedLock;
 import me.izhong.jobs.manage.impl.core.cron.CronExpression;
-import me.izhong.jobs.manage.impl.core.model.XxlJobInfo;
+import me.izhong.jobs.manage.impl.core.model.ZJobInfo;
 import me.izhong.jobs.manage.impl.core.trigger.TriggerTypeEnum;
-import me.izhong.jobs.manage.impl.service.XxlJobInfoService;
+import me.izhong.jobs.manage.impl.service.ZJobInfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ public class JobScheduleHelper {
     private volatile static Map<Long, List<Long>> ringData = new ConcurrentHashMap<>();
 
     @Resource
-    private XxlJobInfoService xxlJobInfoService;
+    private ZJobInfoService zJobInfoService;
 
     @Autowired
     private MongoDistributedLock dLock;
@@ -77,7 +77,7 @@ public class JobScheduleHelper {
                         // 1、pre read
                         long nowTime = System.currentTimeMillis();
                         log.info("去数据库查询最近要执行的任务列表:{}",DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD_HH_MM_SS, new Date(nowTime + PRE_READ_MS)));
-                        List<XxlJobInfo> scheduleList = xxlJobInfoService.scheduleJobQuery(nowTime + PRE_READ_MS);
+                        List<ZJobInfo> scheduleList = zJobInfoService.scheduleJobQuery(nowTime + PRE_READ_MS);
                         if(scheduleList == null || scheduleList.size() == 0) {
                             //logger.info("没有轮询到要执行的定时任务");
                             preReadSuc = false;
@@ -85,7 +85,7 @@ public class JobScheduleHelper {
                             logger.info("获取定时任务数量 {}", scheduleList.size());
 
                             // 2、push time-ring
-                            for (XxlJobInfo jobInfo: scheduleList) {
+                            for (ZJobInfo jobInfo: scheduleList) {
 
                                 // time-ring jump 好久没运行的定时任务，+5s 也没到达当前时间，设置运行时间等待下次调度
                                 if (nowTime > jobInfo.getTriggerNextTime() + PRE_READ_MS) {
@@ -168,8 +168,8 @@ public class JobScheduleHelper {
                             }
 
                             // 3、updateJobGroup trigger info
-                            for (XxlJobInfo jobInfo: scheduleList) {
-                                xxlJobInfoService.scheduleUpdate(jobInfo);
+                            for (ZJobInfo jobInfo: scheduleList) {
+                                zJobInfoService.scheduleUpdate(jobInfo);
                             }
                         }
                     } catch (Exception e) {

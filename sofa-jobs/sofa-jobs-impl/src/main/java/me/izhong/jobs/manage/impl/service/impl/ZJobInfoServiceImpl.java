@@ -6,22 +6,17 @@ import me.izhong.db.common.service.CrudBaseServiceImpl;
 import me.izhong.domain.PageModel;
 import me.izhong.domain.PageRequest;
 import me.izhong.jobs.manage.impl.core.cron.CronExpression;
-import me.izhong.jobs.manage.impl.core.model.XxlJobGroup;
-import me.izhong.jobs.manage.impl.core.model.XxlJobInfo;
-import me.izhong.jobs.manage.impl.core.model.XxlJobLog;
-import me.izhong.jobs.manage.impl.core.route.ExecutorRouteStrategyEnum;
+import me.izhong.jobs.manage.impl.core.model.ZJobGroup;
+import me.izhong.jobs.manage.impl.core.model.ZJobInfo;
 import me.izhong.jobs.manage.impl.core.thread.JobScheduleHelper;
-import me.izhong.jobs.manage.impl.service.XxlJobGroupService;
-import me.izhong.jobs.manage.impl.service.XxlJobInfoService;
-import me.izhong.jobs.manage.impl.service.XxlJobLogGlueService;
-import me.izhong.jobs.manage.impl.service.XxlJobLogService;
+import me.izhong.jobs.manage.impl.service.ZJobGroupService;
+import me.izhong.jobs.manage.impl.service.ZJobInfoService;
+import me.izhong.jobs.manage.impl.service.ZJobScriptService;
+import me.izhong.jobs.manage.impl.service.ZJobLogService;
 import me.izhong.jobs.type.ExecutorBlockStrategyEnum;
-import me.izhong.jobs.type.GlueTypeEnum;
 import me.izhong.model.ReturnT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
-import org.springframework.data.mongodb.core.aggregation.ConditionalOperators;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -36,20 +31,20 @@ import java.util.*;
 
 @Slf4j
 @Service
-public class XxlJobServiceImpl extends CrudBaseServiceImpl<Long,XxlJobInfo> implements XxlJobInfoService {
-	private static Logger logger = LoggerFactory.getLogger(XxlJobServiceImpl.class);
+public class ZJobInfoServiceImpl extends CrudBaseServiceImpl<Long,ZJobInfo> implements ZJobInfoService {
+	private static Logger logger = LoggerFactory.getLogger(ZJobInfoServiceImpl.class);
 
 	@Resource
-	private XxlJobGroupService xxlJobGroupService;
+	private ZJobGroupService xxlJobGroupService;
 	@Resource
-	private XxlJobInfoService xxlJobInfoService;
+	private ZJobInfoService zJobInfoService;
 	@Resource
-	public XxlJobLogService xxlJobLogService;
+	public ZJobLogService zJobLogService;
 	@Resource
-	private XxlJobLogGlueService xxlJobLogGlueService;
+	private ZJobScriptService zJobScriptService;
 
 	@Override
-	public List<XxlJobInfo> scheduleJobQuery(long maxNextTime) {
+	public List<ZJobInfo> scheduleJobQuery(long maxNextTime) {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("triggerNextTime").lte(maxNextTime));
 		query.addCriteria(Criteria.where("triggerStatus").is(0));
@@ -58,7 +53,7 @@ public class XxlJobServiceImpl extends CrudBaseServiceImpl<Long,XxlJobInfo> impl
 
 	@Transactional
 	@Override
-	public void scheduleUpdate(XxlJobInfo jobInfo) {
+	public void scheduleUpdate(ZJobInfo jobInfo) {
 		Assert.notNull(jobInfo,"");
 		Assert.notNull(jobInfo.getJobId(),"");
 		Assert.notNull(jobInfo.getTriggerLastTime(),"");
@@ -72,7 +67,7 @@ public class XxlJobServiceImpl extends CrudBaseServiceImpl<Long,XxlJobInfo> impl
 		update.set("triggerLastTime",jobInfo.getTriggerLastTime());
 		update.set("triggerNextTime",jobInfo.getTriggerNextTime());
 		update.set("triggerStatus",jobInfo.getTriggerStatus());
-		UpdateResult ur = mongoTemplate.updateMulti(query, update, XxlJobInfo.class);
+		UpdateResult ur = mongoTemplate.updateMulti(query, update, ZJobInfo.class);
 		if(ur.getModifiedCount() != 1) {
 			log.error("更新数量异常,数量:{}" , ur.getModifiedCount());
 		}
@@ -88,7 +83,7 @@ public class XxlJobServiceImpl extends CrudBaseServiceImpl<Long,XxlJobInfo> impl
 
 		Update update = new Update();
 		update.set("wakeAgain",waitAgain);
-		UpdateResult ur = mongoTemplate.updateMulti(query, update, XxlJobInfo.class);
+		UpdateResult ur = mongoTemplate.updateMulti(query, update, ZJobInfo.class);
 		if(ur.getModifiedCount() != 1) {
 			log.error("更新数量异常,数量:{}" , ur.getModifiedCount());
 		}
@@ -106,18 +101,34 @@ public class XxlJobServiceImpl extends CrudBaseServiceImpl<Long,XxlJobInfo> impl
 		Update update = new Update();
 		//update.set("runningCount",runningCount);
 		update.set("runningTriggerIds",runningTriggerIds);
-		UpdateResult ur = mongoTemplate.updateMulti(query, update, XxlJobInfo.class);
+		UpdateResult ur = mongoTemplate.updateMulti(query, update, ZJobInfo.class);
 		if(ur.getModifiedCount() != 1) {
 			log.error("更新数量异常,数量:{}" , ur.getModifiedCount());
 		}
 	}
 
 	@Override
-	public PageModel<XxlJobInfo> pageList(PageRequest request, XxlJobInfo jobInfo){
+	public void updateJobScriptId(Long jobId, Long jobScriptId) {
+		Assert.notNull(jobId,"");
+		Assert.notNull(jobScriptId,"");
+
+		Query query = new Query();
+		query.addCriteria(Criteria.where("jobId").is(jobId));
+
+		Update update = new Update();
+		update.set("jobScriptId",jobScriptId);
+		UpdateResult ur = mongoTemplate.updateMulti(query, update, ZJobInfo.class);
+		if(ur.getModifiedCount() != 1) {
+			log.error("更新数量异常,数量:{}" , ur.getModifiedCount());
+		}
+	}
+
+	@Override
+	public PageModel<ZJobInfo> pageList(PageRequest request, ZJobInfo jobInfo){
 	//public Map<String, Object> pageList(int start, int length, int jobGroup, int triggerStatus, String jobDesc, String executorHandler, String author) {
 
 		// page list
-//		List<XxlJobInfo> list = xxlJobInfoDao.pageList(start, length, jobGroup, triggerStatus, jobDesc, executorHandler, author);
+//		List<ZJobInfo> list = xxlJobInfoDao.pageList(start, length, jobGroup, triggerStatus, jobDesc, executorHandler, author);
 //		int list_count = xxlJobInfoDao.pageListCount(start, length, jobGroup, triggerStatus, jobDesc, executorHandler, author);
 //
 //		// package result
@@ -126,11 +137,11 @@ public class XxlJobServiceImpl extends CrudBaseServiceImpl<Long,XxlJobInfo> impl
 //	    maps.put("recordsFiltered", list_count);	// 过滤后的总记录数
 //	    maps.put("data", list);  					// 分页列表
 //		return maps;
-		return xxlJobInfoService.selectPage(request,jobInfo);
+		return zJobInfoService.selectPage(request,jobInfo);
 	}
 
 	@Override
-	public List<XxlJobInfo> findRunningJobs() {
+	public List<ZJobInfo> findRunningJobs() {
 		Query query = new Query();
 
 		//Criteria cr = new Criteria();
@@ -142,12 +153,12 @@ public class XxlJobServiceImpl extends CrudBaseServiceImpl<Long,XxlJobInfo> impl
 
 	@Transactional
 	@Override
-	public ReturnT<String> addJob(XxlJobInfo jobInfo) {
+	public ReturnT<String> addJob(ZJobInfo jobInfo) {
 		// valid
 		if(jobInfo.getJobGroupId() == null) {
 			return new ReturnT<String>(ReturnT.FAIL_CODE, "任务组必填" );
 		}
-		XxlJobGroup group = xxlJobGroupService.selectByPId(jobInfo.getJobGroupId());
+		ZJobGroup group = xxlJobGroupService.selectByPId(jobInfo.getJobGroupId());
 		if (group == null) {
 			return new ReturnT<String>(ReturnT.FAIL_CODE, "分组不存在");
 		}
@@ -167,18 +178,12 @@ public class XxlJobServiceImpl extends CrudBaseServiceImpl<Long,XxlJobInfo> impl
 			return new ReturnT<String>(ReturnT.FAIL_CODE, "阻塞策略不能为空" );
 		}
 
-
-		// fix "\r" in shell
-		if (GlueTypeEnum.GLUE_SHELL==GlueTypeEnum.match(jobInfo.getGlueType()) && jobInfo.getGlueSource()!=null) {
-			jobInfo.setGlueSource(jobInfo.getGlueSource().replaceAll("\r", ""));
-		}
-
 		// ChildJobId valid
 		if (jobInfo.getChildJobId()!=null && jobInfo.getChildJobId().trim().length()>0) {
 			String[] childJobIds = jobInfo.getChildJobId().split(",");
 			for (String childJobIdItem: childJobIds) {
 				if (childJobIdItem!=null && childJobIdItem.trim().length()>0 && isNumeric(childJobIdItem)) {
-					XxlJobInfo childJobInfo = selectByPId(Long.valueOf(childJobIdItem));
+					ZJobInfo childJobInfo = selectByPId(Long.valueOf(childJobIdItem));
 					if (childJobInfo==null) {
 						return new ReturnT<String>(ReturnT.FAIL_CODE,
 								MessageFormat.format("子任务不存在 {}", childJobIdItem));
@@ -201,7 +206,7 @@ public class XxlJobServiceImpl extends CrudBaseServiceImpl<Long,XxlJobInfo> impl
         jobInfo.setCreateTime(new Date());
 		jobInfo.setUpdateTime(new Date());
 		// addJobScript in db
-		xxlJobInfoService.insert(jobInfo);
+		zJobInfoService.insert(jobInfo);
 		if (jobInfo.getJobId() < 1) {
 			return new ReturnT<String>(ReturnT.FAIL_CODE, "插入异常" );
 		}
@@ -220,7 +225,7 @@ public class XxlJobServiceImpl extends CrudBaseServiceImpl<Long,XxlJobInfo> impl
 
 	@Transactional
 	@Override
-	public ReturnT<String> updateJob(XxlJobInfo jobInfo) {
+	public ReturnT<String> updateJob(ZJobInfo jobInfo) {
 
 		Assert.notNull(jobInfo,"");
 		Assert.notNull(jobInfo.getJobId(),"任务ID不能为空");
@@ -229,7 +234,7 @@ public class XxlJobServiceImpl extends CrudBaseServiceImpl<Long,XxlJobInfo> impl
 		if(jobInfo.getJobGroupId() == null) {
 			return new ReturnT<String>(ReturnT.FAIL_CODE, "任务组必填" );
 		}
-		XxlJobGroup group = xxlJobGroupService.selectByPId(jobInfo.getJobGroupId());
+		ZJobGroup group = xxlJobGroupService.selectByPId(jobInfo.getJobGroupId());
 		if (group == null) {
 			return new ReturnT<String>(ReturnT.FAIL_CODE, "任务组不存在" );
 		}
@@ -254,7 +259,7 @@ public class XxlJobServiceImpl extends CrudBaseServiceImpl<Long,XxlJobInfo> impl
 			String[] childJobIds = jobInfo.getChildJobId().split(",");
 			for (String childJobIdItem: childJobIds) {
 				if (childJobIdItem!=null && childJobIdItem.trim().length()>0 && isNumeric(childJobIdItem)) {
-					XxlJobInfo childJobInfo = selectByPId(Long.valueOf(childJobIdItem));
+					ZJobInfo childJobInfo = selectByPId(Long.valueOf(childJobIdItem));
 					if (childJobInfo==null) {
 						return new ReturnT<String>(ReturnT.FAIL_CODE,
 								MessageFormat.format("子任务不存在 {}", childJobIdItem));
@@ -275,7 +280,7 @@ public class XxlJobServiceImpl extends CrudBaseServiceImpl<Long,XxlJobInfo> impl
 		}
 
 		// stage job info
-		XxlJobInfo exists_jobInfo = xxlJobInfoService.selectByPId(jobInfo.getJobId());
+		ZJobInfo exists_jobInfo = zJobInfoService.selectByPId(jobInfo.getJobId());
 		if (exists_jobInfo == null) {
 			return new ReturnT<String>(ReturnT.FAIL_CODE, "任务不存在");
 		}
@@ -309,13 +314,10 @@ public class XxlJobServiceImpl extends CrudBaseServiceImpl<Long,XxlJobInfo> impl
 		exists_jobInfo.setChildJobId(jobInfo.getChildJobId());
 		exists_jobInfo.setTriggerNextTime(nextTriggerTime);
 
-		exists_jobInfo.setGlueSource(jobInfo.getGlueSource());
-		exists_jobInfo.setGlueRemark(jobInfo.getGlueRemark());
-		exists_jobInfo.setGlueUpdatetime(jobInfo.getGlueUpdatetime());
 		exists_jobInfo.setTriggerStatus(jobInfo.getTriggerStatus());
 		exists_jobInfo.setRemark(jobInfo.getRemark());
 
-        xxlJobInfoService.update(exists_jobInfo);
+        zJobInfoService.update(exists_jobInfo);
 
 		return ReturnT.SUCCESS;
 	}
@@ -323,26 +325,26 @@ public class XxlJobServiceImpl extends CrudBaseServiceImpl<Long,XxlJobInfo> impl
 	@Transactional
 	@Override
 	public ReturnT<String> removeJob(long id) {
-		XxlJobInfo xxlJobInfo = xxlJobInfoService.selectByPId(id);
-		if (xxlJobInfo == null) {
+		ZJobInfo zJobInfo = zJobInfoService.selectByPId(id);
+		if (zJobInfo == null) {
 			return ReturnT.SUCCESS;
 		}
 
-		xxlJobInfoService.deleteByPId(id);
-		xxlJobLogService.deleteByPId(id);
-		xxlJobLogGlueService.deleteByPId(id);
+		zJobInfoService.deleteByPId(id);
+		zJobLogService.deleteByPId(id);
+		zJobScriptService.deleteByPId(id);
 		return ReturnT.SUCCESS;
 	}
 
 	@Transactional
 	@Override
 	public ReturnT<String> enableJob(long id) {
-		XxlJobInfo xxlJobInfo = xxlJobInfoService.selectByPId(id);
+		ZJobInfo zJobInfo = zJobInfoService.selectByPId(id);
 
 		// next trigger time (5s后生效，避开预读周期)
 		long nextTriggerTime = 0;
 		try {
-			Date nextValidTime = new CronExpression(xxlJobInfo.getJobCron()).getNextValidTimeAfter(new Date(System.currentTimeMillis() + JobScheduleHelper.PRE_READ_MS));
+			Date nextValidTime = new CronExpression(zJobInfo.getJobCron()).getNextValidTimeAfter(new Date(System.currentTimeMillis() + JobScheduleHelper.PRE_READ_MS));
 			if (nextValidTime == null) {
 				return new ReturnT<String>(ReturnT.FAIL_CODE, "任务永远不会触发");
 			}
@@ -352,40 +354,40 @@ public class XxlJobServiceImpl extends CrudBaseServiceImpl<Long,XxlJobInfo> impl
 			return new ReturnT<String>(ReturnT.FAIL_CODE, "表达式非法"+ e.getMessage());
 		}
 
-		xxlJobInfo.setTriggerStatus(0L);
-		xxlJobInfo.setTriggerLastTime(0L);
-		xxlJobInfo.setTriggerNextTime(nextTriggerTime);
+		zJobInfo.setTriggerStatus(0L);
+		zJobInfo.setTriggerLastTime(0L);
+		zJobInfo.setTriggerNextTime(nextTriggerTime);
 
-		xxlJobInfoService.update(xxlJobInfo);
+		zJobInfoService.update(zJobInfo);
 		return ReturnT.SUCCESS;
 	}
 
 	@Transactional
 	@Override
 	public ReturnT<String> disableJob(long id) {
-        XxlJobInfo xxlJobInfo = xxlJobInfoService.selectByPId(id);
+        ZJobInfo zJobInfo = zJobInfoService.selectByPId(id);
 
-		xxlJobInfo.setTriggerStatus(1L);
-		xxlJobInfo.setTriggerLastTime(0L);
-		xxlJobInfo.setTriggerNextTime(0L);
+		zJobInfo.setTriggerStatus(1L);
+		zJobInfo.setTriggerLastTime(0L);
+		zJobInfo.setTriggerNextTime(0L);
 
-		xxlJobInfoService.update(xxlJobInfo);
+		zJobInfoService.update(zJobInfo);
 		return ReturnT.SUCCESS;
 	}
 
 	@Override
 	public Map<String, Object> dashboardInfo() {
 
-		long jobInfoCount = xxlJobInfoService.count();
-		long jobLogCount = xxlJobLogService.count();
-		long jobLogSuccessCount = xxlJobLogService.triggerCountByHandleCode(ReturnT.SUCCESS_CODE);
+		long jobInfoCount = zJobInfoService.count();
+		long jobLogCount = zJobLogService.count();
+		long jobLogSuccessCount = zJobLogService.triggerCountByHandleCode(ReturnT.SUCCESS_CODE);
 
 		// executor count
 		Set<String> executerAddressSet = new HashSet<String>();
-		List<XxlJobGroup> groupList = xxlJobGroupService.selectAll();
+		List<ZJobGroup> groupList = xxlJobGroupService.selectAll();
 
 		if (groupList!=null && !groupList.isEmpty()) {
-			for (XxlJobGroup group: groupList) {
+			for (ZJobGroup group: groupList) {
 				if (group.getRegistryList()!=null && !group.getRegistryList().isEmpty()) {
 					executerAddressSet.addAll(group.getRegistryList());
 				}
@@ -421,7 +423,7 @@ public class XxlJobServiceImpl extends CrudBaseServiceImpl<Long,XxlJobInfo> impl
 		int triggerCountSucTotal = 0;
 		int triggerCountFailTotal = 0;
 
-//		List<Map<String, Object>> triggerCountMapAll = xxlJobLogService.triggerCountByDay(startDate, endDate);
+//		List<Map<String, Object>> triggerCountMapAll = zJobLogService.triggerCountByDay(startDate, endDate);
 //		if (triggerCountMapAll!=null && triggerCountMapAll.size()>0) {
 //			for (Map<String, Object> item: triggerCountMapAll) {
 //				String day = String.valueOf(item.get("triggerDay"));

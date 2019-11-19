@@ -12,6 +12,7 @@ import me.izhong.jobs.agent.log.RemoteLog;
 import me.izhong.jobs.agent.service.JobServiceReference;
 import me.izhong.jobs.agent.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
+import me.izhong.jobs.model.JobScript;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -60,12 +61,12 @@ public class AgentScriptRunner implements ApplicationRunner {
                     agentLog = new RemoteLog(jobId, triggerId);
                 }
 
-                Job job = facade.findByJobId(jobId);
-                if(job == null) {
-                    log.info("job未找到 jobId:{} ",jobId );
-                    return;
+                JobScript jobScript = facade.findCurrentJobScriptByJobId(jobId);
+                if(jobScript == null) {
+                    log.info("jobScript未找到 jobId:{} ",jobId );
+                    throw new Exception("jobScript未找到 jobId:" + jobId);
                 }
-                String script = job.getGlueSource();
+                String script = jobScript.getScript();
                 log.info("脚本内容:{}", script);
 
                 String envsString = System.getProperty("envs");
@@ -134,7 +135,7 @@ public class AgentScriptRunner implements ApplicationRunner {
             }
         } catch (Exception e) {
             if(agentLog != null) {
-                agentLog.info("run 异常运行结束");
+                agentLog.info("run 异常运行结束" + e.getMessage());
             }
             log.info("run 异常运行结束", e);
             Thread.sleep(3000);

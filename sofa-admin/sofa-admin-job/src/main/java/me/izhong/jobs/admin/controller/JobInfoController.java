@@ -39,11 +39,7 @@ public class JobInfoController {
 		//model.addAttribute("GlueTypeEnum", GlueTypeEnum.values());								// Glue类型-字典
 		//model.addAttribute("ExecutorBlockStrategyEnum", ExecutorBlockStrategyEnum.values());	// 阻塞处理策略-字典
 
-		// 执行器列表
-		List<JobGroup> jobGroupList_all =  jobServiceReference.jobService.selectAllJobGroup();
-
-		// filter group
-		List<JobGroup> jobGroupList = jobGroupList_all;
+		List<JobGroup> jobGroupList = jobServiceReference.jobService.selectAllJobGroup();
 		if (jobGroupList==null || jobGroupList.size()==0) {
 		//	throw new XxlJobException(I18nUtil.getString("jobgroup_empty"));
 		}
@@ -61,7 +57,6 @@ public class JobInfoController {
 			List<Job> jobs = pm.getRows();
 			if(jobs != null) {
 				jobs.forEach(e -> {
-					e.setGlueSource(null);
 					e.setTriggerLastTimeString(DateUtil.parseLongToFullSting(e.getTriggerLastTime()));
 					e.setTriggerNextTimeString(DateUtil.parseLongToFullSting(e.getTriggerNextTime()));
 				});
@@ -132,7 +127,6 @@ public class JobInfoController {
 		exists_jobInfo.setExecutorTimeout(jobInfo.getExecutorTimeout());
 		exists_jobInfo.setExecutorFailRetryCount(jobInfo.getExecutorFailRetryCount());
 		exists_jobInfo.setChildJobId(jobInfo.getChildJobId());
-		exists_jobInfo.setTriggerStatus(jobInfo.getTriggerStatus());
 		exists_jobInfo.setRemark(jobInfo.getRemark());
 
 		ReturnT<String> rObj = jobServiceReference.jobService.update(exists_jobInfo);

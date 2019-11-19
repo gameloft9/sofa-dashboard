@@ -57,6 +57,8 @@ public class ShellCommandStatusJob extends IJobHandler {
             //记录执行状态信息
             if(exitValue == 2) {
                 return ReturnT.successReturn("DONE");
+            } else if(exitValue == 1){
+                log.info("异常，查询到多个进程，正常只有一个");
             }
             return ReturnT.SUCCESS;
         } catch (ExecuteException e) {

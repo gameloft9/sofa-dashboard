@@ -1,12 +1,12 @@
 package me.izhong.jobs.manage.impl.core.util;
 
-import me.izhong.jobs.manage.impl.core.model.XxlJobLog;
+import me.izhong.jobs.manage.impl.core.model.ZJobLog;
 import me.izhong.jobs.model.JobLog;
 import org.springframework.beans.BeanUtils;
 
 public class JobLogUtil {
 
-    public static JobLog toRpcBean(XxlJobLog db){
+    public static JobLog toRpcBean(ZJobLog db){
         if(db == null)
             return null;
         JobLog job = new JobLog();
@@ -14,10 +14,10 @@ public class JobLogUtil {
         return job;
     }
 
-    public static XxlJobLog toDbBean(JobLog job){
+    public static ZJobLog toDbBean(JobLog job){
         if(job ==null)
             return null;
-        XxlJobLog xInfo = new XxlJobLog();
+        ZJobLog xInfo = new ZJobLog();
         BeanUtils.copyProperties(job,xInfo);
         return xInfo;
     }

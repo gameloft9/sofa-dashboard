@@ -1,7 +1,7 @@
 package me.izhong.jobs.manage.impl.core.thread;
 
 import me.izhong.jobs.manage.impl.core.trigger.TriggerTypeEnum;
-import me.izhong.jobs.manage.impl.core.trigger.XxlJobTrigger;
+import me.izhong.jobs.manage.impl.core.trigger.JobDirectTrigger;
 import me.izhong.jobs.manage.impl.core.util.SpringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +70,7 @@ public class JobTriggerPoolHelper {
 
                 try {
                     // do trigger
-                    XxlJobTrigger.trigger(jobId, triggerType, failRetryCount, executorParam);
+                    JobDirectTrigger.trigger(jobId, triggerType, failRetryCount, executorParam);
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                 } finally {

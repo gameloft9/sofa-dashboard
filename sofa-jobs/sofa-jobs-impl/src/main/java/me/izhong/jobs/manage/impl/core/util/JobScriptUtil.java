@@ -1,23 +1,23 @@
 package me.izhong.jobs.manage.impl.core.util;
 
-import me.izhong.jobs.manage.impl.core.model.ZJobInfo;
-import me.izhong.jobs.model.Job;
+import me.izhong.jobs.manage.impl.core.model.ZJobScript;
+import me.izhong.jobs.model.JobScript;
 import org.springframework.beans.BeanUtils;
 
-public class JobInfoUtil {
+public class JobScriptUtil {
 
-    public static Job toRpcBean(ZJobInfo db){
+    public static JobScript toRpcBean(ZJobScript db){
         if(db == null)
             return null;
-        Job job = new Job();
+        JobScript job = new JobScript();
         BeanUtils.copyProperties(db,job);
         return job;
     }
 
-    public static ZJobInfo toDbBean(Job job){
+    public static ZJobScript toDbBean(JobScript job){
         if(job ==null)
             return null;
-        ZJobInfo xInfo = new ZJobInfo();
+        ZJobScript xInfo = new ZJobScript();
         BeanUtils.copyProperties(job,xInfo);
         return xInfo;
     }

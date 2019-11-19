@@ -3,17 +3,16 @@ package me.izhong.jobs.manage.impl.core.thread;
 import lombok.extern.slf4j.Slf4j;
 import me.izhong.db.common.service.MongoDistributedLock;
 import me.izhong.jobs.manage.impl.JobAgentServiceReference;
-import me.izhong.jobs.manage.impl.core.model.XxlJobInfo;
-import me.izhong.jobs.manage.impl.core.model.XxlJobLog;
-import me.izhong.jobs.manage.impl.service.XxlJobInfoService;
-import me.izhong.jobs.manage.impl.service.XxlJobLogService;
+import me.izhong.jobs.manage.impl.core.model.ZJobInfo;
+import me.izhong.jobs.manage.impl.core.model.ZJobLog;
+import me.izhong.jobs.manage.impl.service.ZJobInfoService;
+import me.izhong.jobs.manage.impl.service.ZJobLogService;
 import me.izhong.model.ReturnT;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -28,10 +27,10 @@ public class JobStateMonitorHelper {
     public static final String LOCK_KEY = "job_state_monitor";
 
     @Autowired
-    private XxlJobInfoService jobInfoService;
+    private ZJobInfoService jobInfoService;
 
     @Autowired
-    private XxlJobLogService jobLogService;
+    private ZJobLogService jobLogService;
 
     @Autowired
     private JobAgentServiceReference jobAgentServiceReference;
@@ -49,9 +48,9 @@ public class JobStateMonitorHelper {
                     boolean lock = false;
                     try {
                         lock = dLock.getLock(LOCK_KEY, 8000);
-                        List<XxlJobLog> jobLogs = jobLogService.findRunningJobs();
+                        List<ZJobLog> jobLogs = jobLogService.findRunningJobs();
                         if (jobLogs != null && !jobLogs.isEmpty()) {
-                            for (XxlJobLog jobLog : jobLogs) {
+                            for (ZJobLog jobLog : jobLogs) {
                                 ReturnT<String> rtStatus = jobAgentServiceReference.jobAgentService.status(jobLog.getJobId(), jobLog.getJobLogId());
                                 if(rtStatus.getCode() == ReturnT.SUCCESS_CODE) {
                                     int code = rtStatus.getCode();
@@ -62,7 +61,7 @@ public class JobStateMonitorHelper {
                                     //任务已经结束
                                     if (StringUtils.equals(content,"DONE")) {
                                         jobLogService.updateHandleDoneMessage(jobLog.getJobLogId(),  405, "异常结束(stats进程触发)");
-                                        XxlJobInfo jobInfo = jobInfoService.selectByPId(jobLog.getJobId());
+                                        ZJobInfo jobInfo = jobInfoService.selectByPId(jobLog.getJobId());
                                         if (jobInfo.getRunningTriggerIds() != null && jobInfo.getRunningTriggerIds().contains(jobLog.getJobLogId())) {
                                             jobInfo.getRunningTriggerIds().remove(jobLog.getJobLogId());
 //                                            jobInfo.setRunningCount(jobInfo.getRunningTriggerIds().size());
@@ -76,15 +75,15 @@ public class JobStateMonitorHelper {
                             }
                         }
 
-                        List<XxlJobInfo> jobInfos = jobInfoService.findRunningJobs();
-                        for(XxlJobInfo jobInfo : jobInfos ){
+                        List<ZJobInfo> jobInfos = jobInfoService.findRunningJobs();
+                        for(ZJobInfo jobInfo : jobInfos ){
                             List<Long> triggerIds = jobInfo.getRunningTriggerIds();
                             boolean needUpdate = false;
                             if(triggerIds != null && triggerIds.size() > 0) {
                                 Iterator<Long> it = triggerIds.iterator();
                                 while (it.hasNext()) {
                                     Long tgid = it.next();
-                                    XxlJobLog jl = jobLogService.selectByPId(tgid);
+                                    ZJobLog jl = jobLogService.selectByPId(tgid);
                                     if(jl == null || jl.getHandleCode() != null) {
                                         //已经结束
                                         it.remove();

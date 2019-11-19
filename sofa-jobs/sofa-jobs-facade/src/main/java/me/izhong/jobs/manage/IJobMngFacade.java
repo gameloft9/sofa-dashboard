@@ -33,6 +33,9 @@ public interface IJobMngFacade {
 
     ReturnT<String> trigger(Long jobId);
 
+    ReturnT<String> updateJobScriptId(Long jobId,Long jobScriptId);
+
+
     /**
      * agent上送执行日志，结果到调度器
      * @param
@@ -58,8 +61,6 @@ public interface IJobMngFacade {
 
     LogResult catLog(Long jobId, Long logId, long triggerTime,int fromLineNum);
 
-    void update(JobLog jobLog);
-
     /**
      * script
      * @param jobId
@@ -67,11 +68,13 @@ public interface IJobMngFacade {
      */
     List<JobScript> findJobScriptByJobId(Long jobId);
 
-    JobScript findByJobScriptId(String scriptId);
+    JobScript findByJobScriptId(Long scriptId);
 
-    void addJobScript(JobScript script);
+    JobScript findCurrentJobScriptByJobId(Long jobId);
 
-    void removeOldLog(Long jobId, int keeyDays);
+    JobScript addJobScript(JobScript script);
+
+    void removeOldScript(Long jobId, int keepCounts);
 
 
     /**

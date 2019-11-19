@@ -1,14 +1,10 @@
 package me.izhong.jobs.manage.impl.service.impl;
 
 import com.mongodb.client.result.DeleteResult;
-import me.izhong.db.common.domain.MongoLock;
 import me.izhong.db.common.service.CrudBaseServiceImpl;
-import me.izhong.jobs.manage.impl.core.model.XxlJobLogGlue;
 import me.izhong.jobs.manage.impl.core.model.ZJobStats;
-import me.izhong.jobs.manage.impl.service.XxlJobLogGlueService;
 import me.izhong.jobs.manage.impl.service.ZJobStatsService;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;

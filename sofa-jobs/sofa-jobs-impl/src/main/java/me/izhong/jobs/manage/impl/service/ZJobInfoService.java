@@ -3,25 +3,27 @@ package me.izhong.jobs.manage.impl.service;
 import me.izhong.db.common.service.CrudBaseService;
 import me.izhong.domain.PageModel;
 import me.izhong.domain.PageRequest;
-import me.izhong.jobs.manage.impl.core.model.XxlJobInfo;
+import me.izhong.jobs.manage.impl.core.model.ZJobInfo;
 import me.izhong.model.ReturnT;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public interface XxlJobInfoService extends CrudBaseService<Long,XxlJobInfo> {
-    List<XxlJobInfo> scheduleJobQuery(long maxNextTime);
+public interface ZJobInfoService extends CrudBaseService<Long,ZJobInfo> {
+    List<ZJobInfo> scheduleJobQuery(long maxNextTime);
 
-    void scheduleUpdate(XxlJobInfo jobInfo);
+    void scheduleUpdate(ZJobInfo jobInfo);
 
     void updateWaitAgain(Long jobId, Boolean waitAgain);
 
     void updateRunningTriggers(Long jobId, List<Long> runningTriggerIds);
 
-    PageModel<XxlJobInfo> pageList(PageRequest request, XxlJobInfo jobInfo);
+    void updateJobScriptId(Long jobId, Long scriptId);
 
-    List<XxlJobInfo> findRunningJobs();
+    PageModel<ZJobInfo> pageList(PageRequest request, ZJobInfo jobInfo);
+
+    List<ZJobInfo> findRunningJobs();
 
     /**
      * addJobScript job
@@ -29,7 +31,7 @@ public interface XxlJobInfoService extends CrudBaseService<Long,XxlJobInfo> {
      * @param jobInfo
      * @return
      */
-    public ReturnT<String> addJob(XxlJobInfo jobInfo);
+    public ReturnT<String> addJob(ZJobInfo jobInfo);
 
     /**
      * updateJobGroup job
@@ -37,7 +39,7 @@ public interface XxlJobInfoService extends CrudBaseService<Long,XxlJobInfo> {
      * @param jobInfo
      * @return
      */
-    public ReturnT<String> updateJob(XxlJobInfo jobInfo);
+    public ReturnT<String> updateJob(ZJobInfo jobInfo);
 
     /**
      * removeJobGroup job

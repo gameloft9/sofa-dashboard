@@ -49,7 +49,7 @@
 		<nav class="navbar navbar-static-top">
 			<div class="container">
 				<div class="navbar-header">
-					<a class="navbar-brand"><b>Web</b>IDE</a>
+					<a class="navbar-brand"><b>Web</b>脚本编辑器</a>
 					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
 						<i class="fa fa-bars"></i>
 					</button>
@@ -68,7 +68,7 @@
 					</ul>
 				</div>
 
-				<textarea id="version_now" style="display:none;" >[[${jobInfo.glueSource}]]</textarea>
+				<textarea id="version_now" style="display:none;" >[[${jobScript}]]</textarea>
 
 				<!--<div class="navbar-custom-menu">
 					<ul class="nav navbar-nav">
@@ -128,7 +128,7 @@
 				<form class="form-horizontal form" role="form" >
 					<div class="form-group">
 						<label class="col-sm-2 control-label">保存标签</label>
-						<div class="col-sm-10"><input type="text" class="form-control" id="glueRemark" maxlength="64" ></div>
+						<div class="col-sm-10"><input type="text" class="form-control" id="jobRemark" maxlength="64" ></div>
 					</div>
 					<hr>
 					<div class="form-group">
@@ -176,7 +176,7 @@
 <script th:src="@{/ajax/libs/codemirror/hint/anyword-hint.js}"></script>
 
 <script>
-    var id = '[[${jobInfo.jobId}]]';
+    var id = '[[${jobId}]]';
     var ideMode = "text/x-java";
     var prefix = ctx + "monitor/djob";
 
@@ -184,16 +184,16 @@
 
         // init code editor
         var codeEditor;
-        function initIde(glueSource) {
+        function initIde(jobScript) {
             if (codeEditor == null) {
                 codeEditor = CodeMirror(document.getElementById("ideWindow"), {
                     mode : ideMode,
                     lineNumbers : true,
                     matchBrackets : true,
-                    value: glueSource
+                    value: jobScript
                 });
             } else {
-                codeEditor.setValue(glueSource);
+                codeEditor.setValue(jobScript);
             }
         }
 
@@ -215,35 +215,16 @@
 
         $("#saveModal .ok").click(function() {
 
-            var glueSource = codeEditor.getValue();
-            var glueRemark = $("#glueRemark").val();
-
-            if (!glueRemark) {
-                layer.open({
-                    title: I18n.system_tips,
-                    btn: [ I18n.system_ok],
-                    content: I18n.system_please_input + I18n.jobinfo_glue_remark ,
-                    icon: '2'
-                });
-                return;
-            }
-            if (glueRemark.length <1 || glueRemark.length > 100) {
-                layer.open({
-                    title: I18n.system_tips ,
-                    btn: [ I18n.system_ok ],
-                    content: I18n.jobinfo_glue_remark_limit ,
-                    icon: '2'
-                });
-                return;
-            }
+            var jobScript = codeEditor.getValue();
+            var jobRemark = $("#jobRemark").val();
 
             $.ajax({
                 type : 'POST',
                 url : prefix + '/code/save',
                 data : {
                     'id' : id,
-                    'glueSource' : glueSource,
-                    'glueRemark' : glueRemark
+                    'jobScript' : jobScript,
+                    'jobRemark' : jobRemark
                 },
                 dataType : "json",
                 success : function(data){

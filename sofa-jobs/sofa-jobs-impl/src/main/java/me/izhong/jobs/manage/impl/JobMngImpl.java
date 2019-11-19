@@ -9,16 +9,10 @@ import me.izhong.domain.PageModel;
 import me.izhong.domain.PageRequest;
 import me.izhong.jobs.manage.IJobMngFacade;
 import me.izhong.jobs.manage.impl.core.cron.CronExpression;
-import me.izhong.jobs.manage.impl.core.model.XxlJobGroup;
-import me.izhong.jobs.manage.impl.core.model.XxlJobInfo;
-import me.izhong.jobs.manage.impl.core.model.XxlJobLog;
-import me.izhong.jobs.manage.impl.core.model.ZJobStats;
+import me.izhong.jobs.manage.impl.core.model.*;
 import me.izhong.jobs.manage.impl.core.thread.JobTriggerPoolHelper;
 import me.izhong.jobs.manage.impl.core.trigger.TriggerTypeEnum;
-import me.izhong.jobs.manage.impl.core.util.JobGroupUtil;
-import me.izhong.jobs.manage.impl.core.util.JobInfoUtil;
-import me.izhong.jobs.manage.impl.core.util.JobLogUtil;
-import me.izhong.jobs.manage.impl.core.util.JobStatsUtil;
+import me.izhong.jobs.manage.impl.core.util.*;
 import me.izhong.jobs.manage.impl.service.*;
 import me.izhong.jobs.model.*;
 import me.izhong.model.ReturnT;
@@ -41,19 +35,19 @@ import java.util.stream.Collectors;
 public class JobMngImpl implements IJobMngFacade {
 
     @Autowired
-    private XxlJobRegistryService registryService;
+    private ZJobInfoService jobInfoService;
 
     @Autowired
-    private XxlJobInfoService jobInfoService;
+    private ZJobGroupService jobGroupService;
 
     @Autowired
-    private XxlJobGroupService jobGroupService;
+    private ZJobLogService jobLogService;
 
     @Autowired
-    private XxlJobLogService jobLogService;
+    private ZJobScriptService jobScriptService;
 
     @Autowired
-    private XxlJobLogGlueService jobLogGlueService;
+    private ZJobScriptService jobLogGlueService;
 
     @Autowired
     private ZJobStatsService jobStatsService;
@@ -68,13 +62,13 @@ public class JobMngImpl implements IJobMngFacade {
 
     @Override
     public PageModel<Job> pageList(PageRequest request, Job ino) {
-        XxlJobInfo se = null;
+        ZJobInfo se = null;
         if(ino != null) {
             se = JobInfoUtil.toDbBean(ino);
         }
-        PageModel<XxlJobInfo> gs = jobInfoService.selectPage(request,se);
+        PageModel<ZJobInfo> gs = jobInfoService.selectPage(request,se);
         if(gs != null && gs.getRows().size() > 0) {
-            List<Job> jgs = gs.getRows().stream().map(e -> JobInfoUtil.toRpcBean(e)).map(e->{e.setGlueSource(null);return e;}).collect(Collectors.toList());
+            List<Job> jgs = gs.getRows().stream().map(e -> JobInfoUtil.toRpcBean(e)).collect(Collectors.toList());
             return PageModel.instance(gs.getCount(),jgs);
         }
         return null;
@@ -96,7 +90,7 @@ public class JobMngImpl implements IJobMngFacade {
 
     @Override
     public ReturnT<String> add(Job job) {
-        XxlJobInfo jobInfo = new XxlJobInfo();
+        ZJobInfo jobInfo = new ZJobInfo();
         BeanUtils.copyProperties(job, jobInfo);
         return jobInfoService.addJob(jobInfo);
     }
@@ -108,7 +102,7 @@ public class JobMngImpl implements IJobMngFacade {
 
     @Override
     public ReturnT<String> update(Job job) {
-        XxlJobInfo jobInfo = new XxlJobInfo();
+        ZJobInfo jobInfo = new ZJobInfo();
         BeanUtils.copyProperties(job,jobInfo);
         return jobInfoService.updateJob(jobInfo);
     }
@@ -126,7 +120,7 @@ public class JobMngImpl implements IJobMngFacade {
     @Override
     public ReturnT<String> kill(Long triggerId) {
         log.info("kill triggerId:{}",triggerId);
-        XxlJobLog jobLog = jobLogService.selectByPId(triggerId);
+        ZJobLog jobLog = jobLogService.selectByPId(triggerId);
         return jobAgentServiceReference.jobAgentService.kill(jobLog.getJobId(),triggerId);
     }
 
@@ -137,11 +131,17 @@ public class JobMngImpl implements IJobMngFacade {
     }
 
     @Override
+    public ReturnT<String> updateJobScriptId(Long jobId, Long jobScriptId) {
+        jobInfoService.updateJobScriptId(jobId,jobScriptId);
+        return ReturnT.SUCCESS;
+    }
+
+    @Override
     public void uploadStatics(LogStatics logStatics) {
         Long triggerId = logStatics.getTriggerId();
         log.info("收到日志job:{} triggerId:{} 内容:{}",logStatics.getJobId(),logStatics.getTriggerId(),logStatics.getLogData());
         //收集agent的日志
-        /*XxlJobLog jobLog = jobLogService.selectByPId(triggerId);
+        /*ZJobLog jobLog = jobLogService.selectByPId(triggerId);
         if(jobLog != null) {
             String data = logStatics.getLogData();
             if(StringUtils.isNotBlank(data)) {
@@ -173,7 +173,7 @@ public class JobMngImpl implements IJobMngFacade {
     public void uploadJobEndStatics(Long triggerId, Date endTime, Integer resultStatus, String message) {
         log.info("收到Job执行结束信息 triggerId:{} resultStatus:{}  message:{}",triggerId,resultStatus,message);
         //收集agent的日志
-        XxlJobLog jobLog = jobLogService.selectByPId(triggerId);
+        ZJobLog jobLog = jobLogService.selectByPId(triggerId);
         if(jobLog != null) {
             jobLog.setFinishHandleTime(endTime);
             Date startTime = jobLog.getHandleTime();
@@ -192,9 +192,9 @@ public class JobMngImpl implements IJobMngFacade {
         }
     }
 
-    private void triggerJobFinished(XxlJobLog jobLog) {
+    private void triggerJobFinished(ZJobLog jobLog) {
         Long jobId = jobLog.getJobId();
-        XxlJobInfo jobInfo = jobInfoService.selectByPId(jobId);
+        ZJobInfo jobInfo = jobInfoService.selectByPId(jobId);
         //任务结束了，删除这个任务管理的triggerId
         if(jobInfo.getRunningTriggerIds() != null){
             jobInfo.getRunningTriggerIds().remove(jobLog.getJobLogId());
@@ -231,7 +231,7 @@ public class JobMngImpl implements IJobMngFacade {
     public void uploadJobErrorStatics(Long triggerId, Date endTime, Integer resultStatus, String message) {
         log.info("收到Job异常结束信息 triggerId:{} resultStatus:{}  message:{}",triggerId,resultStatus,message);
         //收集agent的日志
-        XxlJobLog jobLog = jobLogService.selectByPId(triggerId);
+        ZJobLog jobLog = jobLogService.selectByPId(triggerId);
         if(jobLog != null) {
             if(jobLog.getHandleCode() != null) {
                 log.info("job已经执行结束忽略kill消息");
@@ -257,11 +257,11 @@ public class JobMngImpl implements IJobMngFacade {
 
     @Override
     public PageModel<JobLog> logPageList(PageRequest request, JobLog ino) {
-        XxlJobLog se = null;
+        ZJobLog se = null;
         if(ino != null) {
             se = JobLogUtil.toDbBean(ino);
         }
-        PageModel<XxlJobLog> gs = jobLogService.selectPage(request,se);
+        PageModel<ZJobLog> gs = jobLogService.selectPage(request,se);
         if(gs != null && gs.getRows().size() > 0) {
             List<JobLog> jgs = gs.getRows().stream().map(e -> JobLogUtil.toRpcBean(e)).collect(Collectors.toList());
             return PageModel.instance(gs.getCount(),jgs);
@@ -292,28 +292,33 @@ public class JobMngImpl implements IJobMngFacade {
     }
 
     @Override
-    public void update(JobLog jobLog) {
-
-    }
-
-    @Override
     public List<JobScript> findJobScriptByJobId(Long jobId) {
         return null;
     }
 
     @Override
-    public JobScript findByJobScriptId(String scriptId) {
+    public JobScript findByJobScriptId(Long jobScriptId) {
+        return JobScriptUtil.toRpcBean(jobScriptService.selectByPId(jobScriptId));
+    }
+
+    @Override
+    public JobScript findCurrentJobScriptByJobId(Long jobId) {
+        ZJobInfo zJobInfo = jobInfoService.selectByPId(jobId);
+        if(zJobInfo != null && zJobInfo.getJobScriptId() != null) {
+            return findByJobScriptId(zJobInfo.getJobScriptId());
+        }
         return null;
     }
 
     @Override
-    public void addJobScript(JobScript script) {
-
+    public JobScript addJobScript(JobScript script) {
+        ZJobScript dbBean = jobScriptService.insert(JobScriptUtil.toDbBean(script));
+        return JobScriptUtil.toRpcBean(dbBean);
     }
 
     @Override
-    public void removeOldLog(Long jobId, int keeyDays) {
-
+    public void removeOldScript(Long jobId, int keepCounts) {
+        jobScriptService.removeOld(jobId,keepCounts);
     }
 
     /**
@@ -322,7 +327,7 @@ public class JobMngImpl implements IJobMngFacade {
      */
     @Override
     public List<JobGroup> selectAllJobGroup() {
-        List<XxlJobGroup> gs = jobGroupService.selectAll();
+        List<ZJobGroup> gs = jobGroupService.selectAll();
         if(gs != null && gs.size() > 0) {
             return gs.stream().map(e-> JobGroupUtil.toRpcBean(e)).collect(Collectors.toList());
         }
@@ -331,11 +336,11 @@ public class JobMngImpl implements IJobMngFacade {
 
     @Override
     public PageModel<JobGroup> selectJobGroupPage(PageRequest request, JobGroup ino) {
-        XxlJobGroup se = null;
+        ZJobGroup se = null;
         if(ino !=null) {
             se = JobGroupUtil.toDbBean(ino);
         }
-        PageModel<XxlJobGroup> gs = jobGroupService.selectPage(request,se);
+        PageModel<ZJobGroup> gs = jobGroupService.selectPage(request,se);
         if(gs != null && gs.getRows().size() > 0) {
             List<JobGroup> jgs = gs.getRows().stream().map(e -> JobGroupUtil.toRpcBean(e)).collect(Collectors.toList());
             return PageModel.instance(gs.getCount(),jgs);
@@ -350,13 +355,13 @@ public class JobMngImpl implements IJobMngFacade {
 
     @Override
     public JobGroup addJobGroup(JobGroup group) {
-        XxlJobGroup db = jobGroupService.insert(JobGroupUtil.toDbBean(group));
+        ZJobGroup db = jobGroupService.insert(JobGroupUtil.toDbBean(group));
         return JobGroupUtil.toRpcBean(db);
     }
 
     @Override
     public JobGroup updateJobGroup(JobGroup group) {
-        XxlJobGroup db = jobGroupService.update(JobGroupUtil.toDbBean(group));
+        ZJobGroup db = jobGroupService.update(JobGroupUtil.toDbBean(group));
         return JobGroupUtil.toRpcBean(db);
     }
 

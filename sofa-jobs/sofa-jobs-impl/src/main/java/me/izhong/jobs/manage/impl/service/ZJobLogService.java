@@ -1,21 +1,21 @@
 package me.izhong.jobs.manage.impl.service;
 
 import me.izhong.db.common.service.CrudBaseService;
-import me.izhong.jobs.manage.impl.core.model.XxlJobLog;
+import me.izhong.jobs.manage.impl.core.model.ZJobLog;
 
 import java.util.Date;
 import java.util.List;
 
-public interface XxlJobLogService extends CrudBaseService<Long,XxlJobLog> {
+public interface ZJobLogService extends CrudBaseService<Long,ZJobLog> {
     long triggerCountByHandleCode(int successCode);
 
     List<Long> findFailJobLogIds();
 
-    List<XxlJobLog> findRunningJobs();
+    List<ZJobLog> findRunningJobs();
 
-    List<XxlJobLog> findJobLogByJobId(Long jobId);
+    List<ZJobLog> findJobLogByJobId(Long jobId);
 
-    XxlJobLog insertTriggerBeginMessage(Long jobId, Long jobGroupId, String jobDesc, Date trggerTime, Integer finalFailRetryCount);
+    ZJobLog insertTriggerBeginMessage(Long jobId, Long jobGroupId, String jobDesc, Date trggerTime, Integer finalFailRetryCount);
 
     void updateTriggerDoneMessage(Long jobLogId, String executorHandel,String executorParam,
                                   Integer triggerCode,String triggerMsg);

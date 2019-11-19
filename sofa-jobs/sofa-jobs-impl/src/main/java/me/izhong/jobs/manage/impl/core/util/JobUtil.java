@@ -1,13 +1,12 @@
 package me.izhong.jobs.manage.impl.core.util;
 
-import me.izhong.jobs.manage.impl.core.model.XxlJobInfo;
+import me.izhong.jobs.manage.impl.core.model.ZJobInfo;
 import me.izhong.jobs.model.Job;
-import me.izhong.jobs.manage.impl.core.model.XxlJobInfo;
 import org.springframework.beans.BeanUtils;
 
 public class JobUtil {
 
-    public static Job toRpcBean(XxlJobInfo db){
+    public static Job toRpcBean(ZJobInfo db){
         if(db == null)
             return null;
         Job job = new Job();
@@ -15,12 +14,12 @@ public class JobUtil {
         return job;
     }
 
-    public static XxlJobInfo toDbBean(Job job){
+    public static ZJobInfo toDbBean(Job job){
         if(job ==null)
             return null;
-        XxlJobInfo xxlJobInfo = new XxlJobInfo();
-        BeanUtils.copyProperties(job,xxlJobInfo);
-        return xxlJobInfo;
+        ZJobInfo zJobInfo = new ZJobInfo();
+        BeanUtils.copyProperties(job, zJobInfo);
+        return zJobInfo;
     }
 
 

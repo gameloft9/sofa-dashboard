@@ -31,12 +31,12 @@ fi
 PIDS=`ps -efc|grep java|grep $USER|grep SERVER_NAME=${SERVER_NAME}\\\\s|grep isJobAgent=true|grep jobId=${JOB_ID}|grep triggerId=${TRIGGER_ID}|awk -F' ' '{print $2}'`
 for PID in $PIDS
 do
-  echo "正常停止服务 PID ${PID}"
+  echo "normal kill PID ${PID}"
   echo "Kill pid ${PID}."
   kill $PID
 done
 
-#检查服务是否停止，最多90秒
+#检查服务是否停止，最多10秒
 for((i=1;i<=10;i++))
 do
   count=`ps -efc|grep java|grep $USER|grep SERVER_NAME=${SERVER_NAME}\\\\s|grep isJobAgent=true|grep jobId=${JOB_ID}|grep triggerId=${TRIGGER_ID}|wc -l`

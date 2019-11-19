@@ -9,26 +9,12 @@ fi
 
 SERVER_NAME=sofa-jobs-agent-bootstrap
 
-
-#JOB_NAME="NAME"
-#RUN_ENV=""
-#if [ $1 = "--run_env" ] ; then
-#	RUN_ENV=$2
-#else
- #   RUN_ENV=$1
-#fi
 echo "RUN_ENV:$RUN_ENV"
-
-#shift
-#shift
 PARAMS=$*
 
-
-#export BASE_DIR=/home/nuis/jobs
 JAR_DIR=$APP_DIR
 
 echo "JAR_DIR:$JAR_DIR"
-
 
 export USER_MEM_ARGS="-Xms64m -Xmx512m"
 

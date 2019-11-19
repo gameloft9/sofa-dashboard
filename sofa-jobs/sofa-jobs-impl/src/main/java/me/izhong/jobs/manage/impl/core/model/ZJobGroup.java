@@ -17,7 +17,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Document(collection = "sys_djob_group")
-public class XxlJobGroup  extends TimedBasedEntity implements Serializable {
+public class ZJobGroup extends TimedBasedEntity implements Serializable {
 
     @AutoId
     @PrimaryId
