@@ -187,15 +187,21 @@ public class JobMngImpl implements IJobMngFacade {
             jobLog.setHandleMsg(message + (jobLog.getHandleMsg() == null ? "" : ":" + jobLog.getHandleMsg()));
             jobLogService.update(jobLog);
 
-            triggerContinue(jobLog);
+            triggerJobFinished(jobLog);
 
         }
     }
 
-    private void triggerContinue(XxlJobLog jobLog) {
-        Long jobId = jobLog.getJobLogId();
+    private void triggerJobFinished(XxlJobLog jobLog) {
+        Long jobId = jobLog.getJobId();
         XxlJobInfo jobInfo = jobInfoService.selectByPId(jobId);
-        log.info("triggerContinue 任务 {} WakeAgain:{}",jobInfo.getJobDesc(),jobInfo.getWakeAgain());
+        //任务结束了，删除这个任务管理的triggerId
+        if(jobInfo.getRunningTriggerIds() != null){
+            jobInfo.getRunningTriggerIds().remove(jobLog.getJobLogId());
+            jobInfoService.updateRunningTriggers(jobId,jobInfo.getRunningTriggerIds());
+        }
+
+        log.info("triggerJobFinished 任务 {} WakeAgain:{}",jobInfo.getJobDesc(),jobInfo.getWakeAgain());
         if(Boolean.TRUE.equals(jobInfo.getWakeAgain())) {
             log.info("重新唤起任务的执行 {} ",jobInfo.getJobDesc());
             jobInfo.setWakeAgain(Boolean.FALSE);
@@ -242,7 +248,7 @@ public class JobMngImpl implements IJobMngFacade {
             jobLog.setHandleMsg(message + (jobLog.getHandleMsg() == null ? "" : ":" + jobLog.getHandleMsg()));
             jobLogService.update(jobLog);
 
-            triggerContinue(jobLog);
+            triggerJobFinished(jobLog);
 
         }
     }

@@ -48,11 +48,11 @@ public class XxlJobTrigger {
             if(jobInfo.getRunningTriggerIds() != null && jobInfo.getRunningTriggerIds().size() > 0){
                 //任务正在执行
                 if(!Boolean.TRUE.equals(jobInfo.getWakeAgain())) {
-                    logger.info("设置WakeAgain[{}]",jobInfo.getJobDesc());
+                    logger.info("设置WakeAgain[{}]为TRUE RunningTriggerIds:{}",jobInfo.getJobDesc(),jobInfo.getRunningTriggerIds());
                     jobInfo.setWakeAgain(Boolean.TRUE);
                     XxlJobAdminConfig.getAdminConfig().getXxlJobInfoService().updateWaitAgain(jobInfo.getJobId(),Boolean.TRUE);
                 }
-                logger.info("任务[{}]正在执行中，策略[{}]放弃本次调度",jobInfo.getJobDesc(),blockStrategy);
+                logger.info("任务[{}]正在执行中，策略[{}]放弃本次调度, RunningTriggerIds:{}",jobInfo.getJobDesc(),blockStrategy,jobInfo.getRunningTriggerIds());
                 return new ReturnT<String>(ReturnT.FAIL_CODE, "放弃本次调度:"+blockStrategy.getTitle());
             } else {
                 jobLog = XxlJobAdminConfig.getAdminConfig().getXxlJobLogService()
