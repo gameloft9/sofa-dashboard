@@ -55,17 +55,17 @@ public class ShellCommandStatusJob extends IJobHandler {
             int exitValue = shellExecutor.execute(cmdLine);
             log.info("status任务结束了: triggerId:{} exitValue:{}",triggerId,exitValue);
             //记录执行状态信息
-            ReturnT rt = ReturnT.SUCCESS;
-            if(exitValue == 2)
-                rt.setContent("DONE");
-            return rt;
+            if(exitValue == 2) {
+                return ReturnT.successReturn("DONE");
+            }
+            return ReturnT.SUCCESS;
         } catch (ExecuteException e) {
             int exitValue = e.getExitValue();
             log.info("status任务异常结束了: triggerId:{} exitValue:{}",triggerId,exitValue);
-            ReturnT rt = ReturnT.SUCCESS;
-            if(exitValue == 2)
-                rt.setContent("DONE");
-            return rt;
+            if(exitValue == 2) {
+                return ReturnT.successReturn("DONE");
+            }
+            return ReturnT.SUCCESS;
         }  catch (Throwable e) {
             log.error("status任务失败 triggerId:{}",triggerId, e);
             return ReturnT.FAIL;
