@@ -1,5 +1,6 @@
 package me.izhong.jobs.manage.impl.service.impl;
 
+import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
 import me.izhong.db.common.service.CrudBaseServiceImpl;
 import me.izhong.domain.PageModel;
@@ -71,7 +72,10 @@ public class XxlJobServiceImpl extends CrudBaseServiceImpl<Long,XxlJobInfo> impl
 		update.set("triggerLastTime",jobInfo.getTriggerLastTime());
 		update.set("triggerNextTime",jobInfo.getTriggerNextTime());
 		update.set("triggerStatus",jobInfo.getTriggerStatus());
-		mongoTemplate.updateMulti(query, update, XxlJobInfo.class);
+		UpdateResult ur = mongoTemplate.updateMulti(query, update, XxlJobInfo.class);
+		if(ur.getModifiedCount() != 1) {
+			log.error("更新数量异常,数量:{}" , ur.getModifiedCount());
+		}
 	}
 
 	@Override
@@ -84,7 +88,10 @@ public class XxlJobServiceImpl extends CrudBaseServiceImpl<Long,XxlJobInfo> impl
 
 		Update update = new Update();
 		update.set("waitAgain",waitAgain);
-		mongoTemplate.updateFirst(query, update, XxlJobInfo.class);
+		UpdateResult ur = mongoTemplate.updateMulti(query, update, XxlJobInfo.class);
+		if(ur.getModifiedCount() != 1) {
+			log.error("更新数量异常,数量:{}" , ur.getModifiedCount());
+		}
 	}
 
 	@Transactional
@@ -99,7 +106,10 @@ public class XxlJobServiceImpl extends CrudBaseServiceImpl<Long,XxlJobInfo> impl
 		Update update = new Update();
 		//update.set("runningCount",runningCount);
 		update.set("runningTriggerIds",runningTriggerIds);
-		mongoTemplate.updateFirst(query, update, XxlJobInfo.class);
+		UpdateResult ur = mongoTemplate.updateMulti(query, update, XxlJobInfo.class);
+		if(ur.getModifiedCount() != 1) {
+			log.error("更新数量异常,数量:{}" , ur.getModifiedCount());
+		}
 	}
 
 	@Override

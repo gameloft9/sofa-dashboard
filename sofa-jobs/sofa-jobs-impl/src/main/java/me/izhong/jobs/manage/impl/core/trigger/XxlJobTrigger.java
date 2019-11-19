@@ -59,7 +59,7 @@ public class XxlJobTrigger {
                         .insertTriggerBeginMessage(jobInfo.getJobId(),jobInfo.getJobGroupId(),jobInfo.getJobDesc(),new Date(),jobInfo.getExecutorFailRetryCount());
 
                 jobInfo.getRunningTriggerIds().add(jobLog.getJobLogId());
-                XxlJobAdminConfig.getAdminConfig().getXxlJobInfoService().updateRunningTriggers(jobLog.getJobLogId(),jobInfo.getRunningTriggerIds());
+                XxlJobAdminConfig.getAdminConfig().getXxlJobInfoService().updateRunningTriggers(jobLog.getJobId(),jobInfo.getRunningTriggerIds());
             }
         } else if (ExecutorBlockStrategyEnum.COVER_EARLY == blockStrategy) {
 
