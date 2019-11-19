@@ -94,7 +94,7 @@ public class JobStateMonitorHelper {
                             }
                             if(needUpdate) {
                                 log.info("更新任务{}正在运行的trigger:{}",jobInfo.getJobDesc(),triggerIds);
-                                jobInfoService.updateRunningTriggers(jobInfo.getJobId(),triggerIds.size(),triggerIds);
+                                jobInfoService.updateRunningTriggers(jobInfo.getJobId(),triggerIds);
                             }
                         }
                     } catch (Exception e) {

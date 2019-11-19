@@ -15,7 +15,9 @@ public interface XxlJobInfoService extends CrudBaseService<Long,XxlJobInfo> {
 
     void scheduleUpdate(XxlJobInfo jobInfo);
 
-    void updateRunningTriggers(Long jobId, Integer runningCount, List<Long> runningTriggerIds);
+    void updateWaitAgain(Long jobId, Boolean waitAgain);
+
+    void updateRunningTriggers(Long jobId, List<Long> runningTriggerIds);
 
     PageModel<XxlJobInfo> pageList(PageRequest request, XxlJobInfo jobInfo);
 

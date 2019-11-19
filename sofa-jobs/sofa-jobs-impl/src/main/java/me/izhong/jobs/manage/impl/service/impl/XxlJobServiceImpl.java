@@ -74,11 +74,23 @@ public class XxlJobServiceImpl extends CrudBaseServiceImpl<Long,XxlJobInfo> impl
 		mongoTemplate.updateMulti(query, update, XxlJobInfo.class);
 	}
 
+	@Override
+	public void updateWaitAgain(Long jobId, Boolean waitAgain) {
+		Assert.notNull(jobId,"");
+		Assert.notNull(waitAgain,"");
+
+		Query query = new Query();
+		query.addCriteria(Criteria.where("jobId").is(jobId));
+
+		Update update = new Update();
+		update.set("waitAgain",waitAgain);
+		mongoTemplate.updateFirst(query, update, XxlJobInfo.class);
+	}
+
 	@Transactional
 	@Override
-	public void updateRunningTriggers(Long jobId, Integer runningCount, List<Long> runningTriggerIds) {
+	public void updateRunningTriggers(Long jobId, List<Long> runningTriggerIds) {
 		Assert.notNull(jobId,"");
-		//Assert.notNull(runningCount,"");
 		Assert.notNull(runningTriggerIds,"");
 
 		Query query = new Query();

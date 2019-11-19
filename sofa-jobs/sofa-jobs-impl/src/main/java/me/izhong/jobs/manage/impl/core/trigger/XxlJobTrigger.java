@@ -47,8 +47,11 @@ public class XxlJobTrigger {
         if (ExecutorBlockStrategyEnum.SERIAL_EXECUTION == blockStrategy) {
             if(jobInfo.getRunningTriggerIds() != null && jobInfo.getRunningTriggerIds().size() > 0){
                 //任务正在执行
-                if(!Boolean.TRUE.equals(jobInfo.getWakeAgain()))
+                if(!Boolean.TRUE.equals(jobInfo.getWakeAgain())) {
+                    logger.info("设置WakeAgain[{}]",jobInfo.getJobDesc());
                     jobInfo.setWakeAgain(Boolean.TRUE);
+                    XxlJobAdminConfig.getAdminConfig().getXxlJobInfoService().updateWaitAgain(jobInfo.getJobId(),Boolean.TRUE);
+                }
                 logger.info("任务[{}]正在执行中，策略[{}]放弃本次调度",jobInfo.getJobDesc(),blockStrategy);
                 return new ReturnT<String>(ReturnT.FAIL_CODE, "放弃本次调度:"+blockStrategy.getTitle());
             } else {
@@ -56,8 +59,8 @@ public class XxlJobTrigger {
                         .insertTriggerBeginMessage(jobInfo.getJobId(),jobInfo.getJobGroupId(),jobInfo.getJobDesc(),new Date(),jobInfo.getExecutorFailRetryCount());
 
                 jobInfo.getRunningTriggerIds().add(jobLog.getJobLogId());
+                XxlJobAdminConfig.getAdminConfig().getXxlJobInfoService().updateRunningTriggers(jobLog.getJobLogId(),jobInfo.getRunningTriggerIds());
             }
-            XxlJobAdminConfig.getAdminConfig().getXxlJobInfoService().updateJob(jobInfo);
         } else if (ExecutorBlockStrategyEnum.COVER_EARLY == blockStrategy) {
 
         } else {
