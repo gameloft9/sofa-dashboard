@@ -205,6 +205,7 @@ public class JobMngImpl implements IJobMngFacade {
         if(Boolean.TRUE.equals(jobInfo.getWakeAgain())) {
             log.info("重新唤起任务的执行 {} ",jobInfo.getJobDesc());
             jobInfo.setWakeAgain(Boolean.FALSE);
+            jobInfoService.updateWaitAgain(jobId,Boolean.FALSE);
             try {
                 Date nextValidTime = new CronExpression(jobInfo.getJobCron()).getNextValidTimeAfter(new Date());
                 if (nextValidTime != null) {
