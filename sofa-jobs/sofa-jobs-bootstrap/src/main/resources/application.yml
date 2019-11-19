@@ -5,7 +5,7 @@ spring:
     web-application-type: NONE
   data:
     mongodb:
-      uri: mongodb://172.30.251.33:27017/uis
+      uri: mongodb://172.30.251.33:27017/uis?readPreference=primaryPreferred
   output:
     ansi:
       enabled: ALWAYS
@@ -36,7 +36,7 @@ spring:
   profiles: zz
   data:
     mongodb:
-      uri: mongodb://10.10.51.212:27017/training
+      uri: mongodb://10.10.51.212:27017/training?readPreference=primaryPreferred
 com:
   alipay:
     sofa:
@@ -50,7 +50,7 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://10.10.51.212:27017/training
+      uri: mongodb://10.10.51.212:27017/training?readPreference=primaryPreferred
 
 com:
   alipay:

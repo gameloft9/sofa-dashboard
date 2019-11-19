@@ -187,18 +187,20 @@ public class JobMngImpl implements IJobMngFacade {
             jobLog.setHandleMsg(message + (jobLog.getHandleMsg() == null ? "" : ":" + jobLog.getHandleMsg()));
             jobLogService.update(jobLog);
 
-            triggerContinue(jobLog.getJobId());
+            triggerContinue(jobLog);
 
         }
     }
 
-    private void triggerContinue(Long jobId) {
+    private void triggerContinue(XxlJobLog jobLog) {
+        Long jobId = jobLog.getJobLogId();
         XxlJobInfo jobInfo = jobInfoService.selectByPId(jobId);
+        log.info("triggerContinue 任务 {} WakeAgain:{}",jobInfo.getJobDesc(),jobInfo.getWakeAgain());
         if(Boolean.TRUE.equals(jobInfo.getWakeAgain())) {
-            log.info("重新唤起任务的执行");
+            log.info("重新唤起任务的执行 {} ",jobInfo.getJobDesc());
             jobInfo.setWakeAgain(Boolean.FALSE);
             try {
-                Date nextValidTime = new CronExpression(jobInfo.getJobCron()).getNextValidTimeAfter(new Date(jobInfo.getTriggerNextTime()));
+                Date nextValidTime = new CronExpression(jobInfo.getJobCron()).getNextValidTimeAfter(new Date());
                 if (nextValidTime != null) {
                     jobInfo.setTriggerLastTime(jobInfo.getTriggerNextTime());
                     jobInfo.setTriggerNextTime(nextValidTime.getTime());
@@ -211,8 +213,10 @@ public class JobMngImpl implements IJobMngFacade {
                 log.error("",ee);
             }
             jobInfoService.updateJob(jobInfo);
-            JobTriggerPoolHelper.trigger(jobInfo.getJobId(), TriggerTypeEnum.CONTINUE, -1,  null);
-            log.info("WakeAgain触发任务执行 jobId:{}" ,jobInfo.getId() );
+            JobTriggerPoolHelper.trigger(jobInfo.getJobId(), TriggerTypeEnum.CONTINUE, -1, null);
+            log.info("WakeAgain触发任务执行 jobId:{} {}" ,jobInfo.getJobId(),jobInfo.getJobDesc() );
+        } else {
+            log.info("WakeAgain不需要执行 jobId:{}  {}" ,jobInfo.getJobId(),jobInfo.getJobDesc() );
         }
     }
 
@@ -238,7 +242,7 @@ public class JobMngImpl implements IJobMngFacade {
             jobLog.setHandleMsg(message + (jobLog.getHandleMsg() == null ? "" : ":" + jobLog.getHandleMsg()));
             jobLogService.update(jobLog);
 
-            triggerContinue(jobLog.getJobId());
+            triggerContinue(jobLog);
 
         }
     }

@@ -87,7 +87,7 @@ public class XxlJobServiceImpl extends CrudBaseServiceImpl<Long,XxlJobInfo> impl
 		query.addCriteria(Criteria.where("jobId").is(jobId));
 
 		Update update = new Update();
-		update.set("waitAgain",waitAgain);
+		update.set("wakeAgain",waitAgain);
 		UpdateResult ur = mongoTemplate.updateMulti(query, update, XxlJobInfo.class);
 		if(ur.getModifiedCount() != 1) {
 			log.error("更新数量异常,数量:{}" , ur.getModifiedCount());

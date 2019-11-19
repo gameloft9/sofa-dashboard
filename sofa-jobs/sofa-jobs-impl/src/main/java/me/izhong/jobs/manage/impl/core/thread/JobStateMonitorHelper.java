@@ -57,7 +57,7 @@ public class JobStateMonitorHelper {
                                     int code = rtStatus.getCode();
                                     String content = rtStatus.getContent();
                                     String message = rtStatus.getMsg();
-                                    log.info("检测任务，收到状态 jobId:{}jobDesc:{} jobLogId:{} code:{} message:{}", jobLog.getJobId(), jobLog.getJobDesc(), jobLog.getJobLogId(), code, message);
+                                    log.info("检测任务，收到状态 jobId:{}jobDesc:{} jobLogId:{} code:{} content:{} message:{}", jobLog.getJobId(), jobLog.getJobDesc(), jobLog.getJobLogId(), code, content, message);
 
                                     //任务已经结束
                                     if (StringUtils.equals(content,"DONE")) {
@@ -66,8 +66,8 @@ public class JobStateMonitorHelper {
                                         if (jobInfo.getRunningTriggerIds() != null && jobInfo.getRunningTriggerIds().contains(jobLog.getJobLogId())) {
                                             jobInfo.getRunningTriggerIds().remove(jobLog.getJobLogId());
 //                                            jobInfo.setRunningCount(jobInfo.getRunningTriggerIds().size());
-                                            log.info("移除已经停止任务{},当前还有任务{}", jobLog.getJobLogId(), jobInfo.getRunningTriggerIds().size());
-                                            jobInfoService.update(jobInfo);
+                                            log.info("移除已经停止任务{},当前还有任务{}", jobLog.getJobLogId(), jobInfo.getRunningTriggerIds());
+                                            jobInfoService.updateRunningTriggers(jobInfo.getJobId(),jobInfo.getRunningTriggerIds());
                                         } else {
                                             log.info("当前运行 {} 队列不包含异常任务（任务进行中）:triggerId:{}", jobInfo.getJobDesc(),jobLog.getJobLogId());
                                         }
@@ -106,7 +106,7 @@ public class JobStateMonitorHelper {
                             dLock.releaseLock(LOCK_KEY);
                     }
                     try {
-                        TimeUnit.SECONDS.sleep(60);
+                        TimeUnit.SECONDS.sleep(10);
                     } catch (InterruptedException e) {
 
                     }
