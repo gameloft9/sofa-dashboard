@@ -29,6 +29,8 @@ public class XxlJobLog  extends TimedBasedEntity implements Serializable {
 	private String jobDesc;
 	@Search
 	private Long jobGroupId;
+
+	@Indexed
 	private Long jobId;
 
 	// execute info

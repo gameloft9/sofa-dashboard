@@ -7,6 +7,7 @@ import me.izhong.domain.PageRequest;
 import me.izhong.jobs.manage.impl.core.cron.CronExpression;
 import me.izhong.jobs.manage.impl.core.model.XxlJobGroup;
 import me.izhong.jobs.manage.impl.core.model.XxlJobInfo;
+import me.izhong.jobs.manage.impl.core.model.XxlJobLog;
 import me.izhong.jobs.manage.impl.core.route.ExecutorRouteStrategyEnum;
 import me.izhong.jobs.manage.impl.core.thread.JobScheduleHelper;
 import me.izhong.jobs.manage.impl.service.XxlJobGroupService;
@@ -18,6 +19,8 @@ import me.izhong.jobs.type.GlueTypeEnum;
 import me.izhong.model.ReturnT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
+import org.springframework.data.mongodb.core.aggregation.ConditionalOperators;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -71,6 +74,22 @@ public class XxlJobServiceImpl extends CrudBaseServiceImpl<Long,XxlJobInfo> impl
 		mongoTemplate.updateMulti(query, update, XxlJobInfo.class);
 	}
 
+	@Transactional
+	@Override
+	public void updateRunningTriggers(Long jobId, Integer runningCount, List<Long> runningTriggerIds) {
+		Assert.notNull(jobId,"");
+		//Assert.notNull(runningCount,"");
+		Assert.notNull(runningTriggerIds,"");
+
+		Query query = new Query();
+		query.addCriteria(Criteria.where("jobId").is(jobId));
+
+		Update update = new Update();
+		//update.set("runningCount",runningCount);
+		update.set("runningTriggerIds",runningTriggerIds);
+		mongoTemplate.updateFirst(query, update, XxlJobInfo.class);
+	}
+
 	@Override
 	public PageModel<XxlJobInfo> pageList(PageRequest request, XxlJobInfo jobInfo){
 	//public Map<String, Object> pageList(int start, int length, int jobGroup, int triggerStatus, String jobDesc, String executorHandler, String author) {
@@ -87,6 +106,17 @@ public class XxlJobServiceImpl extends CrudBaseServiceImpl<Long,XxlJobInfo> impl
 //		return maps;
 		return xxlJobInfoService.selectPage(request,jobInfo);
 	}
+
+	@Override
+	public List<XxlJobInfo> findRunningJobs() {
+		Query query = new Query();
+
+		//Criteria cr = new Criteria();
+		//cr.orOperator(Criteria.where("runningTriggerIds").ne(0).gt(0), Criteria.where("runningTriggerIds").is(null));
+
+		query.addCriteria(Criteria.where("runningTriggerIds").ne(Collections.EMPTY_LIST));
+
+		return super.selectList(query,null,null);	}
 
 	@Transactional
 	@Override
@@ -257,8 +287,8 @@ public class XxlJobServiceImpl extends CrudBaseServiceImpl<Long,XxlJobInfo> impl
 		exists_jobInfo.setChildJobId(jobInfo.getChildJobId());
 		exists_jobInfo.setTriggerNextTime(nextTriggerTime);
 
-		if(jobInfo.getRunningCount() !=null)
-			exists_jobInfo.setRunningCount(jobInfo.getRunningCount());
+//		if(jobInfo.getRunningCount() !=null)
+//			exists_jobInfo.setRunningCount(jobInfo.getRunningCount());
 		if(jobInfo.getWakeAgain() != null)
 			exists_jobInfo.setWakeAgain(jobInfo.getWakeAgain());
 		exists_jobInfo.setGlueSource(jobInfo.getGlueSource());

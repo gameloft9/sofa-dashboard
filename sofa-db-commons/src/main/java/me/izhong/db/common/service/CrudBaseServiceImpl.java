@@ -290,7 +290,7 @@ public class CrudBaseServiceImpl<K,T> implements CrudBaseService<K,T> {
 
         Query query = new Query();
         query.addCriteria(Criteria.where(fieldName).is(pId));
-        DeleteResult em = mongoTemplate.remove(query);
+        DeleteResult em = mongoTemplate.remove(query, (Class) tClass);
         return em.getDeletedCount();
     }
 
@@ -301,8 +301,26 @@ public class CrudBaseServiceImpl<K,T> implements CrudBaseService<K,T> {
 
         Query query = new Query();
         query.addCriteria(Criteria.where(fieldName).in(pIds));
-        DeleteResult em = mongoTemplate.remove(query);
+        DeleteResult em = mongoTemplate.remove(query, (Class) tClass);
         return em.getDeletedCount();
+    }
+
+    @Transactional
+    @Override
+    public long removeByPIds(String ids) throws BusinessException {
+        Assert.notNull(ids,"");
+        String fieldName = doGetPrimaryId();
+
+        Long[] postIds = Convert.toLongArray(ids);
+        if(postIds.length < 1)
+            throw BusinessException.build("删除的数量不能小于1");
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where(fieldName).in(postIds));
+        query.addCriteria(CriteriaUtil.notDeleteCriteria());
+
+        DeleteResult ur = mongoTemplate.remove(query, (Class) tClass);
+        return ur.getDeletedCount();
     }
 
     private String doGetPrimaryId(){

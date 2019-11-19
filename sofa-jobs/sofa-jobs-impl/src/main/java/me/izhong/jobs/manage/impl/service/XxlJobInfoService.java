@@ -15,7 +15,11 @@ public interface XxlJobInfoService extends CrudBaseService<Long,XxlJobInfo> {
 
     void scheduleUpdate(XxlJobInfo jobInfo);
 
-    public PageModel<XxlJobInfo> pageList(PageRequest request, XxlJobInfo jobInfo);
+    void updateRunningTriggers(Long jobId, Integer runningCount, List<Long> runningTriggerIds);
+
+    PageModel<XxlJobInfo> pageList(PageRequest request, XxlJobInfo jobInfo);
+
+    List<XxlJobInfo> findRunningJobs();
 
     /**
      * addJobScript job
@@ -72,4 +76,5 @@ public interface XxlJobInfoService extends CrudBaseService<Long,XxlJobInfo> {
      * @return
      */
     public ReturnT<Map<String,Object>> chartInfo(Date startDate, Date endDate);
+
 }

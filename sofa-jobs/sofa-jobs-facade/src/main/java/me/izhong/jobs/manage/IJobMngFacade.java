@@ -34,13 +34,6 @@ public interface IJobMngFacade {
     ReturnT<String> trigger(Long jobId);
 
     /**
-     *  agent注册自己的地址到调度器
-     * @param registryParam
-     * @return
-     */
-    ReturnT<String> registryAgent(RegistryParam registryParam);
-
-    /**
      * agent上送执行日志，结果到调度器
      * @param
      * @return

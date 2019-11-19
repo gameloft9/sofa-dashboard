@@ -49,7 +49,10 @@ public class CustomerJobsRouter extends Router {
             String method = request.getMethod().getName();
             XxlJobInfoService jobInfoService = SpringUtil.getBean(XxlJobInfoService.class);
             XxlJobLogService jobLogService = SpringUtil.getBean(XxlJobLogService.class);
-            log.info("路由地址: interfaceName:{} method:{}  {}", interfaceName, method, providerInfos);
+//            路由地址: interfaceName:me.izhong.jobs.manage.IJobAgentMngFacade method:status  [bolt://172.30.251.92:13303?version=1.0&accepts=100000&appName=job-agent&weight=100&language=java
+//&pid=26913&interface=me.izhong.jobs.manage.IJobAgentMngFacade&timeout=0&serialization=hessian2&protocol=bolt&delay=-1&dynamic=true&startTime=1574140442562&id=jobAgentMngImpl&uniqueId=1&rpcVer=50504]
+
+            log.info("路由地址: interfaceName:{} method:{}", interfaceName, method);
             if ("trigger".equals(method)) {
                 int providerSize = providerInfos.size();
                 int randInt = RandomUtils.nextInt() % providerSize;
@@ -67,7 +70,7 @@ public class CustomerJobsRouter extends Router {
                     add(pi);
                 }};
 
-            } else if (StringUtils.equalsAny(method, "catLog", "kill")) {
+            } else if (StringUtils.equalsAny(method, "catLog", "kill","status")) {
                 log.info("按照路由策略执行method:{}",method);
 
                 Object[] args = request.getMethodArgs();

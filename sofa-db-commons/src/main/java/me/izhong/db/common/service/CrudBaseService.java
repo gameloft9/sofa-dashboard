@@ -48,4 +48,6 @@ public interface CrudBaseService<K,T> {
 
      long remove(List<K> pIds);
 
+     long removeByPIds(String pIds) throws BusinessException;
+
 }

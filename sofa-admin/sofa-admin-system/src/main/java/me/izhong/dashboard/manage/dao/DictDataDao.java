@@ -11,8 +11,6 @@ public interface DictDataDao extends MongoRepository<SysDictData, Long> {
 
     List<SysDictData> findAllByDictTypeOrderByDictSortAsc(String dictType);
 
-    List<SysDictData> findAllByDictTypeAndStatusOrderByDictSortAsc(String dictType,String status);
-
     int deleteAllByDictCode(Long dictCode);
 
     SysDictData findByDictCode(Long dictCode);

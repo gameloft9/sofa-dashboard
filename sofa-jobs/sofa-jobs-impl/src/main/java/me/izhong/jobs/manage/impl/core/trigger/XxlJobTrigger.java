@@ -28,7 +28,8 @@ public class XxlJobTrigger {
 
     private static Logger logger = LoggerFactory.getLogger(XxlJobTrigger.class);
 
-    public static ReturnT<String> trigger(long jobId, TriggerTypeEnum triggerType, int failRetryCount,  String executorParam) {
+    public static ReturnT<String> trigger(long jobId, TriggerTypeEnum triggerType,
+                                          int failRetryCount, String executorParam) {
         // load data
         XxlJobInfo jobInfo = XxlJobAdminConfig.getAdminConfig().getXxlJobInfoService().selectByPId(jobId);
         if (jobInfo == null) {
@@ -40,16 +41,21 @@ public class XxlJobTrigger {
         }
         //如果是阻塞的任务，这里就不调度了
         // executor block strategy
+        boolean willSchedule = false;
+        XxlJobLog jobLog = null;
         ExecutorBlockStrategyEnum blockStrategy = ExecutorBlockStrategyEnum.match(jobInfo.getExecutorBlockStrategy(), null);
         if (ExecutorBlockStrategyEnum.SERIAL_EXECUTION == blockStrategy) {
-            if(jobInfo.getRunningCount() != null && jobInfo.getRunningCount().longValue() > 0){
+            if(jobInfo.getRunningTriggerIds() != null && jobInfo.getRunningTriggerIds().size() > 0){
                 //任务正在执行
                 if(!Boolean.TRUE.equals(jobInfo.getWakeAgain()))
                     jobInfo.setWakeAgain(Boolean.TRUE);
                 logger.info("任务[{}]正在执行中，策略[{}]放弃本次调度",jobInfo.getJobDesc(),blockStrategy);
                 return new ReturnT<String>(ReturnT.FAIL_CODE, "放弃本次调度:"+blockStrategy.getTitle());
             } else {
-                jobInfo.setRunningCount(1L);
+                jobLog = XxlJobAdminConfig.getAdminConfig().getXxlJobLogService()
+                        .insertTriggerBeginMessage(jobInfo.getJobId(),jobInfo.getJobGroupId(),jobInfo.getJobDesc(),new Date(),jobInfo.getExecutorFailRetryCount());
+
+                jobInfo.getRunningTriggerIds().add(jobLog.getJobLogId());
             }
             XxlJobAdminConfig.getAdminConfig().getXxlJobInfoService().updateJob(jobInfo);
         } else if (ExecutorBlockStrategyEnum.COVER_EARLY == blockStrategy) {
@@ -59,11 +65,15 @@ public class XxlJobTrigger {
         }
 
         int finalFailRetryCount = failRetryCount>=0?failRetryCount: (jobInfo.getExecutorFailRetryCount() == null ? 0: jobInfo.getExecutorFailRetryCount().intValue());
+        if(jobLog == null)
+            jobLog = XxlJobAdminConfig.getAdminConfig().getXxlJobLogService()
+                    .insertTriggerBeginMessage(jobInfo.getJobId(),jobInfo.getJobGroupId(),jobInfo.getJobDesc(),new Date(),jobInfo.getExecutorFailRetryCount());
 
-
-        XxlJobLog jobLog = XxlJobAdminConfig.getAdminConfig().getXxlJobLogService()
-                .insertTriggerBeginMessage(jobInfo.getJobId(),jobInfo.getJobGroupId(),jobInfo.getJobDesc(),new Date(),jobInfo.getExecutorFailRetryCount());
-
+        if(executorParam != null){
+            jobLog.setExecutorParam(executorParam);
+        } else {
+            jobLog.setExecutorParam(jobInfo.getExecutorParam());
+        }
         logger.debug("job trigger start,job log saved, jobId:{}", jobLog.getId());
 
         // 2、init trigger-param
@@ -72,11 +82,12 @@ public class XxlJobTrigger {
         triggerParam.setLogId(jobLog.getJobLogId());
 
         triggerParam.setExecutorHandler(jobInfo.getExecutorHandler());
-        triggerParam.setExecutorParams(jobInfo.getExecutorParam());
+        triggerParam.setExecutorParams(jobLog.getExecutorParam());
         triggerParam.setExecutorBlockStrategy(jobInfo.getExecutorBlockStrategy());
         triggerParam.setExecutorTimeout(jobInfo.getExecutorTimeout());
 
-        ReturnT<String>  triggerResult = runExecutor(triggerParam, null);
+        //=============================run
+        ReturnT<String>  triggerResult = runExecutor(triggerParam);
 
         jobLog = XxlJobAdminConfig.getAdminConfig().getXxlJobLogService().selectByPId(jobLog.getJobLogId());
 
@@ -107,15 +118,9 @@ public class XxlJobTrigger {
         return triggerResult;
     }
 
-    /**
-     * run executor
-     * @param triggerParam
-     * @param address
-     * @return
-     */
-    public static ReturnT<String> runExecutor(final TriggerParam triggerParam, String address){
+    public static ReturnT<String> runExecutor(final TriggerParam triggerParam){
         ReturnT<String> runResult;
-        logger.info("调度远程执行器执行：{} : {}",triggerParam, address);
+        logger.info("调度远程执行器执行：{}",triggerParam);
         try {
             IJobAgentMngFacade sr = SpringUtil.getBean(JobAgentServiceReference.class).jobAgentService;
 
@@ -147,7 +152,7 @@ public class XxlJobTrigger {
                 runResult = ReturnT.FAIL;
             }
             StringBuffer runResultSB = new StringBuffer("触发调度：");
-            runResultSB.append("<br>address：").append(address);
+//            runResultSB.append("<br>address：").append(address);
             runResultSB.append("<br>code：").append(runResult.getCode());
             runResultSB.append("<br>msg：").append(runResult.getMsg());
 

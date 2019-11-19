@@ -5,7 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import me.izhong.dashboard.manage.dao.DictDataDao;
 import me.izhong.dashboard.manage.entity.SysDictData;
 import me.izhong.dashboard.manage.service.SysDictDataService;
+import me.izhong.db.common.util.CriteriaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,7 +28,11 @@ public class SysDictDataServiceImpl extends CrudBaseServiceImpl<Long,SysDictData
 
     @Override
     public List<SysDictData> selectNormalDictDataByType(String dictType) {
-        return dictDataDao.findAllByDictTypeAndStatusOrderByDictSortAsc(dictType,"0");
+        Query query = new Query();
+        query.addCriteria(Criteria.where("dictType").is(dictType));
+        query.addCriteria(Criteria.where("status").is("0"));
+        query.addCriteria(CriteriaUtil.notDeleteCriteria());
+        return mongoTemplate.find(query, SysDictData.class);
     }
 
     @Override

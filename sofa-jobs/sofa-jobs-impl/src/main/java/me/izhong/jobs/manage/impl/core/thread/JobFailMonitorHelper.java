@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-@Component
 @Slf4j
 public class JobFailMonitorHelper {
     private static Logger logger = LoggerFactory.getLogger(JobFailMonitorHelper.class);

@@ -74,7 +74,7 @@ public class JobMngImpl implements IJobMngFacade {
         }
         PageModel<XxlJobInfo> gs = jobInfoService.selectPage(request,se);
         if(gs != null && gs.getRows().size() > 0) {
-            List<Job> jgs = gs.getRows().stream().map(e -> JobInfoUtil.toRpcBean(e)).collect(Collectors.toList());
+            List<Job> jgs = gs.getRows().stream().map(e -> JobInfoUtil.toRpcBean(e)).map(e->{e.setGlueSource(null);return e;}).collect(Collectors.toList());
             return PageModel.instance(gs.getCount(),jgs);
         }
         return null;
@@ -133,16 +133,6 @@ public class JobMngImpl implements IJobMngFacade {
     @Override
     public ReturnT<String> trigger(Long jobId) {
         JobTriggerPoolHelper.trigger(jobId, TriggerTypeEnum.MANUAL, -1, null);
-        return ReturnT.SUCCESS;
-    }
-
-    @Override
-    public ReturnT<String> registryAgent(RegistryParam registryParam) {
-        //记录agent还活着
-        long ret = registryService.registryUpdate(registryParam.getRegistGroup(), registryParam.getRegistryKey(), registryParam.getRegistryValue());
-        if (ret < 1) {
-            registryService.registrySave(registryParam.getRegistGroup(), registryParam.getRegistryKey(), registryParam.getRegistryValue());
-        }
         return ReturnT.SUCCESS;
     }
 

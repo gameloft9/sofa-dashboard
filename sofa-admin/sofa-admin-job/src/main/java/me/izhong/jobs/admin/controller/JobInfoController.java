@@ -61,6 +61,7 @@ public class JobInfoController {
 			List<Job> jobs = pm.getRows();
 			if(jobs != null) {
 				jobs.forEach(e -> {
+					e.setGlueSource(null);
 					e.setTriggerLastTimeString(DateUtil.parseLongToFullSting(e.getTriggerLastTime()));
 					e.setTriggerNextTimeString(DateUtil.parseLongToFullSting(e.getTriggerNextTime()));
 				});

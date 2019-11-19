@@ -3,6 +3,7 @@ package me.izhong.jobs.agent.service;
 import me.izhong.jobs.agent.bean.JobsConfigBean;
 import me.izhong.jobs.agent.job.ShellCommandKillJob;
 import me.izhong.jobs.agent.job.ShellCommandRunJob;
+import me.izhong.jobs.agent.job.ShellCommandStatusJob;
 import me.izhong.jobs.manage.IJobAgentMngFacade;
 import me.izhong.jobs.agent.bean.JobContext;
 import me.izhong.jobs.model.LogResult;
@@ -33,12 +34,27 @@ public class JobAgentMngImpl implements IJobAgentMngFacade {
             ShellCommandKillJob commandJob = new ShellCommandKillJob();
             //后面考虑缓存 进程id
             JobContext context = new JobContext(jobId, triggerId, 90 * 1000, null, null);
-            commandJob.execute(context);
+            return commandJob.execute(context);
         } catch (Exception e) {
             log.error("", e);
         }
         return ReturnT.SUCCESS;
     }
+
+    @Override
+    public ReturnT<String> status(Long jobId, Long triggerId) {
+        log.info("status 任务 jobId:{} ,triggerId:{}",jobId,triggerId);
+        try {
+            ShellCommandStatusJob commandJob = new ShellCommandStatusJob();
+            //后面考虑缓存 进程id
+            JobContext context = new JobContext(jobId, triggerId, 90 * 1000, null, null);
+            return commandJob.execute(context);
+        } catch (Exception e) {
+            log.error("", e);
+        }
+        return ReturnT.SUCCESS;
+    }
+
 
     @Override
     public ReturnT<String> trigger(Long jobId, Long triggerId, Map<String, String> envs, Map<String, String> params) {

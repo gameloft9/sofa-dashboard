@@ -46,6 +46,20 @@ public class XxlJobLogServiceImpl extends CrudBaseServiceImpl<Long,XxlJobLog> im
 
     }
 
+    @Override
+    public List<XxlJobLog> findRunningJobs() {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("handleCode").is(null));
+        return super.selectList(query,null,null);
+    }
+
+    @Override
+    public List<XxlJobLog> findJobLogByJobId(Long jobId) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("jobId").is(jobId));
+        return super.selectList(query,null,null);
+    }
+
     @Transactional
     @Override
     public XxlJobLog insertTriggerBeginMessage(Long jobId, Long jobGroupId, String jobDesc, Date triggerTime, Integer finalFailRetryCount) {
@@ -70,12 +84,14 @@ public class XxlJobLogServiceImpl extends CrudBaseServiceImpl<Long,XxlJobLog> im
         options.upsert(true);
         options.returnNew(true);
         Update update = new Update();
-        update.set("executorHandler",executorHandler);
-        update.set("executorParam",executorParam);
+        if(executorHandler !=null)
+            update.set("executorHandler",executorHandler);
+        if(executorParam != null)
+            update.set("executorParam",executorParam);
         update.set("triggerCode",triggerCode);
         update.set("triggerMsg",triggerMsg);
         XxlJobLog ur = mongoTemplate.findAndModify(query, update, options, XxlJobLog.class);
-        log.info("返回新值:{},{}",ur.getTriggerCode(),ur.getTriggerMsg());
+        //log.info("返回新值:{},{}",ur.getTriggerCode(),ur.getTriggerMsg());
     }
 
     @Override
@@ -86,6 +102,18 @@ public class XxlJobLogServiceImpl extends CrudBaseServiceImpl<Long,XxlJobLog> im
 
         Update update = new Update();
         update.set("handleTime",startTime);
+        mongoTemplate.findAndModify(query, update, XxlJobLog.class);
+    }
+
+    @Override
+    public void updateHandleDoneMessage(Long jobLogId, Integer handleCode, String handleMsg) {
+        Assert.notNull(jobLogId,"");
+        Query query = new Query();
+        query.addCriteria(Criteria.where("jobLogId").is(jobLogId));
+
+        Update update = new Update();
+        update.set("handleCode",handleCode);
+        update.set("handleMsg",handleMsg);
         mongoTemplate.findAndModify(query, update, XxlJobLog.class);
     }
 
