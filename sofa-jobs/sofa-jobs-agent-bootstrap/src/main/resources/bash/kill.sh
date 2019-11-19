@@ -8,7 +8,7 @@ if [ $# -lt 2 ] ; then
 fi
 JOB_ID=$1
 TRIGGER_ID=$2
-echo "JOB_ID:$JOB_ID TRIGGER_ID:$TRIGGER_ID"
+echo "kill.sh JOB_ID:$JOB_ID TRIGGER_ID:$TRIGGER_ID"
 
 SERVER_NAME=sofa-jobs-agent-bootstrap
 
@@ -31,13 +31,13 @@ fi
 PIDS=`ps -efc|grep java|grep $USER|grep SERVER_NAME=${SERVER_NAME}\\\\s|grep isJobAgent=true|grep jobId=${JOB_ID}|grep triggerId=${TRIGGER_ID}|awk -F' ' '{print $2}'`
 for PID in $PIDS
 do
-  echo "Print current stack information for PID ${PID} to stack.txt"
+  echo "正常停止服务 PID ${PID}"
   echo "Kill pid ${PID}."
   kill $PID
 done
 
 #检查服务是否停止，最多90秒
-for((i=1;i<=90;i++))
+for((i=1;i<=10;i++))
 do
   count=`ps -efc|grep java|grep $USER|grep SERVER_NAME=${SERVER_NAME}\\\\s|grep isJobAgent=true|grep jobId=${JOB_ID}|grep triggerId=${TRIGGER_ID}|wc -l`
   if [ $count -eq 0 ]; then
