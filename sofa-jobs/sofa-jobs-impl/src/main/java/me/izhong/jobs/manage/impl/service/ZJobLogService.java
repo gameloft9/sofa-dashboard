@@ -15,9 +15,9 @@ public interface ZJobLogService extends CrudBaseService<Long,ZJobLog> {
 
     List<ZJobLog> findJobLogByJobId(Long jobId);
 
-    ZJobLog insertTriggerBeginMessage(Long jobId, Long jobGroupId, String jobDesc, Date trggerTime, Integer finalFailRetryCount);
+    ZJobLog insertTriggerBeginMessage(Long jobId, Long jobGroupId, String jobDesc, Date trggerTime, Integer finalFailRetryCount,Long executorTimeout);
 
-    void updateTriggerDoneMessage(Long jobLogId, String executorHandel,String executorParam,
+    void updateTriggerDoneMessage(Long jobLogId,String executorParam,
                                   Integer triggerCode,String triggerMsg);
 
     void updateHandleStartMessage(Long jobLogId, Date startTime);

@@ -55,12 +55,23 @@ public class JobStateMonitorHelper {
                         List<ZJobLog> jobLogs = jobLogService.findRunningJobs();
                         if (jobLogs != null && !jobLogs.isEmpty()) {
                             for (ZJobLog jobLog : jobLogs) {
-                                try {
-                                    if(jobLog.getTriggerCode() != null && jobLog.getTriggerCode().intValue() !=0) {
-                                        //触发失败的任务
-                                        setJobLogResult(jobLog, 405, "异常结束，超时未执行(stats触发)");
+                                if(jobLog.getTriggerCode() != null && jobLog.getTriggerCode().intValue() !=0) {
+                                    //触发失败的任务 直接关闭
+                                    setJobLogResult(jobLog, 405, "异常结束，超时未执行(stats触发)");
+                                    continue;
+                                }
+                                //
+                                if(jobLog.getExecutorTimeout() != null && jobLog.getExecutorTimeout().longValue()  > 0) {
+                                    //结束超时的任务
+                                    Date triggerTime = jobLog.getTriggerTime();
+                                    if(triggerTime != null && (System.currentTimeMillis() - triggerTime.getTime())/1000 > jobLog.getExecutorTimeout().longValue()){
+                                        ReturnT<String> rt = jobAgentServiceReference.jobAgentService.kill(jobLog.getJobId(),jobLog.getJobLogId());
+                                        log.info("任务{}:{}超时了发出kill命令,结果{}",jobLog.getJobId(),jobLog.getJobLogId(),rt);
                                         continue;
                                     }
+                                }
+                                //去检测任务是不是还活着
+                                try {
                                     ReturnT<String> rtStatus = jobAgentServiceReference.jobAgentService.status(jobLog.getJobId(), jobLog.getJobLogId());
                                     if (rtStatus.getCode() == ReturnT.SUCCESS_CODE) {
                                         int code = rtStatus.getCode();
@@ -70,7 +81,7 @@ public class JobStateMonitorHelper {
 
                                         //任务已经结束
                                         if (StringUtils.equals(content, "DONE")) {
-                                            setJobLogResult(jobLog, 405, "异常结束,，任务可能结束(stats触发)");
+                                            setJobLogResult(jobLog, 405, "异常结束,进程没找到(stats触发)");
                                         }
                                     }
                                 } catch (Exception jobLogException) {

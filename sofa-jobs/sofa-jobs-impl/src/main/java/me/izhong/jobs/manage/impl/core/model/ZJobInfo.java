@@ -32,8 +32,6 @@ public class ZJobInfo extends TimedBasedEntity implements Serializable {
 	private String jobCron;		// 任务执行CRON表达式
 	private Long jobScriptId;
 
-
-
 	@Search(op = Search.Op.REGEX)
 	private String jobDesc;
 
@@ -41,7 +39,6 @@ public class ZJobInfo extends TimedBasedEntity implements Serializable {
 	private String alarmEmail;	// 报警邮件
 
 	private String executorRouteStrategy;	// 执行器路由策略
-	private String executorHandler;		    // 执行器，任务Handler名称
 	private String executorParam;		    // 执行器，任务参数
 	private String executorBlockStrategy;	// 阻塞处理策略
 	private Long executorTimeout;     		// 任务执行超时时间，单位秒

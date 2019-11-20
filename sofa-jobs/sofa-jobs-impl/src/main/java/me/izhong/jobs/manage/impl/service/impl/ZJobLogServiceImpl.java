@@ -58,20 +58,21 @@ public class ZJobLogServiceImpl extends CrudBaseServiceImpl<Long,ZJobLog> implem
 
     @Transactional
     @Override
-    public ZJobLog insertTriggerBeginMessage(Long jobId, Long jobGroupId, String jobDesc, Date triggerTime, Integer finalFailRetryCount) {
+    public ZJobLog insertTriggerBeginMessage(Long jobId, Long jobGroupId, String jobDesc, Date triggerTime,
+                                             Integer finalFailRetryCount,Long executorTimeout) {
         ZJobLog jobLog = new ZJobLog();
         jobLog.setJobId(jobId);
         jobLog.setJobGroupId(jobGroupId);
         jobLog.setJobDesc(jobDesc);
         jobLog.setTriggerTime(triggerTime);
         jobLog.setExecutorFailRetryCount(finalFailRetryCount);
+        jobLog.setExecutorTimeout(executorTimeout);
         return super.insert(jobLog);
     }
 
     @Transactional
     @Override
-    public void updateTriggerDoneMessage(Long jobLogId, String executorHandler,
-                                         String executorParam, Integer triggerCode, String triggerMsg) {
+    public void updateTriggerDoneMessage(Long jobLogId, String executorParam, Integer triggerCode, String triggerMsg) {
         Assert.notNull(jobLogId,"");
         Query query = new Query();
         query.addCriteria(Criteria.where("jobLogId").is(jobLogId));
@@ -80,8 +81,6 @@ public class ZJobLogServiceImpl extends CrudBaseServiceImpl<Long,ZJobLog> implem
         options.upsert(true);
         options.returnNew(true);
         Update update = new Update();
-        if(executorHandler !=null)
-            update.set("executorHandler",executorHandler);
         if(executorParam != null)
             update.set("executorParam",executorParam);
         update.set("triggerCode",triggerCode);

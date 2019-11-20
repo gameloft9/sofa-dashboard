@@ -37,6 +37,7 @@ public class ZJobLog extends TimedBasedEntity implements Serializable {
 	private String executorAddress;
 	private String executorHandler;
 	private String executorParam;
+	private Long executorTimeout;
 	private Integer executorFailRetryCount;
 	
 	// trigger info
