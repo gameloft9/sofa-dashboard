@@ -142,7 +142,7 @@ public class ZJobLogServiceImpl extends CrudBaseServiceImpl<Long,ZJobLog> implem
 
 
     public ZJobLog update(ZJobLog target) {
-        log.info("targetAddress:{}",target.getExecutorAddress());
+        //log.info("targetAddress:{}",target.getExecutorAddress());
         return super.update(target);
     }
 

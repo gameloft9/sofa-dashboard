@@ -7,12 +7,15 @@ import me.izhong.jobs.manage.impl.core.model.ZJobInfo;
 import me.izhong.jobs.manage.impl.core.model.ZJobLog;
 import me.izhong.jobs.manage.impl.service.ZJobInfoService;
 import me.izhong.jobs.manage.impl.service.ZJobLogService;
+import me.izhong.jobs.model.JobLog;
 import me.izhong.model.ReturnT;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -34,6 +37,7 @@ public class JobStateMonitorHelper {
 
     @Autowired
     private JobAgentServiceReference jobAgentServiceReference;
+
     @Autowired
     private MongoDistributedLock dLock;
 
@@ -51,24 +55,34 @@ public class JobStateMonitorHelper {
                         List<ZJobLog> jobLogs = jobLogService.findRunningJobs();
                         if (jobLogs != null && !jobLogs.isEmpty()) {
                             for (ZJobLog jobLog : jobLogs) {
-                                ReturnT<String> rtStatus = jobAgentServiceReference.jobAgentService.status(jobLog.getJobId(), jobLog.getJobLogId());
-                                if(rtStatus.getCode() == ReturnT.SUCCESS_CODE) {
-                                    int code = rtStatus.getCode();
-                                    String content = rtStatus.getContent();
-                                    String message = rtStatus.getMsg();
-                                    log.info("检测任务，收到状态 jobId:{}jobDesc:{} jobLogId:{} code:{} content:{} message:{}", jobLog.getJobId(), jobLog.getJobDesc(), jobLog.getJobLogId(), code, content, message);
+                                try {
+                                    if(jobLog.getTriggerCode() != null && jobLog.getTriggerCode().intValue() !=0) {
+                                        //触发失败的任务
+                                        setJobLogResult(jobLog, 405, "异常结束，超时未执行(stats触发)");
+                                        continue;
+                                    }
+                                    ReturnT<String> rtStatus = jobAgentServiceReference.jobAgentService.status(jobLog.getJobId(), jobLog.getJobLogId());
+                                    if (rtStatus.getCode() == ReturnT.SUCCESS_CODE) {
+                                        int code = rtStatus.getCode();
+                                        String content = rtStatus.getContent();
+                                        String message = rtStatus.getMsg();
+                                        log.info("检测任务,收到任务运行状态, jobId:{}jobDesc:{} jobLogId:{} code:{} content:{} message:{}", jobLog.getJobId(), jobLog.getJobDesc(), jobLog.getJobLogId(), code, content, message);
 
-                                    //任务已经结束
-                                    if (StringUtils.equals(content,"DONE")) {
-                                        jobLogService.updateHandleDoneMessage(jobLog.getJobLogId(),  405, "异常结束(stats进程触发)");
-                                        ZJobInfo jobInfo = jobInfoService.selectByPId(jobLog.getJobId());
-                                        if (jobInfo.getRunningTriggerIds() != null && jobInfo.getRunningTriggerIds().contains(jobLog.getJobLogId())) {
-                                            jobInfo.getRunningTriggerIds().remove(jobLog.getJobLogId());
-//                                            jobInfo.setRunningCount(jobInfo.getRunningTriggerIds().size());
-                                            log.info("移除已经停止任务{},当前还有任务{}", jobLog.getJobLogId(), jobInfo.getRunningTriggerIds());
-                                            jobInfoService.updateRunningTriggers(jobInfo.getJobId(),jobInfo.getRunningTriggerIds());
-                                        } else {
-                                            log.info("当前运行 {} 队列不包含异常任务（任务进行中）:triggerId:{}", jobInfo.getJobDesc(),jobLog.getJobLogId());
+                                        //任务已经结束
+                                        if (StringUtils.equals(content, "DONE")) {
+                                            setJobLogResult(jobLog, 405, "异常结束,，任务可能结束(stats触发)");
+                                        }
+                                    }
+                                } catch (Exception jobLogException) {
+                                    log.error("status检测异常",jobLogException);
+                                    if (jobLog.getTriggerTime() != null) {
+                                        Date triggerTimeDes = DateUtils.addMinutes(jobLog.getTriggerTime(), 1);
+                                        //已经过去一分钟
+                                        if (triggerTimeDes.before(new Date())) {
+                                            //检测报错了，过去了一分钟，还没吊起任务，直接失败
+                                            if (jobLog.getHandleCode() == null) {
+                                                setJobLogResult(jobLog, 405, "异常结束，超时未执行(stats触发)");
+                                            }
                                         }
                                     }
                                 }
@@ -98,7 +112,7 @@ public class JobStateMonitorHelper {
                         }
                     } catch (Exception e) {
                         if (!toStop) {
-                            log.error("job fail monitor thread error:{}", e);
+                            log.error("任务监控线程异常", e);
                         }
                     } finally {
                         if(lock)
@@ -126,6 +140,18 @@ public class JobStateMonitorHelper {
             monitorThread.join();
         } catch (InterruptedException e) {
             log.error(e.getMessage(), e);
+        }
+    }
+
+    private void setJobLogResult(ZJobLog jobLog, Integer code, String message){
+        jobLogService.updateHandleDoneMessage(jobLog.getJobLogId(), code, message);
+        ZJobInfo jobInfo = jobInfoService.selectByPId(jobLog.getJobId());
+        if (jobInfo.getRunningTriggerIds() != null && jobInfo.getRunningTriggerIds().contains(jobLog.getJobLogId())) {
+            jobInfo.getRunningTriggerIds().remove(jobLog.getJobLogId());
+            log.info("移除已经停止任务{},当前还有任务{}", jobLog.getJobLogId(), jobInfo.getRunningTriggerIds());
+            jobInfoService.updateRunningTriggers(jobInfo.getJobId(), jobInfo.getRunningTriggerIds());
+        } else {
+            log.info("当前运行 {} 队列不包含异常任务（任务进行中）:triggerId:{}", jobInfo.getJobDesc(), jobLog.getJobLogId());
         }
     }
 

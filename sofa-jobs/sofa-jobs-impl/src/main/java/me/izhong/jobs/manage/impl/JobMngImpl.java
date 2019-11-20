@@ -414,6 +414,7 @@ public class JobMngImpl implements IJobMngFacade {
         ZJobStats zJobStats = JobStatsUtil.toDbBean(stats);
         ZJobStats db = jobStatsService.insertOrUpdate(zJobStats);
         JobStats rpc =  JobStatsUtil.toRpcBean(db);
+        log.info("保存JobStats {}:{}:{}",rpc.getStatsId(),rpc.getKey(),rpc.getValue1());
         return rpc;
     }
 

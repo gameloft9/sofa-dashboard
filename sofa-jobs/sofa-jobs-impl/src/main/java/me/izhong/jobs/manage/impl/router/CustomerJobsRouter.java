@@ -70,8 +70,6 @@ public class CustomerJobsRouter extends Router {
                 }};
 
             } else if (StringUtils.equalsAny(method, "catLog", "kill","status")) {
-                log.info("按照路由策略执行method:{}",method);
-
                 Object[] args = request.getMethodArgs();
                 Long jobId = (Long) args[0];
                 Long triggerId = (Long) args[1];
@@ -86,6 +84,7 @@ public class CustomerJobsRouter extends Router {
                 if (StringUtils.isBlank(jobAddress)) {
                     log.info("任务{} 日志{} 的执行地址为空", jobId, triggerId);
                 }
+                log.info("任务{}发送到{}执行{}",jobId,jobAddress,method);
                 return providerInfos.stream().filter(e -> e.getHost().equals(jobAddress)).collect(toList());
             }
         }catch (Exception e) {
