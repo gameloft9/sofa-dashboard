@@ -19,13 +19,13 @@ function in_array()
 	return 0
 }
 
-SUPPORT_SERVERS=('sofa-jobs-bootstrap' 'sofa-jobs-agent-bootstrap' 'sofa-admin-bootstrap' );
+SUPPORT_SERVERS=('sofa-jobs-bootstrap' 'sofa-jobs-agent-bootstrap' 'uis-pre-do-runner' 'UisBillNotifyMonitor' 'UisUnionPayMonitor' 'UisPayNoticeMonitor' 'UisIotServer' 'UisIotBatch' 'UisServer' 'UisConnectionServer' 'UisSettleServer' 'UisRealTimeServer' 'UisMessageServer');
 
 SERVER_NAME=$1
 SERVER_SHORT_NAME=`echo $SERVER_NAME | sed 's/[0-9]*$//'`
 
 
-count=`ps -efc|grep java|grep -v batch|grep $USER|grep SERVER_NAME=${SERVER_NAME}\\\\s|wc -l`
+count=`ps -efc|grep java|grep $USER|grep SERVER_NAME=${SERVER_NAME}\\\\s|wc -l`
 if [ $count -ge 1 ]; then
   echo "${SERVER_NAME} already running"
   exit 0
@@ -59,8 +59,8 @@ export USER_MEM_ARGS="-XX:MetaspaceSize=128M  -XX:+HeapDumpOnOutOfMemoryError -X
 JAVA_OPTIONS="-Djava.awt.headless=true -Drun_env=${RUN_ENV} -Dproduct_mode=${PRODUCT_MODE} \
 	-Dspring.profiles.active=${RUN_ENV} -Dtrace.prefix=${TRACE_PREFIX} \
 	-DSERVER_NAME=${SERVER_NAME} -Ddubbo.protocol.host=$LOCAL_IP \
-	-Djava.io.tmpdir=${TMP_DIR} -Dlogback.configurationFile=${ETC_DIR}/logback.xml \
-	-Drocketmq.client.logRoot=${LOG_DIR}/mqlog -Djobs.log.dir=${LOG_DIR}/joblogs -Djobs.script.dir=${BIN_DIR}\
+	-Denv=${ENV} -Dapp.id=${APP_ID} -Dapollo.meta=${APOLLO_META} -Dapollo.cacheDir=${APOLLO_CACHE_DIR} -Dapollo.cluster=${APOLLO_CLUSTER} \
+	-Djava.io.tmpdir=${TMP_DIR} -Dlogback.configurationFile=${ETC_DIR}/logback.xml -Drocketmq.client.logRoot=${LOG_DIR}/mqlog
 	-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Dfile.encoding=${FILE_ENCODING} -Djava.library.path=${BASE_DIR}/lib"
 
 export JAVA_OPTIONS
@@ -70,11 +70,10 @@ echo "JAVA_OPTIONS:${JAVA_OPTIONS}"
 rm -rf $DOMAIN_DIR/servers/$SERVER_NAME/tmp
 
 cd $BIN_DIR
-echo "USER_MEM_ARGS:$USER_MEM_ARGS"
+echo "用户自定义启动参数:$USER_MEM_ARGS"
 #echo "JAVA_OPTIONS:$JAVA_OPTIONS"
-echo "logpath:$LOG_DIR/$SERVER_NAME.log"
+echo 日志文件: $LOG_DIR/$SERVER_NAME.log
 
-echo "$APP_DIR/$SERVER_NAME"
 if [ -e "$APP_DIR/$SERVER_NAME.jar" ];then
   LAUNCHER_CLASS=org.springframework.boot.loader.JarLauncher
   echo "LAUNCHER_CLASS:$LAUNCHER_CLASS"

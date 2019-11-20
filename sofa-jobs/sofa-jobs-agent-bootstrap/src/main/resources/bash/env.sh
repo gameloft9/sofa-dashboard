@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export BASE_DIR=/home/dev_nuis/jobs
+export BASE_DIR=/home/nuis/jobs
 export APP_DIR=$BASE_DIR/application
 export BIN_DIR=$BASE_DIR/bin
 export LOG_DIR=$BASE_DIR/logs
@@ -11,7 +11,7 @@ export TMP_DIR=$BASE_DIR/tmp
 export FILE_ENCODING=utf8
 export JAVA_VENDOR=Sun
 export PRODUCT_MODE=t
-export RUN_ENV=dev
+export RUN_ENV=agent,dev
 export ENV=dev
 export TRACE_PREFIX=E0
 export APP_ID=netpay
