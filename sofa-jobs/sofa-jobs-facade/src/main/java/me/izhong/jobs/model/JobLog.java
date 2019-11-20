@@ -28,9 +28,11 @@ public class JobLog implements Serializable {
     private String executorHandler;
     private String executorParam;
     private Integer executorFailRetryCount;
+    private String blockStrategy;
 
     // trigger info
     private Date triggerTime;
+    private String triggerType;
     private Integer triggerCode;
     private String triggerMsg;
 

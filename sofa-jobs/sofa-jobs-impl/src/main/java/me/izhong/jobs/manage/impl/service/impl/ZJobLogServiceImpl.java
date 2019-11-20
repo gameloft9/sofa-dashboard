@@ -50,6 +50,15 @@ public class ZJobLogServiceImpl extends CrudBaseServiceImpl<Long,ZJobLog> implem
     }
 
     @Override
+    public List<ZJobLog> findRunningJobs(Long jobId) {
+        Assert.notNull(jobId,"");
+        Query query = new Query();
+        query.addCriteria(Criteria.where("jobId").is(jobId));
+        query.addCriteria(Criteria.where("handleCode").is(null));
+        return super.selectList(query,null,null);
+    }
+
+    @Override
     public List<ZJobLog> findJobLogByJobId(Long jobId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("jobId").is(jobId));
@@ -58,15 +67,17 @@ public class ZJobLogServiceImpl extends CrudBaseServiceImpl<Long,ZJobLog> implem
 
     @Transactional
     @Override
-    public ZJobLog insertTriggerBeginMessage(Long jobId, Long jobGroupId, String jobDesc, Date triggerTime,
-                                             Integer finalFailRetryCount,Long executorTimeout) {
+    public ZJobLog insertTriggerBeginMessage(Long jobId, Long jobGroupId, String jobDesc, Date triggerTime, String triggerType,
+                                             Integer finalFailRetryCount,Long executorTimeout, String blockStrategy) {
         ZJobLog jobLog = new ZJobLog();
         jobLog.setJobId(jobId);
         jobLog.setJobGroupId(jobGroupId);
         jobLog.setJobDesc(jobDesc);
         jobLog.setTriggerTime(triggerTime);
+        jobLog.setTriggerType(triggerType);
         jobLog.setExecutorFailRetryCount(finalFailRetryCount);
         jobLog.setExecutorTimeout(executorTimeout);
+        jobLog.setBlockStrategy(blockStrategy);
         return super.insert(jobLog);
     }
 

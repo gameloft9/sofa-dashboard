@@ -28,7 +28,7 @@ public class Job implements Serializable {
     private String executorParam;		    // 执行器，任务参数
     private String executorBlockStrategy;	// 阻塞处理策略
     private Long executorTimeout;     		// 任务执行超时时间，单位秒
-    private Long executorFailRetryCount;		// 失败重试次数
+    private Integer executorFailRetryCount;		// 失败重试次数
 
     private String childJobId;		// 子任务ID，多个逗号分隔
 

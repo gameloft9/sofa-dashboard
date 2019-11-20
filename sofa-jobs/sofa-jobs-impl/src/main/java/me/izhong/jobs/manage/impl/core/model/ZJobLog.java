@@ -35,13 +35,14 @@ public class ZJobLog extends TimedBasedEntity implements Serializable {
 
 	// execute info
 	private String executorAddress;
-	private String executorHandler;
 	private String executorParam;
 	private Long executorTimeout;
 	private Integer executorFailRetryCount;
+	private String blockStrategy;
 	
 	// trigger info
 	private Date triggerTime;
+	private String triggerType;
 	private Integer triggerCode;
 	private String triggerMsg;
 	
@@ -63,7 +64,7 @@ public class ZJobLog extends TimedBasedEntity implements Serializable {
 
     public void setHandleMsg(String handleMsg) {
         if(StringUtils.isBlank(handleMsg)){
-            log.error("设置handleMsg为空");
+            //log.error("设置handleMsg为空");
         }
         this.handleMsg = handleMsg;
     }

@@ -55,8 +55,8 @@
 				<div class="form-group">
 					<label class="col-sm-2 control-label">阻塞处理策略</label>
 					<div class="col-sm-4">
-						<select name="executorBlockStrategy" class="form-control m-b" th:with="type=${@dict.getType('sys_job_block_strategy')}">
-							<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{executorBlockStrategy}"></option>
+						<select name="executorBlockStrategy" class="form-control m-b">
+							<option th:each="da:${T(me.izhong.jobs.type.ExecutorBlockStrategyEnum).values()}" th:text="${da.title}" th:value="${da}" th:field="*{executorBlockStrategy}"></option>
 						</select>
 					</div>
 					<label class="col-sm-2 control-label">子任务ID</label>

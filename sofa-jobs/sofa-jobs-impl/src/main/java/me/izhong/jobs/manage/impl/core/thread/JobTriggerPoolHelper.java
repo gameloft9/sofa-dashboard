@@ -43,15 +43,8 @@ public class JobTriggerPoolHelper {
                 }
             });
 
-
-    // job timeout count
-    private volatile long minTim = System.currentTimeMillis()/60000;     // ms > min
     private volatile ConcurrentMap<Long, AtomicInteger> jobTimeoutCountMap = new ConcurrentHashMap<>();
 
-
-    /**
-     * addJobScript trigger
-     */
     private void addTrigger(final long jobId, final TriggerTypeEnum triggerType, final int failRetryCount, final String executorParam) {
 
         // choose thread pool
@@ -69,25 +62,21 @@ public class JobTriggerPoolHelper {
                 long start = System.currentTimeMillis();
 
                 try {
-                    // do trigger
                     JobDirectTrigger.trigger(jobId, triggerType, failRetryCount, executorParam);
                 } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
+                    logger.error("触发JobDirectTrigger异常", e);
                 } finally {
-                    // check timeout-count-map
-                    long minTim_now = System.currentTimeMillis()/60000;
-                    if (minTim != minTim_now) {
-                        minTim = minTim_now;
-                        jobTimeoutCountMap.clear();
+                    AtomicInteger timeoutCount = jobTimeoutCountMap.get(jobId);
+                    if (timeoutCount == null) {
+                        timeoutCount = new AtomicInteger(1);
+                        jobTimeoutCountMap.put(jobId,timeoutCount);
                     }
-
                     // incr timeout-count-map
                     long cost = System.currentTimeMillis()-start;
-                    if (cost > 500) {       // ob-timeout threshold 500ms
-                        AtomicInteger timeoutCount = jobTimeoutCountMap.putIfAbsent(jobId, new AtomicInteger(1));
-                        if (timeoutCount != null) {
-                            timeoutCount.incrementAndGet();
-                        }
+                    if (cost > 500) {
+                        timeoutCount.incrementAndGet();
+                    } else if(cost < 50) {
+                        timeoutCount.set(1);
                     }
 
                 }
@@ -104,17 +93,6 @@ public class JobTriggerPoolHelper {
         logger.info("job trigger thread pool shutdown success.");
     }
 
-    // ---------------------- helper ----------------------
-    /**
-     * @param jobId
-     * @param triggerType
-     * @param failRetryCount
-     * 			>=0: use this param
-     * 			<0: use param from job info config
-     * @param executorParam
-     *          null: use job param
-     *          not null: cover job param
-     */
     public static void trigger(long jobId, TriggerTypeEnum triggerType, int failRetryCount, String executorParam) {
         SpringUtil.getBean(JobTriggerPoolHelper.class).addTrigger(jobId, triggerType, failRetryCount, executorParam);
     }

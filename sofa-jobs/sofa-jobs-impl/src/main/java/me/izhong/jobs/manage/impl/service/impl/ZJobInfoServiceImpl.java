@@ -2,12 +2,14 @@ package me.izhong.jobs.manage.impl.service.impl;
 
 import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
+import me.izhong.db.common.exception.BusinessException;
 import me.izhong.db.common.service.CrudBaseServiceImpl;
 import me.izhong.domain.PageModel;
 import me.izhong.domain.PageRequest;
 import me.izhong.jobs.manage.impl.core.cron.CronExpression;
 import me.izhong.jobs.manage.impl.core.model.ZJobGroup;
 import me.izhong.jobs.manage.impl.core.model.ZJobInfo;
+import me.izhong.jobs.manage.impl.core.route.ExecutorRouteStrategyEnum;
 import me.izhong.jobs.manage.impl.core.thread.JobScheduleHelper;
 import me.izhong.jobs.manage.impl.service.ZJobGroupService;
 import me.izhong.jobs.manage.impl.service.ZJobInfoService;
@@ -153,152 +155,101 @@ public class ZJobInfoServiceImpl extends CrudBaseServiceImpl<Long,ZJobInfo> impl
 
 	@Transactional
 	@Override
-	public ReturnT<String> addJob(ZJobInfo jobInfo) {
+	public ZJobInfo addJob(ZJobInfo jobInfo) {
 		// valid
-		if(jobInfo.getJobGroupId() == null) {
-			return new ReturnT<String>(ReturnT.FAIL_CODE, "任务组必填" );
-		}
-		ZJobGroup group = xxlJobGroupService.selectByPId(jobInfo.getJobGroupId());
-		if (group == null) {
-			return new ReturnT<String>(ReturnT.FAIL_CODE, "分组不存在");
-		}
-		if (!CronExpression.isValidExpression(jobInfo.getJobCron())) {
-			return new ReturnT<String>(ReturnT.FAIL_CODE, "Cron表达式必填" );
-		}
-		if (jobInfo.getJobDesc()==null || jobInfo.getJobDesc().trim().length()==0) {
-			return new ReturnT<String>(ReturnT.FAIL_CODE, "描述必填" );
-		}
-		if (jobInfo.getAuthor()==null || jobInfo.getAuthor().trim().length()==0) {
-			return new ReturnT<String>(ReturnT.FAIL_CODE, "作者必填");
-		}
-//		if (ExecutorRouteStrategyEnum.match(jobInfo.getExecutorRouteStrategy(), null) == null) {
-//			return new ReturnT<String>(ReturnT.FAIL_CODE, "路由策略必填" );
-//		}
-		if (ExecutorBlockStrategyEnum.match(jobInfo.getExecutorBlockStrategy(), null) == null) {
-			return new ReturnT<String>(ReturnT.FAIL_CODE, "阻塞策略不能为空" );
-		}
+		validateJobInfo(jobInfo);
 
-		// ChildJobId valid
-		if (jobInfo.getChildJobId()!=null && jobInfo.getChildJobId().trim().length()>0) {
-			String[] childJobIds = jobInfo.getChildJobId().split(",");
-			for (String childJobIdItem: childJobIds) {
-				if (childJobIdItem!=null && childJobIdItem.trim().length()>0 && isNumeric(childJobIdItem)) {
-					ZJobInfo childJobInfo = selectByPId(Long.valueOf(childJobIdItem));
-					if (childJobInfo==null) {
-						return new ReturnT<String>(ReturnT.FAIL_CODE,
-								MessageFormat.format("子任务不存在 {}", childJobIdItem));
-					}
-				} else {
-					return new ReturnT<String>(ReturnT.FAIL_CODE,
-							MessageFormat.format("子任务异常 {}", childJobIdItem));
-				}
-			}
-
-			String temp = "";	// join ,
-			for (String item:childJobIds) {
-				temp += item + ",";
-			}
-			temp = temp.substring(0, temp.length()-1);
-
-			jobInfo.setChildJobId(temp);
-		}
-
-        jobInfo.setCreateTime(new Date());
+		jobInfo.setCreateTime(new Date());
 		jobInfo.setUpdateTime(new Date());
-		// addJobScript in db
-		zJobInfoService.insert(jobInfo);
-		if (jobInfo.getJobId() < 1) {
-			return new ReturnT<String>(ReturnT.FAIL_CODE, "插入异常" );
-		}
-
-		return new ReturnT<String>(String.valueOf(jobInfo.getJobId()));
+		return zJobInfoService.insert(jobInfo);
 	}
 
 	private boolean isNumeric(String str){
 		try {
-			int result = Integer.valueOf(str);
+			Long.valueOf(str);
 			return true;
 		} catch (NumberFormatException e) {
 			return false;
 		}
 	}
-
-	@Transactional
-	@Override
-	public ReturnT<String> updateJob(ZJobInfo jobInfo) {
-
-		Assert.notNull(jobInfo,"");
-		Assert.notNull(jobInfo.getJobId(),"任务ID不能为空");
-		log.info("update jobInfo JobDesc{}",jobInfo.getJobDesc());
-		// valid
+	private void validateJobInfo(ZJobInfo jobInfo){
 		if(jobInfo.getJobGroupId() == null) {
-			return new ReturnT<String>(ReturnT.FAIL_CODE, "任务组必填" );
+			throw BusinessException.build("任务组必填");
 		}
 		ZJobGroup group = xxlJobGroupService.selectByPId(jobInfo.getJobGroupId());
 		if (group == null) {
-			return new ReturnT<String>(ReturnT.FAIL_CODE, "任务组不存在" );
+			throw BusinessException.build("任务组不存在");
 		}
 		if (!CronExpression.isValidExpression(jobInfo.getJobCron())) {
-			return new ReturnT<String>(ReturnT.FAIL_CODE, "cron表达式非法");
+			throw BusinessException.build("cron表达式非法");
 		}
 		if (jobInfo.getJobDesc()==null || jobInfo.getJobDesc().trim().length()==0) {
-			return new ReturnT<String>(ReturnT.FAIL_CODE, "任务描述不能为空");
+			throw BusinessException.build("任务描述不能为空");
 		}
 		if (jobInfo.getAuthor()==null || jobInfo.getAuthor().trim().length()==0) {
-			return new ReturnT<String>(ReturnT.FAIL_CODE, "作者不能为空");
+			throw BusinessException.build("作者不能为空");
 		}
 //		if (ExecutorRouteStrategyEnum.match(jobInfo.getExecutorRouteStrategy(), null) == null) {
-//			return new ReturnT<String>(ReturnT.FAIL_CODE, "路由策略不能为空" );
+//			throw BusinessException.build("路由策略不能为空");
 //		}
 		if (ExecutorBlockStrategyEnum.match(jobInfo.getExecutorBlockStrategy(), null) == null) {
-			return new ReturnT<String>(ReturnT.FAIL_CODE, "阻塞策略不能为空" );
+			throw BusinessException.build("阻塞处理策略不能为空");
 		}
 
 		// ChildJobId valid
 		if (jobInfo.getChildJobId()!=null && jobInfo.getChildJobId().trim().length()>0) {
 			String[] childJobIds = jobInfo.getChildJobId().split(",");
 			for (String childJobIdItem: childJobIds) {
+				if(!isNumeric(childJobIdItem)){
+					throw BusinessException.build("子任务不是数字:" + childJobIdItem);
+				}
 				if (childJobIdItem!=null && childJobIdItem.trim().length()>0 && isNumeric(childJobIdItem)) {
 					ZJobInfo childJobInfo = selectByPId(Long.valueOf(childJobIdItem));
 					if (childJobInfo==null) {
-						return new ReturnT<String>(ReturnT.FAIL_CODE,
-								MessageFormat.format("子任务不存在 {}", childJobIdItem));
+						throw BusinessException.build("子任务不存在:" + childJobIdItem);
 					}
 				} else {
-					return new ReturnT<String>(ReturnT.FAIL_CODE,
-							MessageFormat.format("子任务异常 {}", childJobIdItem));
+					throw BusinessException.build("子任务异常:" + childJobIdItem);
 				}
 			}
 
 			String temp = "";	// join ,
 			for (String item:childJobIds) {
-				temp += item + ",";
+				temp += item.trim() + ",";
 			}
 			temp = temp.substring(0, temp.length()-1);
-
 			jobInfo.setChildJobId(temp);
 		}
 
-		// stage job info
+	}
+
+
+	@Transactional
+	@Override
+	public ZJobInfo updateJob(ZJobInfo jobInfo) {
+
+		Assert.notNull(jobInfo,"");
+		Assert.notNull(jobInfo.getJobId(),"任务ID不能为空");
+		log.info("update jobInfo JobDesc{}",jobInfo.getJobDesc());
+		// valid
+		validateJobInfo(jobInfo);
 		ZJobInfo exists_jobInfo = zJobInfoService.selectByPId(jobInfo.getJobId());
 		if (exists_jobInfo == null) {
-			return new ReturnT<String>(ReturnT.FAIL_CODE, "任务不存在");
+			throw BusinessException.build("任务不存在无法修改");
 		}
 
 		// next trigger time (5s后生效，避开预读周期)
 		Long nextTriggerTime = exists_jobInfo.getTriggerNextTime();
-		//if (Integer.valueOf(1).equals(exists_jobInfo.getTriggerStatus()) && !jobInfo.getJobCron().equals(exists_jobInfo.getJobCron()) ) {
 			try {
 				Date nextValidTime = new CronExpression(jobInfo.getJobCron()).getNextValidTimeAfter(new Date(System.currentTimeMillis() + JobScheduleHelper.PRE_READ_MS));
 				if (nextValidTime == null) {
-					return new ReturnT<String>(ReturnT.FAIL_CODE,"任务永远不会触发");
+					throw BusinessException.build("任务永远不会触发");
 				}
 				nextTriggerTime = nextValidTime.getTime();
 			} catch (ParseException e) {
 				logger.error(e.getMessage(), e);
-				return new ReturnT<String>(ReturnT.FAIL_CODE, " 任务表达式非法"+ e.getMessage());
+				throw BusinessException.build("任务表达式非法");
 			}
-		//}
 
 		exists_jobInfo.setJobGroupId(jobInfo.getJobGroupId());
 		exists_jobInfo.setJobCron(jobInfo.getJobCron());
@@ -316,28 +267,26 @@ public class ZJobInfoServiceImpl extends CrudBaseServiceImpl<Long,ZJobInfo> impl
 		exists_jobInfo.setTriggerStatus(jobInfo.getTriggerStatus());
 		exists_jobInfo.setRemark(jobInfo.getRemark());
 
-        zJobInfoService.update(exists_jobInfo);
-
-		return ReturnT.SUCCESS;
+        return zJobInfoService.update(exists_jobInfo);
 	}
 
 	@Transactional
 	@Override
-	public ReturnT<String> removeJob(long id) {
+	public long removeJob(long id) {
 		ZJobInfo zJobInfo = zJobInfoService.selectByPId(id);
 		if (zJobInfo == null) {
-			return ReturnT.SUCCESS;
+			return 0;
 		}
 
 		zJobInfoService.deleteByPId(id);
 		zJobLogService.deleteByPId(id);
 		zJobScriptService.deleteByPId(id);
-		return ReturnT.SUCCESS;
+		return 1;
 	}
 
 	@Transactional
 	@Override
-	public ReturnT<String> enableJob(long id) {
+	public long enableJob(long id) {
 		ZJobInfo zJobInfo = zJobInfoService.selectByPId(id);
 
 		// next trigger time (5s后生效，避开预读周期)
@@ -345,12 +294,12 @@ public class ZJobInfoServiceImpl extends CrudBaseServiceImpl<Long,ZJobInfo> impl
 		try {
 			Date nextValidTime = new CronExpression(zJobInfo.getJobCron()).getNextValidTimeAfter(new Date(System.currentTimeMillis() + JobScheduleHelper.PRE_READ_MS));
 			if (nextValidTime == null) {
-				return new ReturnT<String>(ReturnT.FAIL_CODE, "任务永远不会触发");
+				throw BusinessException.build("任务永远不会触发");
 			}
 			nextTriggerTime = nextValidTime.getTime();
 		} catch (ParseException e) {
 			logger.error(e.getMessage(), e);
-			return new ReturnT<String>(ReturnT.FAIL_CODE, "表达式非法"+ e.getMessage());
+			throw BusinessException.build("表达式非法"+ e.getMessage());
 		}
 
 		zJobInfo.setTriggerStatus(0L);
@@ -358,12 +307,12 @@ public class ZJobInfoServiceImpl extends CrudBaseServiceImpl<Long,ZJobInfo> impl
 		zJobInfo.setTriggerNextTime(nextTriggerTime);
 
 		zJobInfoService.update(zJobInfo);
-		return ReturnT.SUCCESS;
+		return 1;
 	}
 
 	@Transactional
 	@Override
-	public ReturnT<String> disableJob(long id) {
+	public long disableJob(long id) {
         ZJobInfo zJobInfo = zJobInfoService.selectByPId(id);
 
 		zJobInfo.setTriggerStatus(1L);
@@ -371,7 +320,7 @@ public class ZJobInfoServiceImpl extends CrudBaseServiceImpl<Long,ZJobInfo> impl
 		zJobInfo.setTriggerNextTime(0L);
 
 		zJobInfoService.update(zJobInfo);
-		return ReturnT.SUCCESS;
+		return 1;
 	}
 
 	@Override

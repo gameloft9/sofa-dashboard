@@ -25,29 +25,11 @@ public interface ZJobInfoService extends CrudBaseService<Long,ZJobInfo> {
 
     List<ZJobInfo> findRunningJobs();
 
-    /**
-     * addJobScript job
-     *
-     * @param jobInfo
-     * @return
-     */
-    public ReturnT<String> addJob(ZJobInfo jobInfo);
+    ZJobInfo addJob(ZJobInfo jobInfo);
 
-    /**
-     * updateJobGroup job
-     *
-     * @param jobInfo
-     * @return
-     */
-    public ReturnT<String> updateJob(ZJobInfo jobInfo);
+    ZJobInfo updateJob(ZJobInfo jobInfo);
 
-    /**
-     * removeJobGroup job
-     * 	 *
-     * @param id
-     * @return
-     */
-    public ReturnT<String> removeJob(long id);
+    long removeJob(long id);
 
     /**
      * start job
@@ -55,7 +37,7 @@ public interface ZJobInfoService extends CrudBaseService<Long,ZJobInfo> {
      * @param id
      * @return
      */
-    public ReturnT<String> enableJob(long id);
+    long enableJob(long id);
 
     /**
      * stop job
@@ -63,7 +45,7 @@ public interface ZJobInfoService extends CrudBaseService<Long,ZJobInfo> {
      * @param id
      * @return
      */
-    public ReturnT<String> disableJob(long id);
+    long disableJob(long id);
 
     /**
      * dashboard info

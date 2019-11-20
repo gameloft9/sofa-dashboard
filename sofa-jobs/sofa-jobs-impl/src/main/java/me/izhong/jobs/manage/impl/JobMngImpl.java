@@ -3,6 +3,7 @@ package me.izhong.jobs.manage.impl;
 import com.alipay.sofa.runtime.api.annotation.SofaService;
 import com.alipay.sofa.runtime.api.annotation.SofaServiceBinding;
 import lombok.extern.slf4j.Slf4j;
+import me.izhong.common.util.Convert;
 import me.izhong.db.common.exception.BusinessException;
 import me.izhong.db.common.service.MongoDistributedLock;
 import me.izhong.domain.PageModel;
@@ -20,6 +21,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -45,9 +47,6 @@ public class JobMngImpl implements IJobMngFacade {
 
     @Autowired
     private ZJobScriptService jobScriptService;
-
-    @Autowired
-    private ZJobScriptService jobLogGlueService;
 
     @Autowired
     private ZJobStatsService jobStatsService;
@@ -92,29 +91,31 @@ public class JobMngImpl implements IJobMngFacade {
     public ReturnT<String> add(Job job) {
         ZJobInfo jobInfo = new ZJobInfo();
         BeanUtils.copyProperties(job, jobInfo);
-        return jobInfoService.addJob(jobInfo);
+        return ReturnT.successReturn(jobInfoService.addJob(jobInfo));
     }
 
     @Override
     public ReturnT<String> remove(Long jobId) {
-        return jobInfoService.removeJob(jobId);
+        return ReturnT.successReturn(jobInfoService.removeJob(jobId));
+
     }
 
     @Override
     public ReturnT<String> update(Job job) {
         ZJobInfo jobInfo = new ZJobInfo();
         BeanUtils.copyProperties(job,jobInfo);
-        return jobInfoService.updateJob(jobInfo);
+        jobInfoService.updateJob(jobInfo);
+        return ReturnT.SUCCESS;
     }
 
     @Override
     public ReturnT<String> enable(Long jobId) {
-        return jobInfoService.enableJob(jobId);
+        return ReturnT.successReturn(jobInfoService.enableJob(jobId));
     }
 
     @Override
     public ReturnT<String> disable(Long jobId) {
-        return jobInfoService.disableJob(jobId);
+        return ReturnT.successReturn(jobInfoService.disableJob(jobId));
     }
 
     @Override
@@ -139,7 +140,7 @@ public class JobMngImpl implements IJobMngFacade {
     @Override
     public void uploadStatics(LogStatics logStatics) {
         Long triggerId = logStatics.getTriggerId();
-        log.info("收到日志job:{} triggerId:{} 内容:{}",logStatics.getJobId(),logStatics.getTriggerId(),logStatics.getLogData());
+        log.info("归集日志job:{} triggerId:{} 内容:{}",logStatics.getJobId(),logStatics.getTriggerId(),logStatics.getLogData());
         //收集agent的日志
         /*ZJobLog jobLog = jobLogService.selectByPId(triggerId);
         if(jobLog != null) {
@@ -225,6 +226,33 @@ public class JobMngImpl implements IJobMngFacade {
         } else {
             log.info("WakeAgain不需要执行 jobId:{}  {}" ,jobInfo.getJobId(),jobInfo.getJobDesc() );
         }
+
+        //执行失败尝试重新调度
+        Integer triggerCode = jobLog.getTriggerCode();
+        Integer handleCode = jobLog.getHandleCode();
+        if(!Integer.valueOf(0).equals(triggerCode) || !Integer.valueOf(0).equals(handleCode) ) {
+            Integer tryCount = jobLog.getExecutorFailRetryCount();
+            if (tryCount != null && tryCount.intValue() > 0) {
+                log.info("任务{}执行失败，重新尝试执行,剩余可尝试次数{}", jobLog.getJobId(), tryCount.intValue() - 1);
+                JobTriggerPoolHelper.trigger(jobLog.getJobId(), TriggerTypeEnum.RETRY, tryCount.intValue() - 1, null);
+            }
+        }
+        //执行成功 尝试吊起子任务
+        if(Integer.valueOf(0).equals(handleCode)) {
+            String subJobIds = jobInfo.getChildJobId();
+            if (subJobIds != null && subJobIds.trim().length() > 0) {
+                try {
+                    Long[] subJobs = Convert.toLongArray(subJobIds);
+                    if (subJobs != null && subJobs.length > 0) {
+                        for (Long sj : subJobs) {
+                            JobTriggerPoolHelper.trigger(sj, TriggerTypeEnum.CHILD, -1, null);
+                        }
+                    }
+                } catch (Exception e) {
+                    log.info("吊起子任务异常", e);
+                }
+            }
+        }
     }
 
     @Override
@@ -250,6 +278,12 @@ public class JobMngImpl implements IJobMngFacade {
             jobLogService.update(jobLog);
 
             triggerJobFinished(jobLog);
+
+            Integer retryCount = jobLog.getExecutorFailRetryCount();
+            if(retryCount != null && retryCount.intValue() > 0){
+                JobTriggerPoolHelper.trigger(jobLog.getJobId(), TriggerTypeEnum.RETRY, retryCount.intValue() - 1, jobLog.getExecutorParam());
+
+            }
 
         }
     }

@@ -63,8 +63,8 @@ public class AgentScriptRunner implements ApplicationRunner {
 
                 JobScript jobScript = facade.findCurrentJobScriptByJobId(jobId);
                 if(jobScript == null) {
-                    log.info("jobScript未找到 jobId:{} ",jobId );
-                    throw new Exception("jobScript未找到 jobId:" + jobId);
+                    log.info("任务{}的Script未找到，检查是否配置了脚本",jobId );
+                    throw new Exception("任务"+jobId+"的Script未找到，检查是否配置了脚本");
                 }
                 String script = jobScript.getScript();
                 log.info("脚本内容:{}", script);

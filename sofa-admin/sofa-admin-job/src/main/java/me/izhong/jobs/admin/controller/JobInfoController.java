@@ -75,7 +75,7 @@ public class JobInfoController {
 	@AjaxWrapper
 	public void add(Job jobInfo) {
 		if(jobInfo.getExecutorFailRetryCount() == null) {
-			jobInfo.setExecutorFailRetryCount(0L);
+			jobInfo.setExecutorFailRetryCount(0);
 		}
 		if(jobInfo.getExecutorTimeout() == null) {
 			jobInfo.setExecutorTimeout(30000L);

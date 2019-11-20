@@ -6,19 +6,22 @@ import me.izhong.jobs.manage.impl.core.model.ZJobLog;
 import java.util.Date;
 import java.util.List;
 
-public interface ZJobLogService extends CrudBaseService<Long,ZJobLog> {
+public interface ZJobLogService extends CrudBaseService<Long, ZJobLog> {
     long triggerCountByHandleCode(int successCode);
 
     List<Long> findFailJobLogIds();
 
     List<ZJobLog> findRunningJobs();
 
+    List<ZJobLog> findRunningJobs(Long jobId);
+
     List<ZJobLog> findJobLogByJobId(Long jobId);
 
-    ZJobLog insertTriggerBeginMessage(Long jobId, Long jobGroupId, String jobDesc, Date trggerTime, Integer finalFailRetryCount,Long executorTimeout);
+    ZJobLog insertTriggerBeginMessage(Long jobId, Long jobGroupId, String jobDesc, Date trggerTime, String triggerType,
+                                      Integer finalFailRetryCount, Long executorTimeout, String blockStrategy);
 
-    void updateTriggerDoneMessage(Long jobLogId,String executorParam,
-                                  Integer triggerCode,String triggerMsg);
+    void updateTriggerDoneMessage(Long jobLogId, String executorParam,
+                                  Integer triggerCode, String triggerMsg);
 
     void updateHandleStartMessage(Long jobLogId, Date startTime);
 
