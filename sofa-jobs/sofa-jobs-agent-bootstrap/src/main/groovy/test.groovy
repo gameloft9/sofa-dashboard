@@ -1,6 +1,8 @@
 import me.izhong.jobs.agent.util.TriggerUtil
 import org.apache.commons.lang3.time.DateUtils
 
+import java.text.SimpleDateFormat
+
 try {
 
     HashMap<String,String> params = params;
@@ -13,7 +15,7 @@ try {
     log.info("log 测试2 {}",yesterday);
 
     //TriggerUtil.triggerJob(2)
-    TriggerUtil.updateJobNextTriggerTime(2,DateUtils.addDays(new Date(),10))
+    TriggerUtil.updateJobNextTriggerTime(2, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2020-10-10 08:09:10"))
     return 0
 } catch (Exception e) {
     log.error("", e);
