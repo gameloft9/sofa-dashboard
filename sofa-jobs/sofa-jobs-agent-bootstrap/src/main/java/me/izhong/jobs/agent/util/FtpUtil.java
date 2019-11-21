@@ -231,10 +231,21 @@ public class FtpUtil {
 		log.info("cd");
 		if (!ftp.changeWorkingDirectory(destDir)) {
 			log.info("mkdir");
-			if (ftp.makeDirectory(destDir)) {
-				ftp.changeWorkingDirectory(destDir);
-			} else {
-				throw new Exception("FTP mkdir fail.");
+			if(destDir.length() > 0 && destDir.indexOf("/") > 0){
+				String[] temp = destDir.split("/");
+				for(String dd : temp){
+					if(ftp.changeWorkingDirectory(destDir)) {
+						break;
+					} else {
+						if(!ftp.changeWorkingDirectory(dd)) {
+							log.info("mkdir:{}",dd);
+							ftp.makeDirectory(dd);
+							if (!ftp.changeWorkingDirectory(dd)) {
+								throw new Exception("FTP mkdir fail. des:" + destDir);
+							}
+						}
+					}
+				}
 			}
 		}
 

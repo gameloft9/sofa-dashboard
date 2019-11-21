@@ -116,6 +116,7 @@ public class JobAgentMngImpl implements IJobAgentMngFacade {
             //reader = new LineNumberReader(new FileReader(logFile));
             String ahrEncode = Charset.defaultCharset().displayName();
             String langEncode = System.getenv("LANG");
+            log.debug("ahrEncode:{} langEncode:{}",ahrEncode,langEncode);
             if(StringUtils.containsIgnoreCase(langEncode,"GBK")) {
                 ahrEncode = "GBK";
             }

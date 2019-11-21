@@ -19,7 +19,7 @@ echo "JAR_DIR:$JAR_DIR"
 export USER_MEM_ARGS="-Xms64m -Xmx512m"
 
 export JAVA_OPTIONS="${USER_MEM_ARGS} $PARAMS -Djava.awt.headless=true -DSERVER_NAME=$SERVER_NAME -Drun_env=${RUN_ENV} \
--Dspring.profiles.active=batch,${RUN_ENV} -Djobs.log.dir=${LOG_DIR}/joblogs -Djobs.script.dir=${BIN_DIR}\ 
+-Dspring.profiles.active=batch,${RUN_ENV} -Djobs.log.dir=${LOG_DIR}/joblogs -Djobs.script.dir=${BIN_DIR} \
 -Dspring.main.web-application-type=none -Djava.library.path=${BASE_DIR}/lib -Dlogback.configurationFile=logback_batch.xml "
 
 #java $JAVA_OPTIONS -cp $CLASSPATH com.chinaums.netpay.jobs.Main $PARAMS
