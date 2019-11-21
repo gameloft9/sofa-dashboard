@@ -3,6 +3,7 @@ package me.izhong.jobs.manage;
 import me.izhong.domain.PageModel;
 import me.izhong.domain.PageRequest;
 import me.izhong.jobs.model.*;
+import me.izhong.jobs.type.TriggerTypeEnum;
 import me.izhong.model.ReturnT;
 
 import javax.xml.crypto.Data;
@@ -31,10 +32,10 @@ public interface IJobMngFacade {
 
     ReturnT<String> kill(Long jobId);
 
-    ReturnT<String> trigger(Long jobId);
+    ReturnT<String> trigger(Long jobId, TriggerTypeEnum triggerType);
 
     ReturnT<String> updateJobScriptId(Long jobId,Long jobScriptId);
-
+    ReturnT<String> updateJobNextTriggerTime(Long jobId,Date nextTriggerTime);
 
     /**
      * agent上送执行日志，结果到调度器

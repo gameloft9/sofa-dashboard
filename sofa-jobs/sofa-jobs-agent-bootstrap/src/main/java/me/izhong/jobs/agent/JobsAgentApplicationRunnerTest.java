@@ -16,7 +16,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-//@ImportResource({ "classpath*:rpc-sofa-boot-starter.xml" })
 @SpringBootApplication(exclude = {
         DataSourceAutoConfiguration.class,
         DataSourceTransactionManagerAutoConfiguration.class,
@@ -28,7 +27,7 @@ public class JobsAgentApplicationRunnerTest {
         System.setProperty("spring.main.web-application-type","NONE");
         SpringApplication.run(JobsAgentApplicationRunnerTest.class, args);
 
-        String file = "D:\\space\\ums\\sofa-dashboard\\sofa-jobs\\sofa-jobs-agent-bootstrap\\src\\main\\groovy\\ttable-sync.groovy";
+        String file = "/Users/jimmy/space/tianru/sofa-dashboard/sofa-jobs/sofa-jobs-agent-bootstrap/src/main/groovy/test.groovy";
 
         //初始化运行环境
         ScriptRunContext context = new ScriptRunContext();

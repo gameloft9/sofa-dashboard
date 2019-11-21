@@ -126,6 +126,22 @@ public class ZJobInfoServiceImpl extends CrudBaseServiceImpl<Long,ZJobInfo> impl
 	}
 
 	@Override
+	public void updateJobNextTriggerTime(Long jobId, Date triggerNextTime) {
+		Assert.notNull(jobId,"");
+		Assert.notNull(triggerNextTime,"");
+
+		Query query = new Query();
+		query.addCriteria(Criteria.where("jobId").is(jobId));
+
+		Update update = new Update();
+		update.set("triggerNextTime",triggerNextTime.getTime());
+		UpdateResult ur = mongoTemplate.updateMulti(query, update, ZJobInfo.class);
+		if(ur.getModifiedCount() != 1) {
+			log.error("更新数量异常,数量:{}" , ur.getModifiedCount());
+		}
+	}
+
+	@Override
 	public PageModel<ZJobInfo> pageList(PageRequest request, ZJobInfo jobInfo){
 	//public Map<String, Object> pageList(int start, int length, int jobGroup, int triggerStatus, String jobDesc, String executorHandler, String author) {
 

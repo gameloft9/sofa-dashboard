@@ -5,7 +5,7 @@ import me.izhong.jobs.manage.impl.core.conf.XxlJobAdminConfig;
 import me.izhong.jobs.manage.impl.core.model.ZJobGroup;
 import me.izhong.jobs.manage.impl.core.model.ZJobInfo;
 import me.izhong.jobs.manage.impl.core.model.ZJobLog;
-import me.izhong.jobs.manage.impl.core.trigger.TriggerTypeEnum;
+import me.izhong.jobs.type.TriggerTypeEnum;
 import me.izhong.jobs.manage.impl.service.ZJobInfoService;
 import me.izhong.jobs.manage.impl.service.ZJobLogService;
 import me.izhong.model.ReturnT;

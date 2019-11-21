@@ -24,10 +24,10 @@ try {
 
     def bmsUrl ="jdbc:oracle:thin:@144.131.254.240:1521:nbcsora"
     def bmsUser = "papp"
-    def bmsPass= "papp"
+    def bmsPass= "x"
     def url = "jdbc:oracle:thin:@172.30.251.120:1521:nuisdb"
     def user = "batnuis"
-    def pass = "CDE#4rfv"
+    def pass = "x"
     def bmsSql = Sql.newInstance( bmsUrl,bmsUser,bmsPass)
     def sql = Sql.newInstance( url ,user, pass)
 

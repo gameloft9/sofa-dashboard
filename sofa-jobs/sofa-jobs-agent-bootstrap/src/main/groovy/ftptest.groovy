@@ -7,7 +7,7 @@ try {
     log.info("参数是:{} {}",params,params.get("xx"));
     def host = "ftp://172.30.251.92:21"
     def user = "dev_nuis"
-    def pass = "CDE#4rfv"
+    def pass = "x"
     List<String> ftpFiles = FtpUtil.listFtpFilesInDir(
             host
             ,user,pass,"battest/68Temp/");

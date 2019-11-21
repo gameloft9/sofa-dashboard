@@ -1,6 +1,6 @@
 package me.izhong.jobs.manage.impl.core.thread;
 
-import me.izhong.jobs.manage.impl.core.trigger.TriggerTypeEnum;
+import me.izhong.jobs.type.TriggerTypeEnum;
 import me.izhong.jobs.manage.impl.core.trigger.JobDirectTrigger;
 import me.izhong.jobs.manage.impl.core.util.SpringUtil;
 import org.slf4j.Logger;

@@ -12,12 +12,7 @@ export FILE_ENCODING=utf8
 export JAVA_VENDOR=Sun
 export PRODUCT_MODE=t
 export RUN_ENV=agent,dev
-export ENV=dev
-export TRACE_PREFIX=E0
-export APP_ID=netpay
-export APOLLO_META=http://144.131.254.141:9980,http://144.131.254.141:9999
-export APOLLO_CACHE_DIR=$BASE_DIR/cache
-export APOLLO_CLUSTER=TEST
+export TRACE_PREFIX=X0
 
 export JAVA_HOME=/usr/local/jdk1.8.0_121
 export PATH=$JAVA_HOME/bin:$PATH

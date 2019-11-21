@@ -14,7 +14,7 @@ try {
 
     def url = "jdbc:oracle:thin:@172.30.251.120:1521:nuisdb"
     def user = "batnuis"
-    def pass = "CDE#4rfv"
+    def pass = "x"
     def sql = Sql.newInstance( url ,user, pass)
 
 

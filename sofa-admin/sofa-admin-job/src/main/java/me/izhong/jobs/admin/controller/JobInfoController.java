@@ -10,6 +10,7 @@ import me.izhong.db.common.annotation.AjaxWrapper;
 import me.izhong.jobs.model.Job;
 import me.izhong.jobs.model.JobGroup;
 import me.izhong.jobs.type.GlueTypeEnum;
+import me.izhong.jobs.type.TriggerTypeEnum;
 import me.izhong.model.ReturnT;
 import me.izhong.dashboard.manage.security.UserInfoContextHelper;
 import me.izhong.jobs.admin.service.JobServiceReference;
@@ -169,7 +170,7 @@ public class JobInfoController {
 		if (executorParam == null) {
 			executorParam = "";
 		}
-		ReturnT<String> rObj = jobServiceReference.jobService.trigger(jobId);
+		ReturnT<String> rObj = jobServiceReference.jobService.trigger(jobId,TriggerTypeEnum.MANUAL);
 		if( ReturnT.SUCCESS_CODE != rObj.getCode()){
 			throw BusinessException.build(rObj.getMsg());
 		}
