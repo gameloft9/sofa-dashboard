@@ -12,7 +12,7 @@ import me.izhong.jobs.manage.IJobMngFacade;
 import me.izhong.jobs.manage.impl.core.cron.CronExpression;
 import me.izhong.jobs.manage.impl.core.model.*;
 import me.izhong.jobs.manage.impl.core.thread.JobTriggerPoolHelper;
-import me.izhong.jobs.manage.impl.core.trigger.TriggerTypeEnum;
+import me.izhong.jobs.type.TriggerTypeEnum;
 import me.izhong.jobs.manage.impl.core.util.*;
 import me.izhong.jobs.manage.impl.service.*;
 import me.izhong.jobs.model.*;
@@ -21,7 +21,6 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -126,14 +125,20 @@ public class JobMngImpl implements IJobMngFacade {
     }
 
     @Override
-    public ReturnT<String> trigger(Long jobId) {
-        JobTriggerPoolHelper.trigger(jobId, TriggerTypeEnum.MANUAL, -1, null);
+    public ReturnT<String> trigger(Long jobId,TriggerTypeEnum triggerType) {
+        JobTriggerPoolHelper.trigger(jobId,triggerType, -1, null);
         return ReturnT.SUCCESS;
     }
 
     @Override
     public ReturnT<String> updateJobScriptId(Long jobId, Long jobScriptId) {
         jobInfoService.updateJobScriptId(jobId,jobScriptId);
+        return ReturnT.SUCCESS;
+    }
+
+    @Override
+    public ReturnT<String> updateJobNextTriggerTime(Long jobId, Date triggerNextTime) {
+        jobInfoService.updateJobNextTriggerTime(jobId,triggerNextTime);
         return ReturnT.SUCCESS;
     }
 

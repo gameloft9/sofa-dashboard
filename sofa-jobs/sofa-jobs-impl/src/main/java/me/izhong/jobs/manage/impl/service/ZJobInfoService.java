@@ -21,6 +21,8 @@ public interface ZJobInfoService extends CrudBaseService<Long,ZJobInfo> {
 
     void updateJobScriptId(Long jobId, Long scriptId);
 
+    void updateJobNextTriggerTime(Long jobId, Date triggerNextTime);
+
     PageModel<ZJobInfo> pageList(PageRequest request, ZJobInfo jobInfo);
 
     List<ZJobInfo> findRunningJobs();

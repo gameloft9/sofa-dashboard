@@ -1,4 +1,4 @@
-package me.izhong.jobs.manage.impl.core.trigger;
+package me.izhong.jobs.type;
 
 public enum TriggerTypeEnum {
 
@@ -6,6 +6,7 @@ public enum TriggerTypeEnum {
     CRON("定时"),
     RETRY("重试"),
     CHILD("子任务"),
+    SCRIPT("脚本"),
     CONTINUE("继续");
 
     TriggerTypeEnum(String title){
