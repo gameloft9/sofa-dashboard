@@ -1,8 +1,10 @@
 package me.izhong.jobs.admin.controller;
 
+import me.izhong.dashboard.manage.security.config.PermissionConstants;
 import me.izhong.db.common.annotation.AjaxWrapper;
 import me.izhong.db.common.util.PageRequestUtil;
 import me.izhong.domain.PageModel;
+import me.izhong.jobs.admin.config.JobPermissions;
 import me.izhong.jobs.admin.service.JobServiceReference;
 import me.izhong.jobs.model.JobGroup;
 import me.izhong.dashboard.manage.annotation.Log;
@@ -34,10 +36,6 @@ public class JobGroupController {
 
 	@RequestMapping
 	public String index(Model model) {
-//
-//		List<JobGroup> list = jobServiceReference.jobService.selectAllJobGroup();
-//
-//		model.addAttribute("list", list);
 		return prefix + "/group";
 	}
 
@@ -47,60 +45,43 @@ public class JobGroupController {
 		return jobServiceReference.jobService.selectJobGroupPage(PageRequestUtil.fromRequest(request),ino);
 	}
 
-	/**
-	 * 新增调度
-	 */
 	@GetMapping("/add")
 	public String add() {
 		return prefix + "/add";
 	}
 
-	/**
-	 * 新增保存调度
-	 */
 	@Log(title = "定时任务分组", businessType = BusinessType.ADD)
-	@RequiresPermissions("monitor:job:group:add")
+	@RequiresPermissions(JobPermissions.JobGroup.ADD)
 	@PostMapping("/add")
 	@AjaxWrapper
-	public JobGroup addSave(JobGroup jg) throws BusinessException
-	{
+	public JobGroup addSave(JobGroup jg) throws BusinessException {
 		if (jg.getGroupName()==null || jg.getGroupName().trim().length()==0) {
-			throw BusinessException.build("GroupName不能为空");
+			throw BusinessException.build("名称不能为空");
 		}
 		if (jg.getGroupName().length()<4 || jg.getGroupName().length()>64) {
-            throw BusinessException.build("GroupName长度4-64");
+            throw BusinessException.build("名称长度应该在4-64之间");
 		}
-
 
 		jg.setCreateBy(UserInfoContextHelper.getCurrentLoginName());
 		jg.setUpdateBy(UserInfoContextHelper.getCurrentLoginName());
 		return jobServiceReference.jobService.addJobGroup(jg);
 	}
 
-
-	/**
-	 * 修改调度
-	 */
 	@GetMapping("/edit/{groupId}")
-	public String edit(@PathVariable("groupId") Long groupId, ModelMap mmap)
-	{
+	public String edit(@PathVariable("groupId") Long groupId, ModelMap mmap) {
 		mmap.put("group", jobServiceReference.jobService.findJobGroup(groupId));
 		return prefix + "/edit";
 	}
 
-	/**
-	 * 修改保存调度
-	 */
 	@Log(title = "定时任务分组", businessType = BusinessType.UPDATE)
-	@RequiresPermissions("monitor:job:group:edit")
+	@RequiresPermissions(JobPermissions.JobGroup.EDIT)
 	@PostMapping("/edit")
 	@AjaxWrapper
 	public JobGroup editSave(JobGroup JobGroup) throws BusinessException
 	{
 		if (JobGroup.getGroupName()==null || JobGroup.getGroupName().trim().length()==0) {
 			throw BusinessException.build("GroupName不能为空");
-		}
-		if (JobGroup.getGroupName().length()<4 || JobGroup.getGroupName().length()>64) {
+		} else if (JobGroup.getGroupName().length()<4 || JobGroup.getGroupName().length()>64) {
 			throw BusinessException.build("GroupName长度需要在4-64之间");
 		}
 
@@ -108,47 +89,14 @@ public class JobGroupController {
 		return jobServiceReference.jobService.updateJobGroup(JobGroup);
 	}
 
-//	private List<String> findRegistryByAppName(String appNameParam){
-//		HashMap<String, List<String>> appAddressMap = new HashMap<String, List<String>>();
-//		List<XxlJobRegistry> list = xxlJobRegistryService.findNormal(RegistryConfig.DEAD_TIMEOUT);
-//		if (list != null) {
-//			for (XxlJobRegistry item: list) {
-//				if (RegistryConfig.RegistType.EXECUTOR.name().equals(item.getRegistryGroup())) {
-//					String appName = item.getRegistryKey();
-//					List<String> registryList = appAddressMap.get(appName);
-//					if (registryList == null) {
-//						registryList = new ArrayList<String>();
-//					}
-//
-//					if (!registryList.contains(item.getRegistryValue())) {
-//						registryList.add(item.getRegistryValue());
-//					}
-//					appAddressMap.put(appName, registryList);
-//				}
-//			}
-//		}
-//		return appAddressMap.get(appNameParam);
-//	}
-
+	@Log(title = "定时任务分组", businessType = BusinessType.DELETE)
+	@RequiresPermissions(JobPermissions.JobGroup.REMOVE)
 	@RequestMapping("/remove")
 	@AjaxWrapper
 	public Long remove(String ids){
-
-		// valid
-//		long count = jobServiceReference.jobGroupService.count();
-//		if (count > 0) {
-//			throw BusinessException.build(I18nUtil.getString("jobgroup_del_limit_0") );
-//		}
-//
-//		List<JobGroup> allList = JobGroupService.selectAllJobGroup();
-//		if (allList.size() == 1) {
-//			throw BusinessException.build(I18nUtil.getString("jobgroup_del_limit_1") );
-//		}
-
 		List<Long> idLongs = Convert.toLongList(ids);
 		if(idLongs.size() < 1)
 			throw BusinessException.build("删除的数量不能小于1");
-
 		return jobServiceReference.jobService.removeJobGroup(idLongs);
 	}
 

@@ -42,16 +42,16 @@
 			</div>
 			
 			<div class="btn-group-sm" id="toolbar" role="group">
-                <a class="btn btn-danger" onclick="clearLog(null,1)" shiro:hasPermission="monitor:job:remove">
+                <a class="btn btn-danger" onclick="clearLog(null,1)" shiro:hasPermission="ext:job:log:clean">
 	                <i class="fa fa-remove"></i> 清理一个月以前的日志
 	            </a>
-				<a class="btn btn-danger" onclick="clearLog(null,9)" shiro:hasPermission="monitor:job:remove">
+				<a class="btn btn-danger" onclick="clearLog(null,9)" shiro:hasPermission="ext:job:log:clean">
 					<i class="fa fa-remove"></i> 清理所有日志
 				</a>
-	            <a class="btn btn-danger multiple disabled" onclick="clearSelected()" shiro:hasPermission="monitor:job:remove">
+	            <a class="btn btn-danger multiple disabled" onclick="clearSelected()" shiro:hasPermission="ext:job:clean:clean">
 	                <i class="fa fa-trash"></i> 删除选中日志
 	            </a>
-				<a class="btn btn-danger single disabled" onclick="kill()" shiro:hasPermission="monitor:job:edit">
+				<a class="btn btn-danger single disabled" onclick="kill()" shiro:hasPermission="ext:job:operate">
 					<i class="fa fa-edit"></i> 停止
 				</a>
 	        </div>
@@ -63,7 +63,7 @@
 	</div>
 	<th:block th:include="include :: footer" />
 	<script th:inline="javascript">
-		var detailFlag = [[${@permission.hasPermi('monitor:job:detail')}]];
+		var detailFlag = [[${@permission.hasPermi('ext:job:log:view')}]];
 		var prefix = ctx + "monitor/djob/log";
 
 		$(function() {

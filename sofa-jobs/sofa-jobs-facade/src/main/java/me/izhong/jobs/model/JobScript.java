@@ -17,4 +17,9 @@ public class JobScript implements Serializable {
     private String script;
     private String remark;
     private Date addTime;
+
+    private Date createTime;
+    private String createBy;
+    private Date updateTime;
+    private String updateBy;
 }

@@ -22,11 +22,6 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-/**
- * 操作日志记录处理
- *
- * @author ruoyi
- */
 @Aspect
 //@Slf4j
 @Component
@@ -118,11 +113,11 @@ public class LogAspect {
      */
     public void getControllerMethodDescription(Log log, SysOperLog sysOperLog) throws Exception {
         // 设置action动作
-        sysOperLog.setBusinessType(log.businessType().ordinal());
+        sysOperLog.setBusinessType(log.businessType().getIndex());
         // 设置标题
         sysOperLog.setTitle(log.title());
         // 设置操作人类别
-        sysOperLog.setOperatorType(log.operatorType().ordinal());
+        sysOperLog.setOperatorType(log.operatorType().getIndex());
         // 是否需要保存request，参数和值
         if (log.isSaveRequestData()) {
             // 获取参数的信息，传入到数据库中。

@@ -53,6 +53,12 @@ public class ZJobInfoServiceImpl extends CrudBaseServiceImpl<Long,ZJobInfo> impl
 		return super.selectList(query, null, null);
 	}
 
+	@Override
+	public List<ZJobInfo> selectByJobGroupId(Long jobGroupId) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("jobGroupId").is(jobGroupId));
+		return super.selectList(query, null, null);	}
+
 	@Transactional
 	@Override
 	public void scheduleUpdate(ZJobInfo jobInfo) {

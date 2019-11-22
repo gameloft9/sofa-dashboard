@@ -2,9 +2,12 @@ package me.izhong.jobs.admin.controller;
 
 import me.izhong.common.util.CronUtil;
 import me.izhong.common.util.DateUtil;
+import me.izhong.dashboard.manage.annotation.Log;
+import me.izhong.dashboard.manage.constants.BusinessType;
 import me.izhong.db.common.exception.BusinessException;
 import me.izhong.db.common.util.PageRequestUtil;
 import me.izhong.domain.PageModel;
+import me.izhong.jobs.admin.config.JobPermissions;
 import me.izhong.jobs.admin.service.JobServiceReference;
 import me.izhong.db.common.annotation.AjaxWrapper;
 import me.izhong.jobs.model.Job;
@@ -15,6 +18,7 @@ import me.izhong.model.ReturnT;
 import me.izhong.dashboard.manage.security.UserInfoContextHelper;
 import me.izhong.jobs.admin.service.JobServiceReference;
 import me.izhong.jobs.type.GlueTypeEnum;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -72,6 +76,8 @@ public class JobInfoController {
 		return prefix + "/add";
 	}
 
+    @Log(title = "定时任务", businessType = BusinessType.ADD)
+    @RequiresPermissions(JobPermissions.JobInfo.ADD)
 	@PostMapping("/add")
 	@AjaxWrapper
 	public void add(Job jobInfo) {
@@ -106,7 +112,8 @@ public class JobInfoController {
 		return prefix + "/edit";
 	}
 
-
+    @Log(title = "定时任务", businessType = BusinessType.UPDATE)
+    @RequiresPermissions(JobPermissions.JobInfo.EDIT)
 	@PostMapping("/edit")
 	@AjaxWrapper
 	public void update(Job jobInfo) {
@@ -115,14 +122,13 @@ public class JobInfoController {
 			throw BusinessException.build("任务不存在");
 		}
 
-		//只修改想修改的内容
+		//只修改允许修改的内容
 		exists_jobInfo.setJobGroupId(jobInfo.getJobGroupId());
 		exists_jobInfo.setJobCron(jobInfo.getJobCron());
 		exists_jobInfo.setJobDesc(jobInfo.getJobDesc());
 		exists_jobInfo.setAuthor(jobInfo.getAuthor());
 		exists_jobInfo.setAlarmEmail(jobInfo.getAlarmEmail());
 		exists_jobInfo.setExecutorRouteStrategy(jobInfo.getExecutorRouteStrategy());
-		exists_jobInfo.setExecutorHandler(jobInfo.getExecutorHandler());
 		exists_jobInfo.setExecutorParam(jobInfo.getExecutorParam());
 		exists_jobInfo.setExecutorBlockStrategy(jobInfo.getExecutorBlockStrategy());
 		exists_jobInfo.setExecutorTimeout(jobInfo.getExecutorTimeout());
@@ -130,12 +136,15 @@ public class JobInfoController {
 		exists_jobInfo.setChildJobId(jobInfo.getChildJobId());
 		exists_jobInfo.setRemark(jobInfo.getRemark());
 
+		exists_jobInfo.setUpdateBy(UserInfoContextHelper.getCurrentLoginName());
 		ReturnT<String> rObj = jobServiceReference.jobService.update(exists_jobInfo);
 		if( ReturnT.SUCCESS_CODE != rObj.getCode()){
 			throw BusinessException.build(rObj.getMsg());
 		}
 	}
-	
+
+	@Log(title = "定时任务", businessType = BusinessType.DELETE)
+	@RequiresPermissions(JobPermissions.JobInfo.REMOVE)
 	@RequestMapping("/remove")
 	@AjaxWrapper
 	public void remove(Long jobId) {
@@ -144,7 +153,9 @@ public class JobInfoController {
 			throw BusinessException.build(rObj.getMsg());
 		}
 	}
-	
+
+	@Log(title = "定时任务", businessType = BusinessType.OPERATE)
+	@RequiresPermissions(JobPermissions.JobInfo.OPERATE)
 	@RequestMapping("/stop")
 	@AjaxWrapper
 	public void stop(Long jobId) {
@@ -153,7 +164,9 @@ public class JobInfoController {
 			throw BusinessException.build(rObj.getMsg());
 		}
 	}
-	
+
+	@Log(title = "定时任务", businessType = BusinessType.OPERATE)
+	@RequiresPermissions(JobPermissions.JobInfo.OPERATE)
 	@RequestMapping("/start")
 	@AjaxWrapper
 	public void start(Long jobId) {
@@ -162,11 +175,12 @@ public class JobInfoController {
 			throw BusinessException.build(rObj.getMsg());
 		}
 	}
-	
+
+	@Log(title = "定时任务", businessType = BusinessType.OPERATE)
+	@RequiresPermissions(JobPermissions.JobInfo.OPERATE)
 	@RequestMapping("/trigger")
 	@AjaxWrapper
 	public void triggerJob(Long jobId, String executorParam) {
-		// force cover job param
 		if (executorParam == null) {
 			executorParam = "";
 		}
@@ -174,7 +188,6 @@ public class JobInfoController {
 		if( ReturnT.SUCCESS_CODE != rObj.getCode()){
 			throw BusinessException.build(rObj.getMsg());
 		}
-		//JobTriggerPoolHelper.trigger(id, TriggerTypeEnum.MANUAL, -1, null, executorParam);
 	}
 
 	@PostMapping("/checkCronExpressionIsValid")

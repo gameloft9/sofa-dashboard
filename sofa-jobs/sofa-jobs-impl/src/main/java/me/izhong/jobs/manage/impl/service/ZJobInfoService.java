@@ -12,6 +12,7 @@ import java.util.Map;
 
 public interface ZJobInfoService extends CrudBaseService<Long,ZJobInfo> {
     List<ZJobInfo> scheduleJobQuery(long maxNextTime);
+    List<ZJobInfo> selectByJobGroupId(Long jobGroupId);
 
     void scheduleUpdate(ZJobInfo jobInfo);
 

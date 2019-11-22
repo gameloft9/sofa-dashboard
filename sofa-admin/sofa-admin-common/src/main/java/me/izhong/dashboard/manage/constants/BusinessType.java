@@ -1,53 +1,73 @@
 package me.izhong.dashboard.manage.constants;
 
+import lombok.Getter;
+
 public enum BusinessType {
+
+
     /**
      * 其它
      */
-    OTHER,
+    OTHER(0,"其他"),
 
     /**
      * 新增
      */
-    ADD,
+    ADD(1,"新增"),
 
     /**
      * 修改
      */
-    UPDATE,
+    UPDATE(2,"修改"),
 
     /**
      * 删除
      */
-    DELETE,
+    DELETE(3,"删除"),
 
     /**
      * 授权
      */
-    GRANT,
+    GRANT(4,"授权"),
 
     /**
      * 导出
      */
-    EXPORT,
+    EXPORT(5,"导出"),
 
     /**
      * 导入
      */
-    IMPORT,
+    IMPORT(6,"导入"),
 
     /**
      * 强退
      */
-    FORCE,
+    FORCE(7,"强退"),
 
     /**
      * 生成代码
      */
-    GENCODE,
+    GENCODE(8,"生成代码"),
 
     /**
      * 清空
      */
-    CLEAN,
+    CLEAN(9,"清空"),
+
+    /**
+     * 执行
+     */
+    OPERATE(10,"执行");
+
+    @Getter
+    private Integer index;
+
+    @Getter
+    private String title;
+
+    BusinessType(Integer index, String title){
+        this.index = index;
+        this.title = title;
+    }
 }
