@@ -358,9 +358,7 @@ public class ZJobInfoServiceImpl extends CrudBaseServiceImpl<Long,ZJobInfo> impl
 
 		if (groupList!=null && !groupList.isEmpty()) {
 			for (ZJobGroup group: groupList) {
-				if (group.getRegistryList()!=null && !group.getRegistryList().isEmpty()) {
-					executerAddressSet.addAll(group.getRegistryList());
-				}
+
 			}
 		}
 
