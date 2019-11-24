@@ -76,7 +76,7 @@
 		        detailUrl: prefix + "/detail/{id}",
 		        removeUrl: prefix + "/remove",
 		        exportUrl: prefix + "/export",
-		        sortName: "createTime",
+		        sortName: "jobLogId",
 		        sortOrder: "desc",
 		        modalName: "调度日志",
 		        columns: [{
@@ -84,23 +84,28 @@
 		        },
 		        {
 		            field: 'jobLogId',
-		            title: '日志编号'
+		            title: '日志编号',
+                    sortable: true
 		        },
 		        {
 		            field: 'jobDesc',
-		            title: '任务名称'
+		            title: '任务名称',
+                    sortable: true
 		        },
                     {
                         field: 'blockStrategy',
-                        title: '阻塞策略'
+                        title: '阻塞策略',
+                        sortable: true
                     },
                     {
                         field: 'triggerType',
-                        title: '触发类型'
+                        title: '触发类型',
+                        sortable: true
                     },
                     {
                         field: 'executorAddress',
-                        title: '执行地址'
+                        title: '执行地址',
+                        sortable: true
                     },
 				{
 					field: 'triggerTime',
@@ -116,7 +121,8 @@
 		        },
 				{
 		            field: 'handleCode',
-		            title: '执行结果'
+		            title: '执行结果',
+                    sortable: true
 		        },
 				{
 					field: 'handleMsg',

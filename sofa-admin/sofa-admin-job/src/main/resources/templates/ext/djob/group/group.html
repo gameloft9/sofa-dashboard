@@ -61,12 +61,30 @@
 		        },
 		        {
 		            field: 'groupId',
-		            title: '分组编号'
+		            title: '分组编号',
+                    sortable: true
 		        },
 		        {
 		            field: 'groupName',
 		            title: '分组名称',
+                    sortable: true
 		        },
+				{
+					field: 'updateTime',
+					title: '修改时间',
+					sortable: true
+				},
+				{
+					field: 'createBy',
+					title: '创建人',
+					sortable: true,
+					visible: false
+				},
+				{
+					field: 'updateBy',
+					title: '修改人',
+					sortable: true
+				},
 		        {
 		            title: '操作',
 		            align: 'center',

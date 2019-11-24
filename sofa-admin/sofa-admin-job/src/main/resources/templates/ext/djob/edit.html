@@ -30,10 +30,24 @@
 					<label class="col-sm-2 control-label">Cron表达式</label>
 					<div class="col-sm-4"><input type="text" class="form-control" id="jobCron" name="jobCron"  th:field="*{jobCron}" ></div>
 
-					<!--<label class="col-sm-2 control-label">JobHandler</label>
-					<div class="col-sm-4"><input type="text" class="form-control" name="executorHandler"
-					th:field="*{executorHandler}" ></div>
-				-->
+					<label class="col-sm-2 control-label">下次运行时间</label>
+					<div class="col-sm-4 form-control-static" th:text="*{triggerNextTimeString}">
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">创建时间</label>
+					<div class="col-sm-4 form-control-static" th:text="${#dates.format(job.createTime,'yyyy-MM-dd HH:mm:ss')}">
+					</div>
+					<label class="col-sm-2 control-label">修改时间</label>
+					<div class="col-sm-4 form-control-static" th:text="${#dates.format(job.updateTime,'yyyy-MM-dd HH:mm:ss')}">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">创建人</label>
+					<div class="col-sm-4 form-control-static" th:text="*{createBy}">
+					</div>
+					<label class="col-sm-2 control-label">修改人</label>
+					<div class="col-sm-4 form-control-static" th:text="*{updateBy}">
+					</div>
 				</div>
 				<!--
 				<div class="form-group">

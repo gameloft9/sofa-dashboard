@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -16,8 +17,9 @@ public class JobGroup implements Serializable {
     private String remark;
     private Long groupId;
     private Long order;
-    private List<String> groupUrl;
 
+    private Date createTime;
     private String createBy;
+    private Date updateTime;
     private String updateBy;
 }

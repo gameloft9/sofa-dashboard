@@ -108,6 +108,7 @@ public class JobInfoController {
 		if(job == null) {
 			throw BusinessException.build(String.format("任务不存在%s",jobId));
 		}
+		job.setTriggerNextTimeString(DateUtil.parseLongToFullSting(job.getTriggerNextTime()));
 		model.addAttribute("job",job);
 		return prefix + "/edit";
 	}

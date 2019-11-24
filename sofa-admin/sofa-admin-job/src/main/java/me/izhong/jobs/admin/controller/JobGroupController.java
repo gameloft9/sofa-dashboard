@@ -84,7 +84,6 @@ public class JobGroupController {
 		} else if (JobGroup.getGroupName().length()<4 || JobGroup.getGroupName().length()>64) {
 			throw BusinessException.build("GroupName长度需要在4-64之间");
 		}
-
 		JobGroup.setUpdateBy(UserInfoContextHelper.getCurrentLoginName());
 		return jobServiceReference.jobService.updateJobGroup(JobGroup);
 	}

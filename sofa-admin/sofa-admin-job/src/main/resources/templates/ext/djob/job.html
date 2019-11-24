@@ -79,19 +79,21 @@
 		        updateUrl: prefix + "/edit/{id}",
 		        removeUrl: prefix + "/remove",
 		        exportUrl: prefix + "/export",
-		        sortName: "createTime",
-		        sortOrder: "desc",
+		        sortName: "jobId",
+		        sortOrder: "asc",
 		        modalName: "任务",
 		        columns: [{
 		            checkbox: true
 		        },
 		        {
 		            field: 'jobId',
-		            title: '任务编号'
+		            title: '任务编号',
+                    sortable: true
 		        },
 		        {
 		            field: 'jobDesc',
 		            title: '任务名称',
+                    sortable: true
 		        },
 		        {
 		            field: 'jobGroupId',
@@ -105,17 +107,19 @@
 								}
 							});
                         return r;
-		            }
+		            },
+                    sortable: true
 		        },
 		        {
 		            field: 'jobCron',
 		            title: '执行表达式'
 		        },
+		        //{
+		        //    field: 'createTime',
+		        //    title: '创建时间',
+		        //    sortable: true
+		        //},
 		        {
-		            field: 'createTime',
-		            title: '创建时间',
-		            sortable: true
-		        }, {
 		            field: 'triggerNextTimeString',
 		            title: '下次运行时间'
 		        },
@@ -131,6 +135,16 @@
                         formatter: function (value, row, index) {
                             return statusTools(row);
                         }
+                    },
+                    {
+                        field: 'updateTime',
+                        title: '修改时间',
+                        sortable: true
+                    },
+                    {
+                        field: 'updateBy',
+                        title: '修改人',
+                        sortable: true
                     },
 		        {
 		            title: '操作',
