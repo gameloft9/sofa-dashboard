@@ -19,10 +19,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.servlet.http.HttpServletRequest;
 
 @Controller
-@RequestMapping("/monitor/djob")
+@RequestMapping("/ext/djob")
 public class JobCodeController {
 
-	private String prefix = "monitor/djob";
+	private String prefix = "ext/djob";
 
 	@Autowired(required = false)
 	private JobServiceReference jobServiceReference;

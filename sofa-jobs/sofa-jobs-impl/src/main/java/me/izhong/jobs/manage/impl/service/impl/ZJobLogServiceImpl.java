@@ -1,6 +1,7 @@
 package me.izhong.jobs.manage.impl.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import me.izhong.db.common.exception.BusinessException;
 import me.izhong.db.common.service.CrudBaseServiceImpl;
 import com.mongodb.client.result.UpdateResult;
 import me.izhong.jobs.manage.impl.core.model.ZJobLog;
@@ -159,6 +160,8 @@ public class ZJobLogServiceImpl extends CrudBaseServiceImpl<Long,ZJobLog> implem
     @Override
     public void clearLog(Long jobId, Date clearBeforeTime, Integer clearBeforeNum) {
         Query query = new Query();
+        if(clearBeforeTime == null && clearBeforeNum == null)
+            throw BusinessException.build("参数异常");
         if(jobId != null)
             query.addCriteria(Criteria.where("jobId").is(jobId));
         if(clearBeforeTime !=null)

@@ -45,6 +45,9 @@
                 <a class="btn btn-danger" onclick="clearLog(null,1)" shiro:hasPermission="ext:job:log:clean">
 	                <i class="fa fa-remove"></i> 清理一个月以前的日志
 	            </a>
+				<a class="btn btn-danger" onclick="clearLog(null,5)" shiro:hasPermission="ext:job:log:clean">
+					<i class="fa fa-remove"></i> 清理100条之前日志
+				</a>
 				<a class="btn btn-danger" onclick="clearLog(null,9)" shiro:hasPermission="ext:job:log:clean">
 					<i class="fa fa-remove"></i> 清理所有日志
 				</a>
@@ -64,7 +67,7 @@
 	<th:block th:include="include :: footer" />
 	<script th:inline="javascript">
 		var detailFlag = [[${@permission.hasPermi('ext:job:log:view')}]];
-		var prefix = ctx + "monitor/djob/log";
+		var prefix = ctx + "ext/djob/log";
 
 		$(function() {
 		    var options = {

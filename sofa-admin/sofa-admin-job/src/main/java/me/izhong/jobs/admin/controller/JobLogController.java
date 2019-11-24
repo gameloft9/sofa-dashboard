@@ -1,5 +1,6 @@
 package me.izhong.jobs.admin.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import me.izhong.common.util.Convert;
 import me.izhong.common.util.DateUtil;
 import me.izhong.dashboard.manage.annotation.Log;
@@ -30,14 +31,14 @@ import java.util.Date;
 import java.util.List;
 
 @Controller
-@RequestMapping("/monitor/djob/log")
+@RequestMapping("/ext/djob/log")
+@Slf4j
 public class JobLogController {
-	private static Logger logger = LoggerFactory.getLogger(JobLogController.class);
 
 	@Autowired(required = false)
 	private JobServiceReference jobServiceReference;
 
-	private static String prefix = "monitor/djob";
+	private static String prefix = "ext/djob";
 
 	@RequestMapping("")
 	public String index(HttpServletRequest request, Model model, Long jobId) {
@@ -129,7 +130,7 @@ public class JobLogController {
 
 			return logResult;
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			throw BusinessException.build(e.getMessage());
 		}
 	}
@@ -154,7 +155,7 @@ public class JobLogController {
 		try {
 			runResult = jobServiceReference.jobService.kill(jobLog.getJobLogId());
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			runResult = new ReturnT<String>(500, e.getMessage());
 		}
 		return runResult;
@@ -178,7 +179,7 @@ public class JobLogController {
 		} else if (type == 4) {
 			clearBeforeTime = DateUtil.addYears(new Date(), -1);	// 清理一年之前日志数据
 		} else if (type == 5) {
-			clearBeforeNum = 1000;		// 清理一千条以前日志数据
+			clearBeforeNum = 100;		// 清理100条以前日志数据
 		} else if (type == 6) {
 			clearBeforeNum = 10000;		// 清理一万条以前日志数据
 		} else if (type == 7) {

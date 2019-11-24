@@ -26,10 +26,10 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Controller
-@RequestMapping("/monitor/djob/group")
+@RequestMapping("/ext/djob/group")
 public class JobGroupController {
 
-	private String prefix = "monitor/djob/group";
+	private String prefix = "ext/djob/group";
 
 	@Autowired(required = false)
 	private JobServiceReference jobServiceReference;

@@ -28,10 +28,10 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Controller
-@RequestMapping("/monitor/djob")
+@RequestMapping("/ext/djob")
 public class JobInfoController {
 
-	private String prefix = "monitor/djob";
+	private String prefix = "ext/djob";
 
 	@Autowired(required = false)
 	private JobServiceReference jobServiceReference;

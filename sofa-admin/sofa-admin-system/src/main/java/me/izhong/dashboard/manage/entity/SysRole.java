@@ -49,7 +49,7 @@ public class SysRole extends TimedBasedEntity {
     /**
      * 角色排序
      */
-    @Indexed(unique = true)
+    @Indexed(unique = false)
     @Excel(name = "角色排序")
     @NotBlank(message = "显示顺序不能为空")
     private String roleSort;
