@@ -103,8 +103,7 @@ public class JobMngImpl implements IJobMngFacade {
     public ReturnT<String> update(Job job) {
         ZJobInfo jobInfo = new ZJobInfo();
         BeanUtils.copyProperties(job,jobInfo);
-        jobInfoService.updateJob(jobInfo);
-        return ReturnT.SUCCESS;
+        return ReturnT.successReturn(jobInfoService.updateJob(jobInfo));
     }
 
     @Override
@@ -125,8 +124,8 @@ public class JobMngImpl implements IJobMngFacade {
     }
 
     @Override
-    public ReturnT<String> trigger(Long jobId,TriggerTypeEnum triggerType) {
-        JobTriggerPoolHelper.trigger(jobId,triggerType, -1, null);
+    public ReturnT<String> trigger(Long jobId,TriggerTypeEnum triggerType,int failRetryCount, String executorParam) {
+        JobTriggerPoolHelper.trigger(jobId,triggerType, failRetryCount, executorParam);
         return ReturnT.SUCCESS;
     }
 

@@ -108,17 +108,19 @@
 							});
                         return r;
 		            },
-                    sortable: true
+                    sortable: true,
+                    visible: false
 		        },
 		        {
 		            field: 'jobCron',
 		            title: '执行表达式'
 		        },
-		        //{
-		        //    field: 'createTime',
-		        //    title: '创建时间',
-		        //    sortable: true
-		        //},
+		        {
+		            field: 'createTime',
+		            title: '创建时间',
+		            sortable: true,
+		            visible: false
+		        },
 		        {
 		            field: 'triggerNextTimeString',
 		            title: '下次运行时间'
@@ -128,24 +130,25 @@
 					title: '负责人',
 					sortable: true
 				},
-                    {
-                        field: 'triggerStatus',
-                        title: '状态',
-                        align: 'center',
-                        formatter: function (value, row, index) {
-                            return statusTools(row);
-                        }
-                    },
-                    {
-                        field: 'updateTime',
-                        title: '修改时间',
-                        sortable: true
-                    },
-                    {
-                        field: 'updateBy',
-                        title: '修改人',
-                        sortable: true
-                    },
+                {
+                    field: 'triggerStatus',
+                    title: '状态',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return statusTools(row);
+                    }
+                },
+                {
+                    field: 'updateTime',
+                    title: '修改时间',
+                    sortable: true
+                },
+                {
+                    field: 'updateBy',
+                    title: '修改人',
+                    sortable: true,
+                    visible: false
+                },
 		        {
 		            title: '操作',
 		            align: 'center',

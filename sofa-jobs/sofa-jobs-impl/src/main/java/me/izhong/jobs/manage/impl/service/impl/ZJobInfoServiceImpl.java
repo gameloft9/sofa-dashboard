@@ -288,6 +288,8 @@ public class ZJobInfoServiceImpl extends CrudBaseServiceImpl<Long,ZJobInfo> impl
 
 		exists_jobInfo.setTriggerStatus(jobInfo.getTriggerStatus());
 		exists_jobInfo.setRemark(jobInfo.getRemark());
+        exists_jobInfo.setCreateBy(jobInfo.getCreateBy());
+        exists_jobInfo.setUpdateBy(jobInfo.getUpdateBy());
 
         return zJobInfoService.update(exists_jobInfo);
 	}

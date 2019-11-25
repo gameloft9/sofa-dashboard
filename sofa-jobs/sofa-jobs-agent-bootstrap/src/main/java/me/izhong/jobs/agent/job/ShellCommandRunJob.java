@@ -47,13 +47,13 @@ public class ShellCommandRunJob extends IJobHandler {
 
         String scriptDir = configBean.getScriptPath();
 
-        Map<String, String> envs = new HashMap<>();
-        envs.put("os","win");
+//        Map<String, String> envs = new HashMap<>();
+//        envs.put("time","win");
 
         Map<String, String> params = jobContext.getParams();
 
-        log.info("shell command job[{}]  trigger [{}] timeout:{}  envs:{} param: {}",
-                jobId, jobContext.getTriggerId(),jobContext.getTimeout(), envs, params);
+        log.info("shell command job[{}]  trigger [{}] timeout:{} param: {}",
+                jobId, jobContext.getTriggerId(),jobContext.getTimeout(), params);
 
         try {
             if (params == null)
@@ -61,20 +61,24 @@ public class ShellCommandRunJob extends IJobHandler {
             long timeout = jobContext.getTimeout();
 
             String dateTime = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-            String envParams = JSON.toJSONString(envs);
+            //String envParams = JSON.toJSONString(envs);
             String execParams = JSON.toJSONString(params);
-            log.info("开始任务:serverName={} command={},envParams={}, execParams={}, timeout={}",
-                    ContextUtil.getServerName(), command, envParams, execParams, timeout);
+            log.info("开始任务:serverName={} command={}, timeout={}",
+                    ContextUtil.getServerName(), command, timeout);
 
             if (StringUtils.isBlank(command)) {
                 throw new JobExecutionException("参数错误");
             }
 
+//            String shellCommand = SHName + " " + scriptDir
+//                    + "/"+ command
+//                    + " -DisJobAgent=true -DscriptType=groovy -DsTime=" + dateTime
+//                    + " -DjobId=" + jobId + " -DtriggerId=" + triggerId
+//                    + " -Denvs=" + envParams + " -Dparams=" + execParams;
             String shellCommand = SHName + " " + scriptDir
                     + "/"+ command
                     + " -DisJobAgent=true -DscriptType=groovy -DsTime=" + dateTime
-                    + " -DjobId=" + jobId + " -DtriggerId=" + triggerId
-                    + " -Denvs=" + envParams + " -Dparams=" + execParams;
+                    + " -DjobId=" + jobId + " -DtriggerId=" + triggerId;
             log.info("shellCommand:{}", shellCommand);
 
             DefaultExecutor shellExecutor = new DefaultExecutor();

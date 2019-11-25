@@ -72,18 +72,17 @@ public class JobDirectTrigger {
 
         int finalFailRetryCount = failRetryCount >= 0 ? failRetryCount : (jobInfo.getExecutorFailRetryCount() == null ? 0 : jobInfo.getExecutorFailRetryCount().intValue());
 
+        if (StringUtils.isNotEmpty(executorParam )) {
+            executorParam = jobInfo.getExecutorParam();
+        }
+        jobLog.setExecutorParam(executorParam);
+
         jobLog = jobLogService.insertTriggerBeginMessage(jobInfo.getJobId(), jobInfo.getJobGroupId(),
                 jobInfo.getJobDesc(), new Date(), triggerType.getTitle(),
-                finalFailRetryCount, jobInfo.getExecutorTimeout(),blockStrategy != null ? blockStrategy.getTitle() : null);
+                finalFailRetryCount, jobInfo.getExecutorTimeout(), executorParam, blockStrategy != null ? blockStrategy.getTitle() : null);
 
         jobInfo.getRunningTriggerIds().add(jobLog.getJobLogId());
         jobInfoService.updateRunningTriggers(jobLog.getJobId(), jobInfo.getRunningTriggerIds());
-
-        if (executorParam != null) {
-            jobLog.setExecutorParam(executorParam);
-        } else {
-            jobLog.setExecutorParam(jobInfo.getExecutorParam());
-        }
 
         // 2、init trigger-param
         TriggerParam triggerParam = new TriggerParam();

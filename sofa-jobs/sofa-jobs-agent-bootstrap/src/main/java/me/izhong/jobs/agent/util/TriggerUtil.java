@@ -1,5 +1,6 @@
 package me.izhong.jobs.agent.util;
 
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import me.izhong.common.util.CronExpression;
 import me.izhong.jobs.agent.service.JobServiceReference;
@@ -10,6 +11,7 @@ import org.springframework.util.Assert;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
 
 @Slf4j
 public class TriggerUtil {
@@ -61,7 +63,18 @@ public class TriggerUtil {
     public static void triggerJob(Long jobId){
         Assert.notNull(jobId,"");
         IJobMngFacade facade = ContextUtil.getBean(JobServiceReference.class).getJobMngFacade();
-        facade.trigger(jobId,TriggerTypeEnum.SCRIPT);
+        facade.trigger(jobId,TriggerTypeEnum.SCRIPT,-1, null);
+    }
+
+    public static void triggerJob(Long jobId, Map<String,String> params){
+        triggerJob(jobId,JSON.toJSONString(params));
+    }
+
+
+    public static void triggerJob(Long jobId, String params){
+        Assert.notNull(jobId,"");
+        IJobMngFacade facade = ContextUtil.getBean(JobServiceReference.class).getJobMngFacade();
+        facade.trigger(jobId,TriggerTypeEnum.SCRIPT,-1, params);
     }
 
 }

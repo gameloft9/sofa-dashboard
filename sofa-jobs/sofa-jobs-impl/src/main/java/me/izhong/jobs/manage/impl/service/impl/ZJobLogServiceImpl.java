@@ -69,7 +69,7 @@ public class ZJobLogServiceImpl extends CrudBaseServiceImpl<Long,ZJobLog> implem
     @Transactional
     @Override
     public ZJobLog insertTriggerBeginMessage(Long jobId, Long jobGroupId, String jobDesc, Date triggerTime, String triggerType,
-                                             Integer finalFailRetryCount,Long executorTimeout, String blockStrategy) {
+                                             Integer finalFailRetryCount,Long executorTimeout,String executorParam, String blockStrategy) {
         ZJobLog jobLog = new ZJobLog();
         jobLog.setJobId(jobId);
         jobLog.setJobGroupId(jobGroupId);
@@ -79,6 +79,7 @@ public class ZJobLogServiceImpl extends CrudBaseServiceImpl<Long,ZJobLog> implem
         jobLog.setExecutorFailRetryCount(finalFailRetryCount);
         jobLog.setExecutorTimeout(executorTimeout);
         jobLog.setBlockStrategy(blockStrategy);
+        jobLog.setExecutorParam(executorParam);
         return super.insert(jobLog);
     }
 

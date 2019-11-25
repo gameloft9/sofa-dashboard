@@ -32,7 +32,7 @@ public interface IJobMngFacade {
 
     ReturnT<String> kill(Long jobId);
 
-    ReturnT<String> trigger(Long jobId, TriggerTypeEnum triggerType);
+    ReturnT<String> trigger(Long jobId, TriggerTypeEnum triggerType, int failRetryCount, String executorParam);
 
     ReturnT<String> updateJobScriptId(Long jobId,Long jobScriptId);
     ReturnT<String> updateJobNextTriggerTime(Long jobId,Date nextTriggerTime);

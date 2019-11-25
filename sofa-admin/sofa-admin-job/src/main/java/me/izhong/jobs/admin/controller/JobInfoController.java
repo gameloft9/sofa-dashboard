@@ -185,7 +185,7 @@ public class JobInfoController {
 		if (executorParam == null) {
 			executorParam = "";
 		}
-		ReturnT<String> rObj = jobServiceReference.jobService.trigger(jobId,TriggerTypeEnum.MANUAL);
+		ReturnT<String> rObj = jobServiceReference.jobService.trigger(jobId,TriggerTypeEnum.MANUAL,-1,executorParam);
 		if( ReturnT.SUCCESS_CODE != rObj.getCode()){
 			throw BusinessException.build(rObj.getMsg());
 		}

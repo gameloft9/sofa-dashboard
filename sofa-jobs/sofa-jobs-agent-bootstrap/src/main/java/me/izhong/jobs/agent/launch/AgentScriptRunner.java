@@ -12,6 +12,7 @@ import me.izhong.jobs.agent.log.RemoteLog;
 import me.izhong.jobs.agent.service.JobServiceReference;
 import me.izhong.jobs.agent.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
+import me.izhong.jobs.model.JobLog;
 import me.izhong.jobs.model.JobScript;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,27 +67,33 @@ public class AgentScriptRunner implements ApplicationRunner {
                     log.info("任务{}的Script未找到，检查是否配置了脚本",jobId );
                     throw new Exception("任务"+jobId+"的Script未找到，检查是否配置了脚本");
                 }
+                JobLog jobLog = facade.findJobLogByJobLogId(triggerId);
+                if(jobLog == null) {
+                    log.info("任务{}的JobLog未找到",jobId );
+                    throw new Exception("任务"+jobId+"的JobLog未找到");
+                }
                 String script = jobScript.getScript();
                 log.info("脚本内容:{}", script);
 
-                String envsString = System.getProperty("envs");
-                log.info("envs:{}", envsString);
-                Map<String, String> envs ;
-                if(StringUtils.isNotBlank(envsString)) {
-                    if(envsString.startsWith("{\"")) {
-                        envs = JSONObject.parseObject(envsString, new TypeReference<Map<String, String>>() {
-                        });
-                    } else if(envsString.startsWith("{")) {
-                        envs = StringUtil.parseParams(envsString);
-                    } else {
-                        log.info("无法解析参数");
-                        return;
-                    }
-                } else {
-                    envs = new HashMap<>();
-                }
+//                String envsString = System.getProperty("envs");
+//                log.info("envs:{}", envsString);
+//                Map<String, String> envs ;
+//                if(StringUtils.isNotBlank(envsString)) {
+//                    if(envsString.startsWith("{\"")) {
+//                        envs = JSONObject.parseObject(envsString, new TypeReference<Map<String, String>>() {
+//                        });
+//                    } else if(envsString.startsWith("{")) {
+//                        envs = StringUtil.parseParams(envsString);
+//                    } else {
+//                        log.info("无法解析参数");
+//                        return;
+//                    }
+//                } else {
+//                    envs = new HashMap<>();
+//                }
 
-                String paramsString = System.getProperty("params");
+                String paramsString = jobLog.getExecutorParam();
+                //String paramsString = System.getProperty("params");
                 log.info("params:{}", paramsString);
                 Map<String, String> params;
                 if(StringUtils.isNotBlank(paramsString)) {
@@ -114,7 +121,7 @@ public class AgentScriptRunner implements ApplicationRunner {
                     context.setTimeout(-1);
                 }
                 context.setLog(agentLog);
-                context.setEnvs(envs);
+                //context.setEnvs(envs);
                 context.setParams(params);
 
                 int code = 0;
