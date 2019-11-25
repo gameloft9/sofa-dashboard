@@ -139,7 +139,7 @@ public class JobInfoController {
 
 		exists_jobInfo.setUpdateBy(UserInfoContextHelper.getCurrentLoginName());
 		ReturnT<String> rObj = jobServiceReference.jobService.update(exists_jobInfo);
-		if( ReturnT.SUCCESS_CODE != rObj.getCode()){
+		if(ReturnT.SUCCESS_CODE != rObj.getCode()){
 			throw BusinessException.build(rObj.getMsg());
 		}
 	}
@@ -182,9 +182,6 @@ public class JobInfoController {
 	@RequestMapping("/trigger")
 	@AjaxWrapper
 	public void triggerJob(Long jobId, String executorParam) {
-		if (executorParam == null) {
-			executorParam = "";
-		}
 		ReturnT<String> rObj = jobServiceReference.jobService.trigger(jobId,TriggerTypeEnum.MANUAL,-1,executorParam);
 		if( ReturnT.SUCCESS_CODE != rObj.getCode()){
 			throw BusinessException.build(rObj.getMsg());

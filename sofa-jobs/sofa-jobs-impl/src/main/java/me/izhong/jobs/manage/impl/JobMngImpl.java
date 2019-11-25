@@ -351,11 +351,17 @@ public class JobMngImpl implements IJobMngFacade {
     @Transactional
     @Override
     public JobScript addJobScript(JobScript script) {
+        if(script.getJobId() == null) {
+            throw BusinessException.build("请求jobId不能为空");
+        }
         ZJobScript dbBean = jobScriptService.insert(JobScriptUtil.toDbBean(script));
-
+        if(dbBean == null) {
+            throw BusinessException.build("保存脚本异常");
+        }else if(dbBean.getJobId() ==null) {
+            throw BusinessException.build("保存脚本异常,jobId不能为空");
+        }
         Long jobScriptId = dbBean.getJobScriptId();
-        jobInfoService.updateJobScriptId(jobScriptId,jobScriptId);
-
+        jobInfoService.updateJobScriptId(dbBean.getJobId(),jobScriptId);
 
         return JobScriptUtil.toRpcBean(dbBean);
     }

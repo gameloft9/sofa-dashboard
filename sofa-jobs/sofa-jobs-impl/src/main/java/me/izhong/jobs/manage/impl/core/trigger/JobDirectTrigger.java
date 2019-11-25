@@ -35,9 +35,6 @@ public class JobDirectTrigger {
             logger.warn("trigger fail, jobId invalid，jobId={}", jobId);
             return ReturnT.FAIL;
         }
-        if (executorParam != null) {
-            jobInfo.setExecutorParam(executorParam);
-        }
         //如果是阻塞的任务，这里就不调度了
         // executor block strategy
         boolean willSchedule = false;
@@ -75,11 +72,11 @@ public class JobDirectTrigger {
         if (StringUtils.isNotEmpty(executorParam )) {
             executorParam = jobInfo.getExecutorParam();
         }
-        jobLog.setExecutorParam(executorParam);
 
         jobLog = jobLogService.insertTriggerBeginMessage(jobInfo.getJobId(), jobInfo.getJobGroupId(),
                 jobInfo.getJobDesc(), new Date(), triggerType.getTitle(),
                 finalFailRetryCount, jobInfo.getExecutorTimeout(), executorParam, blockStrategy != null ? blockStrategy.getTitle() : null);
+        jobLog.setExecutorParam(executorParam);
 
         jobInfo.getRunningTriggerIds().add(jobLog.getJobLogId());
         jobInfoService.updateRunningTriggers(jobLog.getJobId(), jobInfo.getRunningTriggerIds());

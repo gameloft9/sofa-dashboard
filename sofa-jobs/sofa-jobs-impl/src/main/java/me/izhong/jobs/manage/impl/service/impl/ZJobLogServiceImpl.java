@@ -1,11 +1,14 @@
 package me.izhong.jobs.manage.impl.service.impl;
 
+import com.mongodb.client.result.DeleteResult;
 import lombok.extern.slf4j.Slf4j;
 import me.izhong.db.common.exception.BusinessException;
 import me.izhong.db.common.service.CrudBaseServiceImpl;
 import com.mongodb.client.result.UpdateResult;
 import me.izhong.jobs.manage.impl.core.model.ZJobLog;
+import me.izhong.jobs.manage.impl.core.model.ZJobScript;
 import me.izhong.jobs.manage.impl.service.ZJobLogService;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -162,14 +165,18 @@ public class ZJobLogServiceImpl extends CrudBaseServiceImpl<Long,ZJobLog> implem
     public void clearLog(Long jobId, Date clearBeforeTime, Integer clearBeforeNum) {
         Query query = new Query();
         if(clearBeforeTime == null && clearBeforeNum == null)
-            throw BusinessException.build("参数异常");
+            throw BusinessException.build("参数异常,清理日志的限制时间和限制数量不能同时为空");
         if(jobId != null)
             query.addCriteria(Criteria.where("jobId").is(jobId));
         if(clearBeforeTime !=null)
             query.addCriteria(Criteria.where("createTime").lte(clearBeforeTime));
-        if(clearBeforeNum > 0)
-            query.addCriteria(Criteria.where("jobId").lte(clearBeforeNum));
-        mongoTemplate.remove(query, ZJobLog.class);
+        if(clearBeforeNum > 0) {
+            query.skip(clearBeforeNum);
+            query.with(new Sort(Sort.Direction.DESC, "createTime"));
+        }
+        query.addCriteria(Criteria.where("handleCode").ne(null));
+        DeleteResult rt = mongoTemplate.remove(query, ZJobLog.class);
+        log.info("已删除日志数量:{}",rt.getDeletedCount());
     }
 
 
@@ -179,6 +186,7 @@ public class ZJobLogServiceImpl extends CrudBaseServiceImpl<Long,ZJobLog> implem
             return;
         Query query = new Query();
         query.addCriteria(Criteria.where("jobLogId").in(jobLogIds));
-        mongoTemplate.remove(query, ZJobLog.class);
+        DeleteResult rt = mongoTemplate.remove(query, ZJobLog.class);
+        log.info("已删除日志数量:{}",rt.getDeletedCount());
     }
 }

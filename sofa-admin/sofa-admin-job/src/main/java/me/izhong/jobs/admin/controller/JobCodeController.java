@@ -70,6 +70,7 @@ public class JobCodeController {
 		}
 
 		JobScript jobS = new JobScript();
+		jobS.setJobId(exists_jobInfo.getJobId());
 		jobS.setScript(jobScript);
 		jobS.setRemark(jobRemark);
 		jobS.setCreateBy(UserInfoContextHelper.getCurrentLoginName());
