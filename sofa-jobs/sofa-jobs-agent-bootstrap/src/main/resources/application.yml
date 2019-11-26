@@ -27,7 +27,7 @@ com:
     sofa:
       rpc:
         registry:
-          address: zookeeper://144.131.254.141:2181
+          address: zookeeper://xxx:2181
         bolt-port: 13303
 ---
 spring:
