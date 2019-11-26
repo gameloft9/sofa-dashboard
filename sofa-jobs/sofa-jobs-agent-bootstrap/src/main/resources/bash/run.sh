@@ -22,8 +22,6 @@ export JAVA_OPTIONS="${USER_MEM_ARGS} $PARAMS -Djava.awt.headless=true -DSERVER_
 -Dspring.profiles.active=batch,${RUN_ENV} -Djobs.log.dir=${LOG_DIR}/joblogs -Djobs.script.dir=${BIN_DIR} \
 -Dspring.main.web-application-type=none -Djava.library.path=${BASE_DIR}/lib -Dlogback.configurationFile=logback_batch.xml "
 
-#java $JAVA_OPTIONS -cp $CLASSPATH com.chinaums.netpay.jobs.Main $PARAMS
-
 echo ">> run #: java $JAVA_OPTIONS -jar $JAR_DIR/$SERVER_NAME.jar"
 # > /dev/null 2>&1 &
 java $JAVA_OPTIONS -jar $JAR_DIR/$SERVER_NAME.jar

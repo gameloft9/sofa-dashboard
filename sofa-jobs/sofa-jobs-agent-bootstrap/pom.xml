@@ -132,35 +132,6 @@
 
     </dependencies>
 
-    <profiles>
-        <profile>
-            <id>nuis</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.chinaums</groupId>
-                    <artifactId>ums-sm4util-jdk1.8-x64</artifactId>
-                    <version>1.0.5</version>
-                </dependency>
-            </dependencies>
-            <repositories>
-                <repository>
-                    <id>main</id>
-                    <url>http://172.30.252.132:8081/nexus/content/groups/security/</url>
-                    <releases>
-                        <enabled>true</enabled>
-                    </releases>
-                    <snapshots>
-                        <enabled>true</enabled>
-                        <updatePolicy>always</updatePolicy>
-                    </snapshots>
-                </repository>
-            </repositories>
-        </profile>
-    </profiles>
-
     <build>
         <plugins>
             <plugin>
