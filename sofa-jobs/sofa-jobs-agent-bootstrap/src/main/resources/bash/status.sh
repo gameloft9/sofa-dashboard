@@ -14,7 +14,6 @@ SERVER_NAME=sofa-jobs-agent-bootstrap
 
 echo "command:ps -efc|grep java|grep isJobAgent|grep $USER|grep batch|grep SERVER_NAME=${SERVER_NAME}\\\\s|grep isJobAgent=true|grep jobId=${JOB_ID}|grep triggerId=${TRIGGER_ID}| wc -l"
 
-
 count=`ps -efc|grep java|grep isJobAgent|grep $USER|grep batch|grep SERVER_NAME=${SERVER_NAME}\\\\s|grep isJobAgent=true|grep jobId=${JOB_ID}|grep triggerId=${TRIGGER_ID}| wc -l`
 if [ $count -eq 0 ]; then
   echo "No running server found."

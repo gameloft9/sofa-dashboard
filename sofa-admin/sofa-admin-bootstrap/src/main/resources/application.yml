@@ -6,7 +6,7 @@ spring:
     banner-mode: "OFF"
   data:
     mongodb:
-      uri: mongodb://172.30.251.33:27017/uis
+      uri: mongodb://xxx:27017/uis
   http:
     encoding:
       charset: UTF-8

@@ -5,7 +5,7 @@ spring:
     web-application-type: NONE
   data:
     mongodb:
-      uri: mongodb://172.30.251.33:27017/uis?readPreference=primaryPreferred
+      uri: mongodb://xxx:27017/uis?readPreference=primaryPreferred
   output:
     ansi:
       enabled: ALWAYS
@@ -22,8 +22,6 @@ xxl:
   job:
     accessToken:
 
-### xxl-job, i18n (default empty as chinese, "en" as english)
-    i18n:
 com:
   alipay:
     sofa:

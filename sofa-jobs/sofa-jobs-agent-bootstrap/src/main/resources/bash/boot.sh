@@ -19,13 +19,13 @@ function in_array()
 	return 0
 }
 
-SUPPORT_SERVERS=('sofa-jobs-bootstrap' 'sofa-jobs-agent-bootstrap' 'uis-pre-do-runner' 'UisBillNotifyMonitor' 'UisUnionPayMonitor' 'UisPayNoticeMonitor' 'UisIotServer' 'UisIotBatch' 'UisServer' 'UisConnectionServer' 'UisSettleServer' 'UisRealTimeServer' 'UisMessageServer');
+SUPPORT_SERVERS=('sofa-admin-bootstrap' 'sofa-jobs-bootstrap' 'sofa-jobs-agent-bootstrap');
 
 SERVER_NAME=$1
 SERVER_SHORT_NAME=`echo $SERVER_NAME | sed 's/[0-9]*$//'`
 
 
-count=`ps -efc|grep java|grep $USER|grep SERVER_NAME=${SERVER_NAME}\\\\s|wc -l`
+count=`ps -efc|grep java|grep -v batch|grep $USER|grep SERVER_NAME=${SERVER_NAME}\\\\s|wc -l`
 if [ $count -ge 1 ]; then
   echo "${SERVER_NAME} already running"
   exit 0
@@ -40,15 +40,6 @@ fi
 
 echo "SERVER_NAME:$SERVER_NAME"
 
-if [ 'x'$DEBUG_PORT != 'x' ]; then
-	DEBUG_OPTION="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=$DEBUG_PORT,suspend=n"
-fi
-
-LAUNCHER_CLASS=org.springframework.boot.loader.JarLauncher
-
-
-echo "LAUNCHER_CLASS:$LAUNCHER_CLASS"
-
 #export USER_MEM_ARGS="-Xms256m -Xmx768m -XX:PermSize=128M -XX:MaxPermSize=420M"
 export USER_MEM_ARGS="-XX:MetaspaceSize=128M  -XX:+HeapDumpOnOutOfMemoryError -XX:+UseG1GC "
 
@@ -59,8 +50,9 @@ export USER_MEM_ARGS="-XX:MetaspaceSize=128M  -XX:+HeapDumpOnOutOfMemoryError -X
 JAVA_OPTIONS="-Djava.awt.headless=true -Drun_env=${RUN_ENV} -Dproduct_mode=${PRODUCT_MODE} \
 	-Dspring.profiles.active=${RUN_ENV} -Dtrace.prefix=${TRACE_PREFIX} \
 	-DSERVER_NAME=${SERVER_NAME} -Ddubbo.protocol.host=$LOCAL_IP \
-	-Denv=${ENV} -Dapp.id=${APP_ID} -Dapollo.meta=${APOLLO_META} -Dapollo.cacheDir=${APOLLO_CACHE_DIR} -Dapollo.cluster=${APOLLO_CLUSTER} \
-	-Djava.io.tmpdir=${TMP_DIR} -Dlogback.configurationFile=${ETC_DIR}/logback.xml -Drocketmq.client.logRoot=${LOG_DIR}/mqlog
+	-Dcom.alipay.sofa.rpc.virtual-host=$LOCAL_IP -Dcom.alipay.sofa.rpc.registry.address=${ZOOKEEPER_IP} \
+	-Dspring.data.mongodb.uri=${MONGO_URI} \
+	-Djava.io.tmpdir=${TMP_DIR} -Dlogback.configurationFile=${ETC_DIR}/logback.xml -Drocketmq.client.logRoot=${LOG_DIR}/mqlog \
 	-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Dfile.encoding=${FILE_ENCODING} -Djava.library.path=${BASE_DIR}/lib"
 
 export JAVA_OPTIONS
