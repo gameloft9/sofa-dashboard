@@ -13,7 +13,7 @@ export JAVA_VENDOR=Sun
 export PRODUCT_MODE=t
 export RUN_ENV=agent,dev
 export TRACE_PREFIX=X0
-export ZOOKEEPER_IP=144.131.254.141:2181
+export ZOOKEEPER_IP=zookeeper://144.131.254.141:2181
 export MONGO_URI=mongodb://172.30.251.33:27017/uis
 
 export JAVA_HOME=/usr/local/jdk1.8.0_121

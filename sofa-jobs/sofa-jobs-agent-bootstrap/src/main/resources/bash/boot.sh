@@ -52,6 +52,7 @@ JAVA_OPTIONS="-Djava.awt.headless=true -Drun_env=${RUN_ENV} -Dproduct_mode=${PRO
 	-DSERVER_NAME=${SERVER_NAME} -Ddubbo.protocol.host=$LOCAL_IP \
 	-Dcom.alipay.sofa.rpc.virtual-host=$LOCAL_IP -Dcom.alipay.sofa.rpc.registry.address=${ZOOKEEPER_IP} \
 	-Dspring.data.mongodb.uri=${MONGO_URI} \
+	-Djobs.log.dir=${LOG_DIR}/joblogs -Djobs.script.dir=${BIN_DIR} \
 	-Djava.io.tmpdir=${TMP_DIR} -Dlogback.configurationFile=${ETC_DIR}/logback.xml -Drocketmq.client.logRoot=${LOG_DIR}/mqlog \
 	-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Dfile.encoding=${FILE_ENCODING} -Djava.library.path=${BASE_DIR}/lib"
 
@@ -62,9 +63,9 @@ echo "JAVA_OPTIONS:${JAVA_OPTIONS}"
 rm -rf $DOMAIN_DIR/servers/$SERVER_NAME/tmp
 
 cd $BIN_DIR
-echo "用户自定义启动参数:$USER_MEM_ARGS"
+echo "USER_MEM_ARGS:$USER_MEM_ARGS"
 #echo "JAVA_OPTIONS:$JAVA_OPTIONS"
-echo 日志文件: $LOG_DIR/$SERVER_NAME.log
+echo LOG_DIR: $LOG_DIR/$SERVER_NAME.log
 
 if [ -e "$APP_DIR/$SERVER_NAME.jar" ];then
   LAUNCHER_CLASS=org.springframework.boot.loader.JarLauncher
