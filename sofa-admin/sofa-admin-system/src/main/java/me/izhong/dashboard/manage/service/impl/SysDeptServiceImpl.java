@@ -89,7 +89,7 @@ public class SysDeptServiceImpl extends CrudBaseServiceImpl<Long,SysDept> implem
         if(ps != null && ps.size() >0){
             List<String> names = ps.stream().filter(e->!Boolean.TRUE.equals(e.getIsDelete())).map(e->e.getDeptName()).collect(Collectors.toList());
             if(names.size() > 0 ) {
-                throw BusinessException.build("部门["+cur.getDeptName()+"]存在这些子部门["+names+"]无法删除");
+                throw BusinessException.build("部门["+cur.getDeptName()+"]存在这些子部门"+names+"无法删除");
             }
         }
     }
@@ -101,7 +101,7 @@ public class SysDeptServiceImpl extends CrudBaseServiceImpl<Long,SysDept> implem
             List<String> names = us.stream().filter(e->!Boolean.TRUE.equals(e.getIsDelete())).map(e->e.getLoginName()).collect(Collectors.toList());
             if(names.size() > 0 ) {
                 log.info("部门{}存在这些用户{}无法删除", deptId, names);
-                throw BusinessException.build("部门[" + deptId + "]存在这些用户[" + names + "]无法删除");
+                throw BusinessException.build("部门[" + deptId + "]存在这些用户" + names + "无法删除");
             }
         }
     }
