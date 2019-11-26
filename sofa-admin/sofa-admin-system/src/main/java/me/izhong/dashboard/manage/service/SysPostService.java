@@ -37,4 +37,8 @@ public interface SysPostService extends CrudBaseService<Long,SysPost> {
     public boolean checkPostNameUnique(SysPost sysPost);
 
     public boolean checkPostCodeUnique(SysPost sysPost);
+
+    long deleteAuthUsers(Long userId);
+
+    long removePostInfo(String ids);
 }

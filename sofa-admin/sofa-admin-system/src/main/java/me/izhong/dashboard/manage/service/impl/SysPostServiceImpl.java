@@ -1,5 +1,8 @@
 package me.izhong.dashboard.manage.service.impl;
 
+import me.izhong.dashboard.manage.dao.UserPostDao;
+import me.izhong.dashboard.manage.entity.SysRole;
+import me.izhong.dashboard.manage.service.SysUserService;
 import me.izhong.db.common.service.CrudBaseServiceImpl;
 import me.izhong.dashboard.manage.dao.PostDao;
 import me.izhong.dashboard.manage.entity.SysPost;
@@ -35,6 +38,11 @@ public class SysPostServiceImpl extends CrudBaseServiceImpl<Long, SysPost> imple
     @Autowired
     private PostDao postDao;
 
+    @Autowired
+    private UserPostDao userPostDao;
+
+    @Autowired
+    private SysUserService userService;
     /**
      * 根据用户ID查询岗位
      *
@@ -125,6 +133,27 @@ public class SysPostServiceImpl extends CrudBaseServiceImpl<Long, SysPost> imple
             return false;
         }
         return true;
+    }
+
+    @Override
+    public long deleteAuthUsers(Long userId) {
+        Assert.notNull(userId,"");
+        return userPostDao.deleteAllByUserId(userId);
+    }
+
+    @Transactional
+    @Override
+    public long removePostInfo(String ids) {
+        Long[] postIds = Convert.toLongArray(ids);
+        for (Long postId : postIds) {
+            SysPost sysPost = selectByPId(postId);
+            List<SysUser> userPosts = doSelectUserByPostId(postId, 10);
+            if (userPosts!= null && userPosts.size() > 0) {
+                List<String> loginNames = userPosts.stream().map(e->e.getLoginName()).collect(Collectors.toList());
+                throw BusinessException.build("[" + sysPost.getPostName() + "]已分配给用户"+loginNames+"不能删除");
+            }
+        }
+        return removeByPIds(ids);
     }
 
     private List<SysPost> doSelectPostsByUserId(Long userId) {

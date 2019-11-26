@@ -46,6 +46,8 @@ public interface SysUserService {
 
     long deleteUserByIds(String ids);
 
+    void deleteAllUserInfoByUserId(Long userId);
+
     SysUser resetUserPwd(Long userId, String newPassword, String salt);
 
     String selectUserRoleGroup(Long userId);

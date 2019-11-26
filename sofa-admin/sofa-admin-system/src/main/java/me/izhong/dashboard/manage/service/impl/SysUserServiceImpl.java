@@ -30,10 +30,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
@@ -274,6 +272,7 @@ public class SysUserServiceImpl extends CrudBaseServiceImpl<Long,SysUser> implem
         return doGetUserAllocatedList(request, roleId, user, deptIds, false);
     }
 
+    @Transactional
     @Override
     public long deleteUserByIds(String ids) throws BusinessException {
         Long[] userIds = Convert.toLongArray(ids);
@@ -282,21 +281,23 @@ public class SysUserServiceImpl extends CrudBaseServiceImpl<Long,SysUser> implem
                 throw BusinessException.build("不允许删除超级管理员用户");
             }
             checkUserAllowed(new SysUser(userId));
+            deleteAllUserInfoByUserId(userId);
+            return userIds.length;
         }
+        return 0;
+    }
 
-        Query query = new Query();
-        if (userIds == null || userIds.length < 1)
-            throw BusinessException.build("请求参数错误");
-
-        query.addCriteria(Criteria.where("userId").in(userIds));
-
-        Update update = new Update();
-        update.set("isDelete", true);
-
-        UpdateResult ur = mongoTemplate.updateMulti(query, update, SysUser.class);
-
-        //DeleteResult result = mongoTemplate.remove(query, SysUser.class);
-        return ur.getModifiedCount();
+    @Transactional
+    @Override
+    public void deleteAllUserInfoByUserId(Long userId) {
+        SysUser sysUser = findUser(userId);
+        //删除用户角色
+        long delRoleCount = sysRoleService.deleteAuthUsers(userId);
+        //删除用户岗位
+        long delPostCount = sysPostService.deleteAuthUsers(userId);
+        //逻辑删除用户信息
+        long delUserCount = deleteByPId(userId);
+        log.info("删除用户{},删除用户角色数量{}, 删除用户岗位数量{}",delUserCount,delRoleCount,delPostCount);
     }
 
     /**

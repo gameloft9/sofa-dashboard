@@ -51,7 +51,7 @@
 <script th:inline="javascript">
     var addFlag = [[${@permission.hasPermi('system:dept:add')}]];
     var editFlag = [[${@permission.hasPermi('system:dept:edit')}]];
-    var removeFlag = [[${@permission.hasPermi('system:dept:removeJobGroup')}]];
+    var removeFlag = [[${@permission.hasPermi('system:dept:remove')}]];
     var datas = [[${@dict.getType('sys_normal_disable')}]];
     var prefix = ctx + "system/dept"
 

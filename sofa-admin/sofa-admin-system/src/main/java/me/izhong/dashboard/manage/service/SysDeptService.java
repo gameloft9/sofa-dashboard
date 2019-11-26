@@ -22,7 +22,7 @@ public interface SysDeptService extends CrudBaseService<Long,SysDept> {
     /**
      * 根据角色ID查询菜单
      *
-     * @param role 角色对象
+     * @param roleId 角色Id
      * @return 菜单列表
      */
     public List<Ztree> roleDeptTreeData(Long roleId);
@@ -35,13 +35,14 @@ public interface SysDeptService extends CrudBaseService<Long,SysDept> {
      */
     public int selectDeptCount(Long parentId);
 
+    public void checkExistChildDept(Long parentId);
+
     /**
      * 查询部门是否存在用户
      *
      * @param deptId 部门ID
-     * @return 结果 true 存在 false 不存在
      */
-    public boolean checkDeptExistUser(Long deptId);
+    public void checkDeptExistUser(Long deptId);
 
 
 

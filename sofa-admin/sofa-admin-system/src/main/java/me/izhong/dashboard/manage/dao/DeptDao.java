@@ -16,5 +16,7 @@ public interface DeptDao extends MongoRepository<SysDept, Long> {
 
     int countByParentId(Long parentId);
 
+    List<SysDept> findAllByParentId(Long parentId);
+
     SysDept findByDeptNameAndParentId(String deptName, Long parentId);
 }

@@ -13,7 +13,6 @@ import me.izhong.db.common.exception.BusinessException;
 import me.izhong.dashboard.manage.service.SysRoleService;
 import me.izhong.common.util.Convert;
 import me.izhong.db.common.util.CriteriaUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -76,7 +75,7 @@ public class SysRoleServiceImpl extends CrudBaseServiceImpl<Long,SysRole> implem
      * 根据用户ID查询角色
      *
      * @param userId 用户ID
-     * @return 角色列表
+     * @return 所有角色列表，用户有权限的打勾
      */
     @Override
     public List<SysRole> selectAllRolesByUserId(Long userId) {
@@ -90,6 +89,7 @@ public class SysRoleServiceImpl extends CrudBaseServiceImpl<Long,SysRole> implem
                 }
             }
         }
+        //返回的是系统所有的角色
         return sysRoles;
     }
 
@@ -106,7 +106,7 @@ public class SysRoleServiceImpl extends CrudBaseServiceImpl<Long,SysRole> implem
      */
     @Override
     public long deleteRoleById(Long roleId) {
-        return deleteRoleByIds(roleId + "");
+        return removeRoleInfo(roleId + "");
     }
 
     /**
@@ -116,7 +116,7 @@ public class SysRoleServiceImpl extends CrudBaseServiceImpl<Long,SysRole> implem
      * @throws Exception
      */
     @Override
-    public long deleteRoleByIds(String ids) throws BusinessException {
+    public long removeRoleInfo(String ids) throws BusinessException {
         Long[] roleIds = Convert.toLongArray(ids);
         for (Long roleId : roleIds) {
             SysRole sysRole = selectByPId(roleId);
@@ -125,7 +125,7 @@ public class SysRoleServiceImpl extends CrudBaseServiceImpl<Long,SysRole> implem
                 throw BusinessException.build(String.format("%1$s已分配,不能删除", sysRole.getRoleName()));
             }
         }
-        return super.deleteByPIds(ids);
+        return super.removeByPIds(ids);
     }
 
     /**
@@ -269,6 +269,18 @@ public class SysRoleServiceImpl extends CrudBaseServiceImpl<Long,SysRole> implem
         List<SysUserRole> sysUserRoles = userRoleDao.findAllByRoleIdAndUserIdIn(roleId, Convert.toLongArray(userIds));
         userRoleDao.deleteAll(sysUserRoles);
         return sysUserRoles.size();
+    }
+
+    @Override
+    public long deleteAuthUsers(List<Long> roleIds, Long userId) {
+        List<SysUserRole> sysUserRoles = userRoleDao.findAllByRoleIdInAndUserId(roleIds, userId);
+        userRoleDao.deleteAll(sysUserRoles);
+        return sysUserRoles.size();
+    }
+
+    @Override
+    public long deleteAuthUsers(Long userId) {
+        return userRoleDao.deleteAllByUserId(userId);
     }
 
     /**

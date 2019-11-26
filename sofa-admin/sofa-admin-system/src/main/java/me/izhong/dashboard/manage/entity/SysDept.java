@@ -1,5 +1,6 @@
 package me.izhong.dashboard.manage.entity;
 
+import me.izhong.db.common.annotation.PrimaryId;
 import me.izhong.db.common.domain.TimedBasedEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,6 +30,7 @@ public class SysDept extends TimedBasedEntity {
      * 部门ID
      */
     @AutoId
+    @PrimaryId
     @Indexed(unique = true)
     private Long deptId;
 

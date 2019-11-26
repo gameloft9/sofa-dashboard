@@ -46,7 +46,7 @@ public interface SysRoleService extends CrudBaseService<Long,SysRole> {
      * @return 结果
      * @throws Exception 异常
      */
-    public long deleteRoleByIds(String ids) throws BusinessException;
+    public long removeRoleInfo(String ids) throws BusinessException;
 
     /**
      * 新增保存角色信息
@@ -120,6 +120,9 @@ public interface SysRoleService extends CrudBaseService<Long,SysRole> {
      * @return 结果
      */
     public long deleteAuthUsers(Long roleId, String userIds);
+
+    public long deleteAuthUsers(List<Long> roleId, Long userId);
+    public long deleteAuthUsers(Long userId);
 
     /**
      * 批量选择授权用户角色

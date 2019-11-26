@@ -9,12 +9,14 @@ import java.util.List;
 @Repository
 public interface UserRoleDao extends MongoRepository<SysUserRole, Long> {
 
-    void deleteAllByUserId(Long userId);
+    long deleteAllByUserId(Long userId);
 
     long deleteAllByUserIdAndRoleId(Long userId, Long roleId);
 
     int countByRoleId(Long roleId);
 
     List<SysUserRole> findAllByRoleIdAndUserIdIn(Long roleId, Long[] longs);
+
+    List<SysUserRole> findAllByRoleIdInAndUserId(List<Long> roleIds, Long userId);
 
 }

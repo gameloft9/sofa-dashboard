@@ -179,7 +179,8 @@ public class UserAdminController {
         //修改
         dbUser = sysUserService.findUser(user.getUserId());
 
-        UserInfoContextHelper.checkScopePermission(PermissionConstants.User.EDIT,dbUser.getDeptId());
+        if(dbUser.getDeptId() != null)
+            UserInfoContextHelper.checkScopePermission(PermissionConstants.User.EDIT,dbUser.getDeptId());
 
         if (StringUtils.isBlank(user.getLoginName())) {
             throw BusinessException.build("loginName不能为空");

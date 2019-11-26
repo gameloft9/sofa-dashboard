@@ -1,5 +1,6 @@
 package me.izhong.dashboard.web.controller.admin;
 
+import me.izhong.dashboard.manage.service.SysUserService;
 import me.izhong.db.common.annotation.AjaxWrapper;
 import me.izhong.db.common.util.PageRequestUtil;
 import me.izhong.domain.PageModel;
@@ -27,6 +28,9 @@ public class PostAdminController {
 
     @Autowired
     private SysPostService sysPostService;
+
+    @Autowired
+    private SysUserService sysUserService;
 
     @RequiresPermissions(PermissionConstants.Post.VIEW)
     @GetMapping()
@@ -59,7 +63,7 @@ public class PostAdminController {
     @PostMapping("/remove")
     @AjaxWrapper
     public long remove(String ids) throws BusinessException {
-        return sysPostService.deleteByPIds(ids);
+        return sysPostService.removePostInfo(ids);
     }
 
 

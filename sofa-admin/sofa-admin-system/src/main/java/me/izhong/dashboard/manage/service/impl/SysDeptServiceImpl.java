@@ -11,7 +11,6 @@ import me.izhong.db.common.exception.BusinessException;
 import me.izhong.dashboard.manage.service.SysDeptService;
 import me.izhong.db.common.util.CriteriaUtil;
 import me.izhong.dashboard.manage.domain.Ztree;
-import org.apache.shiro.util.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -20,6 +19,7 @@ import org.springframework.data.mongodb.core.aggregation.LookupOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -81,13 +81,29 @@ public class SysDeptServiceImpl extends CrudBaseServiceImpl<Long,SysDept> implem
     }
 
     @Override
-    public boolean checkDeptExistUser(Long deptId) {
+    public void checkExistChildDept(Long deptId) {
+        Assert.notNull(deptId,"");
+        SysDept cur = deptDao.findByDeptId(deptId);
+        Assert.notNull(cur,"");
+        List<SysDept> ps = deptDao.findAllByParentId(deptId);
+        if(ps != null && ps.size() >0){
+            List<String> names = ps.stream().filter(e->!Boolean.TRUE.equals(e.getIsDelete())).map(e->e.getDeptName()).collect(Collectors.toList());
+            if(names.size() > 0 ) {
+                throw BusinessException.build("部门["+cur.getDeptName()+"]存在这些子部门["+names+"]无法删除");
+            }
+        }
+    }
+
+    @Override
+    public void checkDeptExistUser(Long deptId) {
         List<SysUser> us = userDao.findAllByDeptId(deptId);
         if(us !=null && us.size() > 0) {
-            List<String> names = us.stream().map(e->e.getLoginName()).collect(Collectors.toList());
-            log.info("部门{}存在这些用户{}无法删除",deptId,names);
+            List<String> names = us.stream().filter(e->!Boolean.TRUE.equals(e.getIsDelete())).map(e->e.getLoginName()).collect(Collectors.toList());
+            if(names.size() > 0 ) {
+                log.info("部门{}存在这些用户{}无法删除", deptId, names);
+                throw BusinessException.build("部门[" + deptId + "]存在这些用户[" + names + "]无法删除");
+            }
         }
-        return us != null && us.size() > 0;
     }
 
     @Override

@@ -2,7 +2,6 @@ package me.izhong.dashboard.web.controller.admin;
 
 import me.izhong.db.common.util.PageRequestUtil;
 import me.izhong.domain.PageModel;
-import me.izhong.domain.PageRequest;
 import lombok.extern.slf4j.Slf4j;
 import me.izhong.db.common.annotation.AjaxWrapper;
 import me.izhong.dashboard.manage.annotation.Log;
@@ -151,7 +150,7 @@ public class RoleAdminController {
     @PostMapping("/remove")
     @AjaxWrapper
     public long remove(String ids) throws BusinessException {
-        return sysRoleService.deleteRoleByIds(ids);
+        return sysRoleService.removeRoleInfo(ids);
     }
 
     @PostMapping("/checkRoleNameUnique")

@@ -114,13 +114,9 @@ public class DeptAdminController {
     @GetMapping("/remove/{deptId}")
     @AjaxWrapper
     public long remove(@PathVariable("deptId") Long deptId) {
-        if (sysDeptService.selectDeptCount(deptId) > 0) {
-            throw BusinessException.build("存在下级部门,不允许删除");
-        }
-        if (sysDeptService.checkDeptExistUser(deptId)) {
-            throw BusinessException.build("部门存在用户,不允许删除");
-        }
-        return sysDeptService.deleteByPId(deptId);
+        sysDeptService.checkExistChildDept(deptId);
+        sysDeptService.checkDeptExistUser(deptId);
+        return sysDeptService.remove(deptId);
     }
 
     @PostMapping("/checkDeptNameUnique")
