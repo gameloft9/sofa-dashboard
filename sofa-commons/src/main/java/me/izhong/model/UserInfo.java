@@ -2,6 +2,8 @@ package me.izhong.model;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -27,10 +29,19 @@ public class UserInfo implements Serializable {
     private String createBy;
     private String updateBy;
 
+    @JSONField(serialize = false,deserialize = false)
+    private boolean hasAllDeptPerm = false;
+
 
     public UserInfo() {
 
     }
+
+    @Getter
+    @Setter
+    @JSONField(serialize = false,deserialize = false)
+    private static Map<Long,String> deptIdNames = new HashMap<>();
+
 
     @JSONField(serialize = false,deserialize = false)
     private Map<String,Set<Long>> scopes = new HashMap<>();
@@ -63,6 +74,8 @@ public class UserInfo implements Serializable {
     }
 
     public boolean hashScopePermission(String perm, Long deptId){
+        if(hasAllDeptPerm)
+            return true;
         Set<Long> s = scopes.get(perm);
         if(s != null && s.contains(deptId))
             return true;
@@ -70,8 +83,12 @@ public class UserInfo implements Serializable {
     }
 
     public void checkScopePermission(String perm, Long deptId){
-        if(!hashScopePermission(perm,deptId))
-            throw new RuntimeException("缺少数据对应的部门权限:" + perm + ",部门ID:" + deptId) ;
+        if(hasAllDeptPerm)
+            return;
+        if(!hashScopePermission(perm,deptId)) {
+            String notice = deptIdNames.get(deptId);
+            throw new RuntimeException("缺少数据对应的部门权限! 权限:[" + perm + "],部门:" + notice + "[" + deptId + "]");
+        }
     }
 
     @Override

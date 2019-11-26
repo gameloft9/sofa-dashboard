@@ -22,12 +22,10 @@ public class TimedBasedEntity implements Serializable {
     @Indexed
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-    //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @CreateTimeAdvise
     private Date createTime;
 
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-    //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @UpdateTimeAdvise
     private Date updateTime;
 
@@ -35,6 +33,7 @@ public class TimedBasedEntity implements Serializable {
 
     private String updateBy;
 
+    @JSONField(serialize = false,deserialize = false)
     private Boolean isDelete;
 
     /**

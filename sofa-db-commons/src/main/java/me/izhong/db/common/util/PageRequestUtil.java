@@ -113,7 +113,7 @@ public class PageRequestUtil {
         Pageable pageableRequest = org.springframework.data.domain.PageRequest.of((int) request.getPageNum() - 1, (int) request.getPageSize());
         query.with(pageableRequest);
 
-        if(false && request.getDepts() != null && request.getDepts().size() > 0) {
+        if(request.getDepts() != null && request.getDepts().size() > 0) {
             try {
                 Field cField = FieldUtils.getField(query.getClass(), "criteria",true);
                 cField.setAccessible(true);

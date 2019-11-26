@@ -81,7 +81,8 @@ public class UserAdminController {
         searchUser.setIsDelete(false);
 
         PageRequest pageRequest = PageRequestUtil.fromRequest(request);
-        pageRequest.setDepts(UserInfoContextHelper.getLoginUser().getScopeData(PermissionConstants.User.VIEW));
+        if(!UserInfoContextHelper.getLoginUser().isHasAllDeptPerm())
+            pageRequest.setDepts(UserInfoContextHelper.getLoginUser().getScopeData(PermissionConstants.User.VIEW));
 
         PageModel<SysUser> pe = sysUserService.getPage(pageRequest, searchUser);
         List<SysUser> lue = pe.getRows();
@@ -107,10 +108,7 @@ public class UserAdminController {
 
         UserInfoContextHelper.getLoginUser().checkScopePermission(PermissionConstants.User.ADD,user.getDeptId());
 
-        SysUser dbUser = null;
-
-        //新增
-        dbUser = new SysUser();
+        SysUser dbUser = new SysUser();
         if (StringUtils.isBlank(user.getLoginName())) {
             throw BusinessException.build("loginName不能为空");
         }
@@ -139,7 +137,6 @@ public class UserAdminController {
         if (user.getDeptId() != null) {
             SysDept sysDept = sysDeptService.selectDeptByDeptId(user.getDeptId());
             dbUser.setDeptId(user.getDeptId());
-            dbUser.setParentId(sysDept.getParentId());
             dbUser.setDeptName(sysDept.getDeptName());
         }
         dbUser.setRoleIds(user.getRoleIds());
@@ -205,7 +202,6 @@ public class UserAdminController {
         if (user.getDeptId() != null) {
             dbUser.setDeptId(user.getDeptId());
             SysDept sysDept = sysDeptService.selectDeptByDeptId(user.getDeptId());
-            dbUser.setParentId(sysDept.getParentId());
             dbUser.setDeptName(sysDept.getDeptName());
         }
         dbUser.setRoleIds(user.getRoleIds());

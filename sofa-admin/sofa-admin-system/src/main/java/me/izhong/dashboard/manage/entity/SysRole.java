@@ -49,13 +49,13 @@ public class SysRole extends TimedBasedEntity {
     /**
      * 角色排序
      */
-    @Indexed(unique = false)
+    @Indexed
     @Excel(name = "角色排序")
     @NotBlank(message = "显示顺序不能为空")
     private String roleSort;
 
     /**
-     * 数据范围（1：所有数据权限；2：自定义数据权限）
+     * 数据范围
      */
     @NotBlank
     @Excel(name = "数据范围", readConverterExp = "1=所有数据权限,2=自定义数据权限,3=本部门数据权限,4=本部门及以下数据权限")

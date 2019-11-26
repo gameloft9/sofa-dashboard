@@ -28,9 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 自定义Realm 处理登录 权限
@@ -59,7 +58,7 @@ public class UserRealm extends AuthorizingRealm {
         UserInfo user = UserInfoContextHelper.getLoginUser();
         // 角色列表
         Set<String> roles = new HashSet<String>();
-        // 功能列表
+        // 菜单，按钮权限列表
         Set<String> menus = new HashSet<String>();
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
         // 管理员拥有所有权限
@@ -110,10 +109,10 @@ public class UserRealm extends AuthorizingRealm {
         }
         UserInfo loginUser = UserConvertUtil.convert(user);
 
-        String conextpath = ServletUtil.getRequest().getContextPath();
-        String avatorUrl = conextpath + Global.getAvatarMapping();
+        String conextPath = ServletUtil.getRequest().getContextPath();
+        String avatarUrl = conextPath + Global.getAvatarMapping();
         if(StringUtils.isNotBlank(loginUser.getAvatar()) && !loginUser.getAvatar().startsWith("http")) {
-            loginUser.setAvatar(avatorUrl + user.getAvatar());
+            loginUser.setAvatar(avatarUrl + user.getAvatar());
         }
 
         SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(loginUser, password, getName());
@@ -122,21 +121,29 @@ public class UserRealm extends AuthorizingRealm {
         List<SysRole> rs = sysRoleService.selectRolesByUserId(loginUser.getUserId());
         // 实体名称 -> deptIds
         Long deptId = loginUser.getDeptId();
+        if(deptId == null)
+            throw BusinessException.build("用户["+loginUser+"]缺少所属部门记录，不能登陆");
+
         SysDept sysDept = sysDeptService.selectDeptByDeptId(deptId);
         List<Long> desces = sysDept.getDescendents();
-        List<Long> allDeptIds = sysDeptService.selectAllDeptId();
+        List<SysDept> allDepts = sysDeptService.selectAll();
+        List<Long> allDeptIds = allDepts.stream().map(e->e.getDeptId()).collect(Collectors.toList());
 
+        allDepts.forEach(e->{
+            UserInfo.getDeptIdNames().put(e.getDeptId(),e.getDeptName());
+        });
 
+        //遍历用户角色
         rs.forEach(e -> {
             Long roleId = e.getRoleId();
             String scope = e.getDataScope();
-            //String perms = e.getRoleKey();
 
             List<String> rolePerms = sysMenuService.selectPermsByRoleId(roleId);
             List<Long> roleDeptIds = sysRoleService.selectDeptIdsByRoleId(roleId);
             if (rolePerms != null && rolePerms.size() > 0) {
                 rolePerms.forEach(rpk -> {
                     if (StringUtils.equals("1", scope)) {
+                        loginUser.setHasAllDeptPerm(true);
                         loginUser.addScopeData(rpk, allDeptIds);
                     } else if (StringUtils.equals("2", scope)) {
                         loginUser.addScopeData(rpk, roleDeptIds);
