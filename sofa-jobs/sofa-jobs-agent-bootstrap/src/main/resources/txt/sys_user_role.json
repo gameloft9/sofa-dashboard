@@ -1,0 +1,12 @@
+{"_id":{"$oid":"5cf27c23c8877615b19e5132"},"userId":1,"roleId":1}
+{"_id":{"$oid":"5cf522aef2e9290726179466"},"userId":{"$numberLong":"1008"},"roleId":{"$numberLong":"2"},"_class":"me.izhong.tianru.training.entity.UserRole"}
+{"_id":{"$oid":"5d3e7329e0c74d30fbe87cd8"},"userId":{"$numberLong":"1023"},"roleId":{"$numberLong":"2"},"_class":"me.izhong.dashboard.manage.entity.SysUserRole"}
+{"_id":{"$oid":"5d3e7329e0c74d30fbe87cd9"},"userId":{"$numberLong":"1023"},"roleId":{"$numberLong":"1"},"_class":"me.izhong.dashboard.manage.entity.SysUserRole"}
+{"_id":{"$oid":"5dcd5194b50f9d0718ad65d0"},"userId":{"$numberLong":"901"},"roleId":{"$numberLong":"2"},"_class":"me.izhong.dashboard.manage.entity.SysUserRole"}
+{"_id":{"$oid":"5dd93f43e0c74d24885c8752"},"userId":{"$numberLong":"901"},"roleId":{"$numberLong":"23"},"_class":"me.izhong.dashboard.manage.entity.SysUserRole"}
+{"_id":{"$oid":"5dda7a51e0c74d49528d687d"},"userId":{"$numberLong":"1015"},"roleId":{"$numberLong":"26"},"_class":"me.izhong.dashboard.manage.entity.SysUserRole"}
+{"_id":{"$oid":"5ddccc0319edd142b8e6c1a7"},"userId":{"$numberLong":"1002"},"roleId":{"$numberLong":"23"},"_class":"me.izhong.dashboard.manage.entity.SysUserRole"}
+{"_id":{"$oid":"5ddce10619edd123bc7968c6"},"userId":{"$numberLong":"1012"},"roleId":{"$numberLong":"23"},"_class":"me.izhong.dashboard.manage.entity.SysUserRole"}
+{"_id":{"$oid":"5ddce76919edd136805ff116"},"userId":{"$numberLong":"908"},"roleId":{"$numberLong":"2"},"_class":"me.izhong.dashboard.manage.entity.SysUserRole"}
+{"_id":{"$oid":"5ddce77619edd136805ff11b"},"userId":{"$numberLong":"910"},"roleId":{"$numberLong":"2"},"_class":"me.izhong.dashboard.manage.entity.SysUserRole"}
+{"_id":{"$oid":"5ddce77d19edd136805ff11d"},"userId":{"$numberLong":"911"},"roleId":{"$numberLong":"2"},"_class":"me.izhong.dashboard.manage.entity.SysUserRole"}

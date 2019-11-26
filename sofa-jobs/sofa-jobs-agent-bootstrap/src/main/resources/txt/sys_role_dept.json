@@ -1,0 +1,3 @@
+{"_id":{"$oid":"5d35d52ed8dd41d434747600"},"roleId":{"$numberLong":"2"},"deptId":{"$numberLong":"5"},"_class":"me.izhong.dashboard.manage.entity.RoleDept"}
+{"_id":{"$oid":"5d35d52ed8dd41d434747601"},"roleId":{"$numberLong":"2"},"deptId":{"$numberLong":"11"},"_class":"me.izhong.dashboard.manage.entity.RoleDept"}
+{"_id":{"$oid":"5ddcf18619edd147fc31938e"},"roleId":{"$numberLong":"1"},"deptId":{"$numberLong":"10101"},"_class":"me.izhong.dashboard.manage.entity.SysRoleDept"}
