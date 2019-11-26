@@ -173,6 +173,7 @@ public class SysRoleServiceImpl extends CrudBaseServiceImpl<Long,SysRole> implem
     @Transactional
     public int authDataScope(SysRole sysRole) {
         Assert.notNull(sysRole.getRoleId(), "roleId cant be null");
+        Assert.notNull(sysRole.getDataScope(), "roleId cant be null");
         SysRole dbSysRole = roleDao.findByRoleId(sysRole.getRoleId());
         //dbSysRole.setRoleName(sysRole.getRoleName());
         //dbSysRole.setRoleKey(sysRole.getRoleKey());

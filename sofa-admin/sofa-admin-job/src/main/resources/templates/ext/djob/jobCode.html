@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head>
 	<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
 	<link th:href="@{/css/font-awesome.min.css}" rel="stylesheet"/>
@@ -95,7 +95,7 @@
 					<ul class="nav navbar-nav">
 						</li>
 						<li id="save" >
-							<a href="javascript:;" >
+							<a href="javascript:;" shiro:hasPermission="ext:job:code:edit">
 								<i class="fa fa-fw fa-save" ></i>
 								保存
 							</a>
@@ -133,7 +133,7 @@
 					<hr>
 					<div class="form-group">
 						<div class="col-sm-offset-3 col-sm-6">
-							<button type="button" class="btn btn-primary ok" >保存</button>
+							<button type="button" class="btn btn-primary ok">保存</button>
 							<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
 						</div>
 					</div>
@@ -178,7 +178,7 @@
 <script>
     var id = '[[${jobId}]]';
     var ideMode = "text/x-java";
-    var prefix = ctx + "monitor/djob";
+    var prefix = ctx + "ext/djob";
 
     $(function() {
 

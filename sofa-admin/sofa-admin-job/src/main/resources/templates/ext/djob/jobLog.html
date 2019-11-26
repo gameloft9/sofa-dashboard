@@ -42,16 +42,19 @@
 			</div>
 			
 			<div class="btn-group-sm" id="toolbar" role="group">
-                <a class="btn btn-danger" onclick="clearLog(null,1)" shiro:hasPermission="monitor:job:remove">
+                <a class="btn btn-danger" onclick="clearLog(null,1)" shiro:hasPermission="ext:job:log:clean">
 	                <i class="fa fa-remove"></i> 清理一个月以前的日志
 	            </a>
-				<a class="btn btn-danger" onclick="clearLog(null,9)" shiro:hasPermission="monitor:job:remove">
+				<a class="btn btn-danger" onclick="clearLog(null,5)" shiro:hasPermission="ext:job:log:clean">
+					<i class="fa fa-remove"></i> 清理100条之前日志
+				</a>
+				<a class="btn btn-danger" onclick="clearLog(null,9)" shiro:hasPermission="ext:job:log:clean">
 					<i class="fa fa-remove"></i> 清理所有日志
 				</a>
-	            <a class="btn btn-danger multiple disabled" onclick="clearSelected()" shiro:hasPermission="monitor:job:remove">
+	            <a class="btn btn-danger multiple disabled" onclick="clearSelected()" shiro:hasPermission="ext:job:log:clean">
 	                <i class="fa fa-trash"></i> 删除选中日志
 	            </a>
-				<a class="btn btn-danger single disabled" onclick="kill()" shiro:hasPermission="monitor:job:edit">
+				<a class="btn btn-danger single disabled" onclick="kill()" shiro:hasPermission="ext:job:operate">
 					<i class="fa fa-edit"></i> 停止
 				</a>
 	        </div>
@@ -63,8 +66,8 @@
 	</div>
 	<th:block th:include="include :: footer" />
 	<script th:inline="javascript">
-		var detailFlag = [[${@permission.hasPermi('monitor:job:detail')}]];
-		var prefix = ctx + "monitor/djob/log";
+		var detailFlag = [[${@permission.hasPermi('ext:job:log:view')}]];
+		var prefix = ctx + "ext/djob/log";
 
 		$(function() {
 		    var options = {
@@ -73,7 +76,7 @@
 		        detailUrl: prefix + "/detail/{id}",
 		        removeUrl: prefix + "/remove",
 		        exportUrl: prefix + "/export",
-		        sortName: "createTime",
+		        sortName: "jobLogId",
 		        sortOrder: "desc",
 		        modalName: "调度日志",
 		        columns: [{
@@ -81,23 +84,28 @@
 		        },
 		        {
 		            field: 'jobLogId',
-		            title: '日志编号'
+		            title: '日志编号',
+                    sortable: true
 		        },
 		        {
 		            field: 'jobDesc',
-		            title: '任务名称'
+		            title: '任务名称',
+                    sortable: true
 		        },
                     {
                         field: 'blockStrategy',
-                        title: '阻塞策略'
+                        title: '阻塞策略',
+                        sortable: true
                     },
                     {
                         field: 'triggerType',
-                        title: '触发类型'
+                        title: '触发类型',
+                        sortable: true
                     },
                     {
                         field: 'executorAddress',
-                        title: '执行地址'
+                        title: '执行地址',
+                        sortable: true
                     },
 				{
 					field: 'triggerTime',
@@ -113,7 +121,8 @@
 		        },
 				{
 		            field: 'handleCode',
-		            title: '执行结果'
+		            title: '执行结果',
+                    sortable: true
 		        },
 				{
 					field: 'handleMsg',

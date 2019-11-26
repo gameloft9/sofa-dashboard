@@ -53,6 +53,12 @@ public class ZJobInfoServiceImpl extends CrudBaseServiceImpl<Long,ZJobInfo> impl
 		return super.selectList(query, null, null);
 	}
 
+	@Override
+	public List<ZJobInfo> selectByJobGroupId(Long jobGroupId) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("jobGroupId").is(jobGroupId));
+		return super.selectList(query, null, null);	}
+
 	@Transactional
 	@Override
 	public void scheduleUpdate(ZJobInfo jobInfo) {
@@ -282,6 +288,8 @@ public class ZJobInfoServiceImpl extends CrudBaseServiceImpl<Long,ZJobInfo> impl
 
 		exists_jobInfo.setTriggerStatus(jobInfo.getTriggerStatus());
 		exists_jobInfo.setRemark(jobInfo.getRemark());
+        exists_jobInfo.setCreateBy(jobInfo.getCreateBy());
+        exists_jobInfo.setUpdateBy(jobInfo.getUpdateBy());
 
         return zJobInfoService.update(exists_jobInfo);
 	}
@@ -352,9 +360,7 @@ public class ZJobInfoServiceImpl extends CrudBaseServiceImpl<Long,ZJobInfo> impl
 
 		if (groupList!=null && !groupList.isEmpty()) {
 			for (ZJobGroup group: groupList) {
-				if (group.getRegistryList()!=null && !group.getRegistryList().isEmpty()) {
-					executerAddressSet.addAll(group.getRegistryList());
-				}
+
 			}
 		}
 

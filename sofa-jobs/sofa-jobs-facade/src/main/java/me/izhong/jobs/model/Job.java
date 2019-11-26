@@ -24,7 +24,6 @@ public class Job implements Serializable {
     private String remark;
 
     private String executorRouteStrategy;	// 执行器路由策略
-    private String executorHandler;		    // 执行器，任务Handler名称
     private String executorParam;		    // 执行器，任务参数
     private String executorBlockStrategy;	// 阻塞处理策略
     private Long executorTimeout;     		// 任务执行超时时间，单位秒

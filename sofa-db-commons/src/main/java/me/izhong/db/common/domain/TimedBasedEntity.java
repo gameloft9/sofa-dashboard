@@ -19,7 +19,7 @@ public class TimedBasedEntity implements Serializable {
     @JSONField(serialize = false,deserialize = false)
     private ObjectId id;
 
-    @Indexed(unique = false)
+    @Indexed
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")

@@ -28,7 +28,5 @@ public class ZJobGroup extends TimedBasedEntity implements Serializable {
     private String groupName;
 
     private Long order;
-    private List<String> addressList;   // 执行器地址列表，多地址逗号分隔(手动录入)
-    private List<String> registryList;  // 执行器地址列表(系统注册)
 
 }

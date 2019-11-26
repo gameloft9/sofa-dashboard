@@ -1,21 +1,23 @@
 package me.izhong.jobs.admin.controller;
 
-
+import lombok.extern.slf4j.Slf4j;
 import me.izhong.common.util.Convert;
 import me.izhong.common.util.DateUtil;
+import me.izhong.dashboard.manage.annotation.Log;
+import me.izhong.dashboard.manage.constants.BusinessType;
+import me.izhong.dashboard.manage.util.StringUtil;
 import me.izhong.db.common.annotation.AjaxWrapper;
-
 import me.izhong.db.common.exception.BusinessException;
 import me.izhong.db.common.util.PageRequestUtil;
 import me.izhong.domain.PageModel;
+import me.izhong.jobs.admin.config.JobPermissions;
 import me.izhong.jobs.admin.service.JobServiceReference;
 import me.izhong.jobs.model.Job;
 import me.izhong.jobs.model.JobGroup;
 import me.izhong.jobs.model.JobLog;
 import me.izhong.jobs.model.LogResult;
 import me.izhong.model.ReturnT;
-import me.izhong.dashboard.manage.util.StringUtil;
-import me.izhong.jobs.admin.service.JobServiceReference;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,22 +25,20 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.List;
 
 @Controller
-@RequestMapping("/monitor/djob/log")
+@RequestMapping("/ext/djob/log")
+@Slf4j
 public class JobLogController {
-	private static Logger logger = LoggerFactory.getLogger(JobLogController.class);
 
 	@Autowired(required = false)
 	private JobServiceReference jobServiceReference;
 
-	private static String prefix = "monitor/djob";
+	private static String prefix = "ext/djob";
 
 	@RequestMapping("")
 	public String index(HttpServletRequest request, Model model, Long jobId) {
@@ -90,7 +90,7 @@ public class JobLogController {
 		return jobServiceReference.jobService.logPageList(PageRequestUtil.fromRequest(request),jLog);
 	}
 
-
+	@RequiresPermissions(JobPermissions.JobInfo.LOG_VIEW)
 	@RequestMapping("/detail/{jobLogId}")
 	public String logDetailPage(@PathVariable Long jobLogId, Model model){
 		JobLog jobLog = jobServiceReference.jobService.findJobLogByJobLogId(jobLogId);
@@ -101,6 +101,7 @@ public class JobLogController {
 		return prefix +  "/jobLogResult";
 	}
 
+	@RequiresPermissions(JobPermissions.JobInfo.LOG_VIEW)
 	@RequestMapping("/logDetailPage")
 	public String logDetailPage(long logId, Model model){
 
@@ -113,6 +114,7 @@ public class JobLogController {
 		return prefix +  "/jobLogDetail";
 	}
 
+	@RequiresPermissions(JobPermissions.JobInfo.LOG_VIEW)
 	@RequestMapping("/logDetailCat")
 	@AjaxWrapper
 	public LogResult logDetailCat(String executorAddress, long triggerTime, long jobId, long jobLogId, int fromLineNum){
@@ -128,11 +130,13 @@ public class JobLogController {
 
 			return logResult;
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			throw BusinessException.build(e.getMessage());
 		}
 	}
 
+	@Log(title = "定时任务", businessType = BusinessType.OPERATE)
+	@RequiresPermissions(JobPermissions.JobInfo.OPERATE)
 	@RequestMapping("/kill")
 	@AjaxWrapper
 	public ReturnT<String> kill(long jobLogId){
@@ -151,13 +155,14 @@ public class JobLogController {
 		try {
 			runResult = jobServiceReference.jobService.kill(jobLog.getJobLogId());
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			runResult = new ReturnT<String>(500, e.getMessage());
 		}
 		return runResult;
 	}
 
-
+	@Log(title = "定时任务日志", businessType = BusinessType.DELETE)
+	@RequiresPermissions(JobPermissions.JobInfo.LOG_CLEAN)
 	@RequestMapping("/clearLog")
 	@AjaxWrapper
 	public ReturnT<String> clearLog(Long jobId, Integer type){
@@ -174,7 +179,7 @@ public class JobLogController {
 		} else if (type == 4) {
 			clearBeforeTime = DateUtil.addYears(new Date(), -1);	// 清理一年之前日志数据
 		} else if (type == 5) {
-			clearBeforeNum = 1000;		// 清理一千条以前日志数据
+			clearBeforeNum = 100;		// 清理100条以前日志数据
 		} else if (type == 6) {
 			clearBeforeNum = 10000;		// 清理一万条以前日志数据
 		} else if (type == 7) {
@@ -191,7 +196,9 @@ public class JobLogController {
 		return ReturnT.SUCCESS;
 	}
 
-    @RequestMapping("/clearLogByIds")
+	@Log(title = "定时任务日志", businessType = BusinessType.DELETE)
+	@RequiresPermissions(JobPermissions.JobInfo.LOG_CLEAN)
+	@RequestMapping("/clearLogByIds")
     @AjaxWrapper
     public ReturnT<String> clearLog(String jobLogIds){
         jobServiceReference.jobService.clearLog(Convert.toLongArray(jobLogIds));

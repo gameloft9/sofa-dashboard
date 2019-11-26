@@ -46,7 +46,7 @@ public class ExecGrooyScript implements IBatch {
 		binding.setProperty("ac", ContextUtil.getApplicationContext());
 		binding.setProperty("remoteLog", logger);
 		binding.setProperty("log", log);
-		binding.setProperty("envs", context.getEnvs());
+		//binding.setProperty("envs", context.getEnvs());
 		binding.setProperty("params", context.getParams());
 
 		GroovyShell shell = new GroovyShell(binding);

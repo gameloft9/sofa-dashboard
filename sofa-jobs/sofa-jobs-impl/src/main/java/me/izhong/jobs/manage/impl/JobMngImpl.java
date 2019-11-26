@@ -103,8 +103,7 @@ public class JobMngImpl implements IJobMngFacade {
     public ReturnT<String> update(Job job) {
         ZJobInfo jobInfo = new ZJobInfo();
         BeanUtils.copyProperties(job,jobInfo);
-        jobInfoService.updateJob(jobInfo);
-        return ReturnT.SUCCESS;
+        return ReturnT.successReturn(jobInfoService.updateJob(jobInfo));
     }
 
     @Override
@@ -125,8 +124,8 @@ public class JobMngImpl implements IJobMngFacade {
     }
 
     @Override
-    public ReturnT<String> trigger(Long jobId,TriggerTypeEnum triggerType) {
-        JobTriggerPoolHelper.trigger(jobId,triggerType, -1, null);
+    public ReturnT<String> trigger(Long jobId,TriggerTypeEnum triggerType,int failRetryCount, String executorParam) {
+        JobTriggerPoolHelper.trigger(jobId,triggerType, failRetryCount, executorParam);
         return ReturnT.SUCCESS;
     }
 
@@ -349,9 +348,21 @@ public class JobMngImpl implements IJobMngFacade {
         return null;
     }
 
+    @Transactional
     @Override
     public JobScript addJobScript(JobScript script) {
+        if(script.getJobId() == null) {
+            throw BusinessException.build("请求jobId不能为空");
+        }
         ZJobScript dbBean = jobScriptService.insert(JobScriptUtil.toDbBean(script));
+        if(dbBean == null) {
+            throw BusinessException.build("保存脚本异常");
+        }else if(dbBean.getJobId() ==null) {
+            throw BusinessException.build("保存脚本异常,jobId不能为空");
+        }
+        Long jobScriptId = dbBean.getJobScriptId();
+        jobInfoService.updateJobScriptId(dbBean.getJobId(),jobScriptId);
+
         return JobScriptUtil.toRpcBean(dbBean);
     }
 
@@ -398,6 +409,7 @@ public class JobMngImpl implements IJobMngFacade {
         return JobGroupUtil.toRpcBean(db);
     }
 
+    @Transactional
     @Override
     public JobGroup updateJobGroup(JobGroup group) {
         ZJobGroup db = jobGroupService.update(JobGroupUtil.toDbBean(group));
@@ -409,6 +421,11 @@ public class JobMngImpl implements IJobMngFacade {
     public long removeJobGroup(List<Long> groupIds) {
         long c = 0;
         for(Long l:groupIds){
+            List<ZJobInfo> lls = jobInfoService.selectByJobGroupId(l);
+            if(lls != null && lls.size() > 0) {
+                ZJobInfo zJobInfo = lls.get(0);
+                throw BusinessException.build("任务组[" + zJobInfo.getJobGroupId() + "]删除失败,有任务[" + zJobInfo.getJobDesc() + "]在使用");
+            }
             c += jobGroupService.deleteByPId(l);
         }
         return c;
