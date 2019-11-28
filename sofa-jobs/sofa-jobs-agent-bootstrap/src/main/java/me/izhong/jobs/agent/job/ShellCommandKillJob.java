@@ -101,11 +101,10 @@ public class ShellCommandKillJob extends IJobHandler {
             log.info("kill任务结束了: triggerId:{} exitValue:{}",triggerId,exitValue);
             //记录执行状态信息
             jobMng.uploadJobErrorStatics(triggerId, new Date(), 400, exitValue == 0 ? "执行失败（终止成功）":"终止任务异常");
-
             return ReturnT.SUCCESS;
         } catch (Throwable e) {
             log.error("kill任务失败 triggerId:{}",triggerId, e);
-            jobMng.uploadJobErrorStatics(triggerId,new Date(), 401, "kill任务执行异常:" + e.getMessage());
+            jobMng.uploadJobErrorStatics(triggerId,new Date(), 400, "kill任务执行异常:" + e.getMessage());
             return ReturnT.FAIL;
         } finally {
 

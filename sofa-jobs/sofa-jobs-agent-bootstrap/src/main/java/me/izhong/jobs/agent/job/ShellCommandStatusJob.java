@@ -1,22 +1,13 @@
 package me.izhong.jobs.agent.job;
 
-import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
-import me.izhong.common.util.DateUtil;
 import me.izhong.jobs.agent.bean.JobContext;
 import me.izhong.jobs.agent.bean.JobsConfigBean;
-import me.izhong.jobs.agent.exp.JobExecutionException;
-import me.izhong.jobs.agent.service.JobServiceReference;
 import me.izhong.jobs.agent.util.ContextUtil;
-import me.izhong.jobs.manage.IJobMngFacade;
 import me.izhong.model.ReturnT;
-import org.apache.commons.exec.*;
-import org.apache.commons.lang3.StringUtils;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.ExecuteException;
 
 /**
  * 执行script脚本的定时任务，通过run.sh调起来
@@ -62,6 +53,7 @@ public class ShellCommandStatusJob extends IJobHandler {
             }
             return ReturnT.SUCCESS;
         } catch (ExecuteException e) {
+            log.error("",e);
             int exitValue = e.getExitValue();
             log.info("status任务异常结束了: triggerId:{} exitValue:{}",triggerId,exitValue);
             if(exitValue == 2) {

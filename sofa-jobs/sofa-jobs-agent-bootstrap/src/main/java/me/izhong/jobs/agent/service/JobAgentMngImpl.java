@@ -93,9 +93,9 @@ public class JobAgentMngImpl implements IJobAgentMngFacade {
         // filePath/yyyyMMdd/3_9999.log
         String logFileName = logFilePath.getPath()
                 .concat(File.separator)
-                .concat(String.valueOf(jobId))
-                .concat("_")
                 .concat(String.valueOf(logId))
+                .concat("_")
+                .concat(String.valueOf(jobId))
                 .concat(".txt");
 
         // valid log file

@@ -164,11 +164,6 @@ public class JobScheduleHelper {
                                     }
 
                                 }
-
-                            }
-
-                            // 3、updateJobGroup trigger info
-                            for (ZJobInfo jobInfo: scheduleList) {
                                 zJobInfoService.scheduleUpdate(jobInfo);
                             }
                         }

@@ -57,7 +57,7 @@ public class JobStateMonitorHelper {
                             for (ZJobLog jobLog : jobLogs) {
                                 if(jobLog.getTriggerCode() != null && jobLog.getTriggerCode().intValue() !=0) {
                                     //触发失败的任务 直接关闭
-                                    setJobLogResult(jobLog, 405, "异常结束，超时未执行(stats触发)");
+                                    setJobLogResult(jobLog, 404, "异常结束，超时未执行(stats触发)");
                                     continue;
                                 }
                                 //
@@ -80,8 +80,11 @@ public class JobStateMonitorHelper {
                                         log.info("检测任务,收到任务运行状态, jobId:{}jobDesc:{} jobLogId:{} code:{} content:{} message:{}", jobLog.getJobId(), jobLog.getJobDesc(), jobLog.getJobLogId(), code, content, message);
 
                                         //任务已经结束
+                                        Date oneMinutesAgo = DateUtils.addMinutes(new Date(),-1);
+                                        Date cTime = jobLog.getCreateTime();
                                         if (StringUtils.equals(content, "DONE")) {
-                                            setJobLogResult(jobLog, 405, "异常结束,进程没找到(stats触发)");
+                                            if(cTime == null || cTime.before(oneMinutesAgo))
+                                                setJobLogResult(jobLog, 404, "异常结束,进程没找到(stats触发)");
                                         }
                                     }
                                 } catch (Exception jobLogException) {
@@ -92,7 +95,7 @@ public class JobStateMonitorHelper {
                                         if (triggerTimeDes.before(new Date())) {
                                             //检测报错了，过去了一分钟，还没吊起任务，直接失败
                                             if (jobLog.getHandleCode() == null) {
-                                                setJobLogResult(jobLog, 405, "异常结束，超时未执行(stats触发)");
+                                                setJobLogResult(jobLog, 404, "异常结束，超时未执行(stats触发)");
                                             }
                                         }
                                     }

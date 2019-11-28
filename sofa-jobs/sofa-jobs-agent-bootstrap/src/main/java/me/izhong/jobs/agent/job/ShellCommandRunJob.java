@@ -11,10 +11,7 @@ import me.izhong.jobs.agent.service.JobServiceReference;
 import me.izhong.jobs.agent.util.ContextUtil;
 import me.izhong.jobs.manage.IJobMngFacade;
 import me.izhong.model.ReturnT;
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.ExecuteWatchdog;
-import org.apache.commons.exec.PumpStreamHandler;
+import org.apache.commons.exec.*;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -94,7 +91,7 @@ public class ShellCommandRunJob extends IJobHandler {
                 throw new JobExecutionException("日志文件路径不存在:"+configBean.getLogDir());
             }
             String dateString = new SimpleDateFormat("yyyyMMdd").format(new Date());
-            logFile = new File(configBean.getLogDir() + File.separator + dateString + File.separator + +jobId + "_" + triggerId + ".txt");
+            logFile = new File(configBean.getLogDir() + File.separator + dateString + File.separator + triggerId + "_" + jobId + ".txt");
 
             File parentDir = logFile.getParentFile();
             if(!parentDir.exists()){
@@ -122,12 +119,21 @@ public class ShellCommandRunJob extends IJobHandler {
             int exitValue = shellExecutor.execute(cmdLine);
             log.info("run.sh任务结束了: triggerId:{} exitValue:{} 上送结果信息",triggerId,exitValue);
             //记录执行状态信息
-            jobMng.uploadJobEndStatics(triggerId,new Date(), exitValue, exitValue == 0 ? "执行成功":"执行失败");
+            jobMng.uploadJobEndStatics(triggerId,new Date(), exitValue, exitValue == 0 ? "执行成功":"执行失败"+exitValue);
 
             return ReturnT.SUCCESS;
+        } catch (ExecuteException e) {
+            log.error("",e);
+            int exitValue = e.getExitValue();
+            if(exitValue == 143) {
+                log.info("任务被kill了");
+                jobMng.uploadJobEndStatics(triggerId,new Date(), 405, "执行失败143");
+            }
+            log.info("run.sh任务异常结束了: triggerId:{} exitValue:{}",triggerId,exitValue);
+            return ReturnT.FAIL;
         } catch (Throwable e) {
-            log.error("任务失败 triggerId:{}",triggerId, e);
-            jobMng.uploadJobEndStatics(triggerId,new Date(), 254, "执行异常:" + e.getMessage());
+            log.error("run.sh任务失败 triggerId:{}",triggerId, e);
+            jobMng.uploadJobEndStatics(triggerId,new Date(), 405, "执行异常:" + e.getMessage());
             return ReturnT.FAIL;
         } finally {
 

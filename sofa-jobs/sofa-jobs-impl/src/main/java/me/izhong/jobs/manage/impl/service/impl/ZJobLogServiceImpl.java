@@ -101,6 +101,7 @@ public class ZJobLogServiceImpl extends CrudBaseServiceImpl<Long,ZJobLog> implem
             update.set("executorParam",executorParam);
         update.set("triggerCode",triggerCode);
         update.set("triggerMsg",triggerMsg);
+        update.set("updateTime",new Date());
         ZJobLog ur = mongoTemplate.findAndModify(query, update, options, ZJobLog.class);
         //log.info("返回新值:{},{}",ur.getTriggerCode(),ur.getTriggerMsg());
     }
@@ -113,6 +114,7 @@ public class ZJobLogServiceImpl extends CrudBaseServiceImpl<Long,ZJobLog> implem
 
         Update update = new Update();
         update.set("handleTime",startTime);
+        update.set("updateTime",new Date());
         mongoTemplate.findAndModify(query, update, ZJobLog.class);
     }
 
@@ -125,6 +127,7 @@ public class ZJobLogServiceImpl extends CrudBaseServiceImpl<Long,ZJobLog> implem
         Update update = new Update();
         update.set("handleCode",handleCode);
         update.set("handleMsg",handleMsg);
+        update.set("updateTime",new Date());
         mongoTemplate.findAndModify(query, update, ZJobLog.class);
     }
 
@@ -136,6 +139,7 @@ public class ZJobLogServiceImpl extends CrudBaseServiceImpl<Long,ZJobLog> implem
 
         Update update = new Update();
         update.set("alarmStatus",newStatus);
+        update.set("updateTime",new Date());
         UpdateResult ur = mongoTemplate.updateMulti(query, update, ZJobLog.class);
         return ur.getModifiedCount();
     }
@@ -152,6 +156,7 @@ public class ZJobLogServiceImpl extends CrudBaseServiceImpl<Long,ZJobLog> implem
 
         Update update = new Update();
         update.set("executorAddress",address);
+        update.set("updateTime",new Date());
         mongoTemplate.findAndModify(query, update, options,ZJobLog.class);
     }
 
