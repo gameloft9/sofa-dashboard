@@ -75,7 +75,7 @@ public class ShellCommandRunJob extends IJobHandler {
             String shellCommand = SHName + " " + scriptDir
                     + "/"+ command
                     + " -DisJobAgent=true -DscriptType=groovy -DsTime=" + dateTime
-                    + " -DjobId=" + jobId + " -DtriggerId=" + triggerId;
+                    + " -DjobId=" + jobId + " -DtriggerId=" + triggerId + " -Dtimeout=" + timeout;
             log.info("shellCommand:{}", shellCommand);
 
             DefaultExecutor shellExecutor = new DefaultExecutor();
@@ -127,7 +127,13 @@ public class ShellCommandRunJob extends IJobHandler {
             int exitValue = e.getExitValue();
             if(exitValue == 143) {
                 log.info("任务被kill了");
-                jobMng.uploadJobEndStatics(triggerId,new Date(), 405, "执行失败143");
+                jobMng.uploadJobEndStatics(triggerId,new Date(), 405, "执行失败:被kill了");
+            } else if(exitValue == 2) {
+                jobMng.uploadJobEndStatics(triggerId,new Date(), 405, "执行失败:脚本没有配置");
+            } else if(exitValue == 3) {
+                jobMng.uploadJobEndStatics(triggerId,new Date(), 405, "执行失败:参数解析异常");
+            } else {
+                jobMng.uploadJobEndStatics(triggerId,new Date(), 405, "执行失败:"+exitValue+"查询日志");
             }
             log.info("run.sh任务异常结束了: triggerId:{} exitValue:{}",triggerId,exitValue);
             return ReturnT.FAIL;

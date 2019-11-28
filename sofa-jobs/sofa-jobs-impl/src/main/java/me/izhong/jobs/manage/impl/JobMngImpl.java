@@ -267,8 +267,8 @@ public class JobMngImpl implements IJobMngFacade {
         if(jobLog != null) {
             if(jobLog.getHandleCode() != null) {
                 log.info("job已经执行结束忽略kill消息");
-                jobLog.setHandleMsg((jobLog.getHandleMsg() == null ? "" : jobLog.getHandleMsg()) + ":" + message);
-                jobLogService.update(jobLog);
+                //jobLog.setHandleMsg((jobLog.getHandleMsg() == null ? "" : jobLog.getHandleMsg()) + ":" + message);
+                //jobLogService.update(jobLog);
                 return;
             }
             jobLog.setFinishHandleTime(endTime);

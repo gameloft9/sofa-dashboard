@@ -46,6 +46,8 @@ public class ExecGrooyScript implements IBatch {
 		binding.setProperty("ac", ContextUtil.getApplicationContext());
 		binding.setProperty("remoteLog", logger);
 		binding.setProperty("log", log);
+		binding.setProperty("jobId", context.getJobId());
+		binding.setProperty("triggerId", context.getTriggerId());
 		//binding.setProperty("envs", context.getEnvs());
 		binding.setProperty("params", context.getParams());
 

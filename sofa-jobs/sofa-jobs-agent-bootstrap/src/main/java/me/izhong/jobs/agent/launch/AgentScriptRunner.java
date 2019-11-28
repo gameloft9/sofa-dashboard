@@ -65,6 +65,7 @@ public class AgentScriptRunner implements ApplicationRunner {
                 JobScript jobScript = facade.findCurrentJobScriptByJobId(jobId);
                 if(jobScript == null) {
                     log.info("任务{}的Script未找到，检查是否配置了脚本",jobId );
+                    System.exit(2);
                     throw new Exception("任务"+jobId+"的Script未找到，检查是否配置了脚本");
                 }
                 JobLog jobLog = facade.findJobLogByJobLogId(triggerId);
@@ -95,7 +96,7 @@ public class AgentScriptRunner implements ApplicationRunner {
                 String paramsString = jobLog.getExecutorParam();
                 //String paramsString = System.getProperty("params");
                 log.info("params:{}", paramsString);
-                Map<String, String> params;
+                Map<String, String> params = new HashMap<>();;
                 if(StringUtils.isNotBlank(paramsString)) {
                     if(paramsString.startsWith("{\"")) {
                         params = JSONObject.parseObject(paramsString, new TypeReference<Map<String, String>>() {
@@ -104,10 +105,8 @@ public class AgentScriptRunner implements ApplicationRunner {
                         params = StringUtil.parseParams(paramsString);
                     } else {
                         log.info("无法解析参数");
-                        return;
+                        System.exit(3);
                     }
-                } else {
-                    params = new HashMap<>();
                 }
                 //log.info("params2:{}",params);
 
@@ -116,7 +115,7 @@ public class AgentScriptRunner implements ApplicationRunner {
                 context.setJobId(jobId);
                 context.setScript(script);
                 try {
-                    context.setTimeout(Long.valueOf(System.getProperty("jobId")));
+                    context.setTimeout(Long.valueOf(System.getProperty("timeout")));
                 } catch (Exception e) {
                     context.setTimeout(-1);
                 }

@@ -99,8 +99,8 @@ public class ShellCommandKillJob extends IJobHandler {
             CommandLine cmdLine = CommandLine.parse(shellCommand);
             int exitValue = shellExecutor.execute(cmdLine);
             log.info("kill任务结束了: triggerId:{} exitValue:{}",triggerId,exitValue);
-            //记录执行状态信息
-            jobMng.uploadJobErrorStatics(triggerId, new Date(), 400, exitValue == 0 ? "执行失败（终止成功）":"终止任务异常");
+            //记录执行状态信息 原来那个任务能返回，它可以自己记录
+            //jobMng.uploadJobErrorStatics(triggerId, new Date(), 400, exitValue == 0 ? "执行失败（终止成功）":"终止任务异常");
             return ReturnT.SUCCESS;
         } catch (Throwable e) {
             log.error("kill任务失败 triggerId:{}",triggerId, e);
