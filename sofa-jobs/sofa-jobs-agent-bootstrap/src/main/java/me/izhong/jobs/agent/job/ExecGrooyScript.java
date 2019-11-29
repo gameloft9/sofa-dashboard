@@ -9,6 +9,8 @@ import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
@@ -41,11 +43,12 @@ public class ExecGrooyScript implements IBatch {
 
 		AgentLog logger = context.getLog();
 
+		Logger slfLog = LoggerFactory.getLogger("脚本日志");
 		log.info("envs:{} params:{}",context.getEnvs(),context.getParams());
 		Binding binding = new Binding();
 		binding.setProperty("ac", ContextUtil.getApplicationContext());
 		binding.setProperty("remoteLog", logger);
-		binding.setProperty("log", log);
+		binding.setProperty("log", slfLog);
 		binding.setProperty("jobId", context.getJobId());
 		binding.setProperty("triggerId", context.getTriggerId());
 		//binding.setProperty("envs", context.getEnvs());
