@@ -291,6 +291,9 @@ public class SysUserServiceImpl extends CrudBaseServiceImpl<Long,SysUser> implem
     @Override
     public void deleteAllUserInfoByUserId(Long userId) {
         SysUser sysUser = findUser(userId);
+        if (SysUser.isAdmin(userId)) {
+            throw BusinessException.build("不允许删除超级管理员用户");
+        }
         //删除用户角色
         long delRoleCount = sysRoleService.deleteAuthUsers(userId);
         //删除用户岗位
