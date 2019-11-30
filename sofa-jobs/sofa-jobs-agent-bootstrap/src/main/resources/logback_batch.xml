@@ -6,7 +6,7 @@
 
 	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
-			<pattern>%d{HH:mm:ss.SSS} %-5level [%.15thread][%X{_traceId}] %logger{16} - %.-4096msg%n</pattern>
+			<pattern>%d{HH:mm:ss.SSS} %-5level [%.20thread] %logger{26} - %.-4096msg%n</pattern>
 		</encoder>
 	</appender>
 
